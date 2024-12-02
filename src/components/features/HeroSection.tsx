@@ -75,7 +75,7 @@ const HeroSection = () => {
 
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <span className="text-white font-bold">Join 128 700 Insiders</span>
+                  <span className="text-white font-bold">Join +128 700 Insiders</span>
                   <div className="flex -space-x-1">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />

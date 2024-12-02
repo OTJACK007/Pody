@@ -73,7 +73,7 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <button className="hidden md:flex items-center space-x-2 h-10 px-4 bg-secondary/20 text-white hover:bg-secondary/30 rounded-lg transition-colors">
             <img 
-              src="https://static.wixstatic.com/media/c67dd6_955397943b4b4236830c9d02e7bfedc6~mv2.png" 
+              src="https://static.wixstatic.com/media/c67dd6_6c38c4c1f3524c42b5c7c30b68fdd9bf~mv2.png" 
               alt="Discord"
               className="w-5 h-5"
             />

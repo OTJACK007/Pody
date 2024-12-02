@@ -51,7 +51,7 @@ const FeaturesMenu = ({ isOpen }: FeaturesMenuProps) => {
       title: 'Key Insights Extraction',
       description: 'Automatically identify and highlight key takeaways from each episode.',
       videoUrl: 'https://video.wixstatic.com/video/c67dd6_8c436b9b6e42468a9e2b68ea49868528/1080p/mp4/file.mp4',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1616628188502-383885dcd579'
+      thumbnailUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800&auto=format&fit=crop&q=60'
     },
     {
       id: '7',
