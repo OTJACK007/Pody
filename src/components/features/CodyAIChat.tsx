@@ -72,10 +72,10 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
         <ModalHeader className="flex items-center gap-4">
           <div className="relative">
             <Avatar
-              src="https://static.wixstatic.com/shapes/c67dd6_53baa9a980544d87b59c68b9b0020981.svg"
+              src="https://static.wixstatic.com/media/c67dd6_ac4955e964b5498f944b0d11d6415b7c~mv2.jpg"
               className="w-10 h-10"
             />
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full animate-pulse"></span>
           </div>
           <div>
             <h3 className={`text-xl font-semibold ${
@@ -100,7 +100,7 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
                 >
                   <Avatar
                     src={message.type === 'assistant' 
-                      ? "https://static.wixstatic.com/shapes/c67dd6_53baa9a980544d87b59c68b9b0020981.svg"
+                      ? "https://static.wixstatic.com/media/c67dd6_ac4955e964b5498f944b0d11d6415b7c~mv2.jpg"
                       : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
                     }
                     className="w-8 h-8"
@@ -132,7 +132,7 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
               {isTyping && (
                 <div className="flex items-center gap-2">
                   <Avatar
-                    src="https://static.wixstatic.com/shapes/c67dd6_53baa9a980544d87b59c68b9b0020981.svg"
+                    src="https://static.wixstatic.com/media/c67dd6_ac4955e964b5498f944b0d11d6415b7c~mv2.jpg"
                     className="w-8 h-8"
                   />
                   <div className="flex gap-1">
