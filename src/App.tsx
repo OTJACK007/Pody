@@ -21,6 +21,7 @@ import LanguageSettings from './pages/dashboard/settings/LanguageSettings';
 import BillingSettings from './pages/dashboard/settings/BillingSettings';
 import Podcasts from './pages/dashboard/Podcasts';
 import PodcastVideo from './pages/dashboard/podcasts/PodcastVideo';
+import NewFeatures from './pages/dashboard/NewFeatures';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           <Route path="settings/language" element={<LanguageSettings />} />
           <Route path="settings/billing" element={<BillingSettings />} />
           <Route path="notifications" element={<Notifications />} />
+          <Route path="newfeatures" element={<NewFeatures />} />
         </Route>
       </Routes>
     </BrowserRouter>

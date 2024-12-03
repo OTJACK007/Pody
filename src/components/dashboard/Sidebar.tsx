@@ -12,7 +12,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Headphones
+  Headphones,
+  Sparkles
 } from 'lucide-react';
 import UpgradePlanModal from '../../pages/dashboard/settings/billing/UpgradePlanModal';
 
@@ -34,7 +35,8 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
     { name: 'Analytics', path: '/dashboard/analytics', icon: <BarChart2 /> },
     { name: 'Connected Apps', path: '/dashboard/connected-apps', icon: <AppWindow /> },
     { name: 'Social Accounts', path: '/dashboard/social', icon: <Share2 /> },
-    { name: 'Settings', path: '/dashboard/settings', icon: <Settings /> },
+    { name: 'New Features', path: '/dashboard/newfeatures', icon: <Sparkles /> },
+    { name: 'Settings', path: '/dashboard/settings', icon: <Settings /> }
   ];
 
   return (
