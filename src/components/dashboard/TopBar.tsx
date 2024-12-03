@@ -1,5 +1,6 @@
 import React from 'react';
 import { Menu, Bell, Settings, Search } from 'lucide-react';
+import { Avatar, Badge } from "@nextui-org/react";
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -30,10 +31,18 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <button className="relative p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <Bell className="w-6 h-6" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
-          </button>
+          <div className="relative">
+            <Badge
+              content="5"
+              color="danger"
+              shape="circle"
+              size="sm"
+            >
+              <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+                <Bell className="w-6 h-6" />
+              </button>
+            </Badge>
+          </div>
           
           <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
             <Settings className="w-6 h-6" />
@@ -44,11 +53,12 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
               <p className="text-sm font-medium text-white">John Doe</p>
               <p className="text-xs text-gray-400">Premium Member</p>
             </div>
-            <div className="relative group">
-              <img
+            <div className="relative">
+              <Avatar
+                isBordered
+                color="primary"
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
-                alt="Profile"
-                className="w-10 h-10 rounded-lg ring-2 ring-primary/50 transition-all duration-300 group-hover:ring-primary cursor-pointer"
+                className="w-10 h-10"
               />
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full" />
             </div>
