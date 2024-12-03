@@ -4,7 +4,7 @@ import LandingPage from './pages/LandingPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import LiveSpace from './pages/dashboard/LiveSpace';
 import KnowledgeLibrary from './pages/dashboard/KnowledgeLibrary';
-import MyGoals from './pages/dashboard/MyGoals';
+import MyGoals from './pages/dashboard/myGoals/MyGoals';
 import TasksCalendar from './pages/dashboard/TasksCalendar';
 import Analytics from './pages/dashboard/Analytics';
 import ConnectedApps from './pages/dashboard/ConnectedApps';
@@ -19,6 +19,8 @@ import PrivacySettings from './pages/dashboard/settings/PrivacySettings';
 import AppearanceSettings from './pages/dashboard/settings/AppearanceSettings';
 import LanguageSettings from './pages/dashboard/settings/LanguageSettings';
 import BillingSettings from './pages/dashboard/settings/BillingSettings';
+import Podcasts from './pages/dashboard/Podcasts';
+import PodcastVideo from './pages/dashboard/podcasts/PodcastVideo';
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/livespace" replace />} />
           <Route path="livespace" element={<LiveSpace />} />
+          <Route path="podcasts" element={<Podcasts />} />
+          <Route path="podcasts/podcastvideo" element={<PodcastVideo />} />
           <Route path="knowledge" element={<KnowledgeLibrary />} />
           <Route path="goals" element={<MyGoals />} />
           <Route path="tasks" element={<TasksCalendar />} />
