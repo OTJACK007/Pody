@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Genre } from '../../types';
-import LiveBanner from './livespace/components/LiveBanner';
-import FeaturedSection from './livespace/components/FeaturedSection';
-import FeedSection from './livespace/components/FeedSection';
+import { Genre } from '../../../types';
+import LiveBanner from './components/LiveBanner';
+import FeaturedSection from './components/FeaturedSection';
+import FeedSection from './components/FeedSection';
 
 const LiveSpace = () => {
   const [selectedGenre, setSelectedGenre] = useState<Genre>('Trending');
