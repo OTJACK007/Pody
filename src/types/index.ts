@@ -33,6 +33,10 @@ export interface Feature {
   thumbnailUrl: string;
 }
 
+export type Platform = 'YouTube' | 'X/Twitter' | 'TikTok' | 'Instagram' | 'Spotify';
+
+export type AuthMode = 'signin' | 'signup';
+
 export type Genre = 
   | 'Trending'
   | 'Mindset'

@@ -3,11 +3,13 @@ import { LayoutDashboard, AppWindow, ListVideo } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 import ConnectAppsDropdown from '../features/ConnectAppsDropdown';
 import FeaturesMenu from '../features/FeaturesMenu';
+import AuthDialog from '../auth/AuthDialog';
 import { NavItem } from '../../types';
 
 const Header = () => {
   const [isAppsOpen, setIsAppsOpen] = useState(false);
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   const navItems: NavItem[] = [
     { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
@@ -79,7 +81,10 @@ const Header = () => {
             />
             <span>Join our Discord</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg transition-colors">
+          <button 
+            onClick={() => setIsAuthOpen(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg transition-colors"
+          >
             <img 
               src="https://static.wixstatic.com/shapes/c67dd6_53baa9a980544d87b59c68b9b0020981.svg" 
               alt="Join icon"
@@ -90,6 +95,8 @@ const Header = () => {
           <MobileMenu items={navItems} />
         </div>
       </div>
+
+      {isAuthOpen && <AuthDialog onClose={() => setIsAuthOpen(false)} />}
     </header>
   );
 };

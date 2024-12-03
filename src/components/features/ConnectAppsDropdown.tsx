@@ -12,7 +12,7 @@ const ConnectAppsDropdown = ({ isOpen }: ConnectAppsDropdownProps) => {
     { name: 'Spotify', icon: 'https://static.wixstatic.com/media/c67dd6_ec71f45884124292ab688e1089e48cb4~mv2.png', comingSoon: true },
     { name: 'CreatorOS', icon: 'https://static.wixstatic.com/media/c67dd6_1244908d1b0545f6ac85b9f17e808a66~mv2.png', comingSoon: true },
     { name: 'Zapier', icon: 'https://static.wixstatic.com/media/c67dd6_4de0049f34934c93ac04c63d0bb84608~mv2.png', comingSoon: true },
-    { name: 'Placemento', icon: 'https://static.wixstatic.com/media/c67dd6_fe72f6ac930c4088a877a6f0fca0084b~mv2.png', comingSoon: true },
+    { name: 'Opus Clip', icon: 'https://static.wixstatic.com/media/c67dd6_c8ef1b8e181340c0a540162c50c059a1~mv2.png', comingSoon: true },
     { name: 'Miro', icon: 'https://static.wixstatic.com/media/c67dd6_db7bcff2a108431cab79c8c90c531d62~mv2.png', comingSoon: true },
     { name: 'Google Tasks', icon: 'https://static.wixstatic.com/media/c67dd6_a9320374565d487ab96fa91c5c0ad8fd~mv2.avif', connected: true },
     { name: 'Skool', icon: 'https://static.wixstatic.com/media/c67dd6_bd2d62a49a6d4cf3b0f670cda8876925~mv2.png', comingSoon: true },
