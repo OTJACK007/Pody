@@ -1,12 +1,16 @@
 import React from 'react';
-import { Menu, Bell, Settings, Search } from 'lucide-react';
-import { Avatar, Badge } from "@nextui-org/react";
+import { useNavigate } from 'react-router-dom';
+import { Menu, Settings, Search } from 'lucide-react';
+import { Avatar, Button } from "@nextui-org/react";
+import NotificationsMenu from './NotificationsMenu';
 
 interface TopBarProps {
   onMenuClick: () => void;
 }
 
 const TopBar = ({ onMenuClick }: TopBarProps) => {
+  const navigate = useNavigate();
+
   return (
     <header className="bg-gray-900 border-b border-gray-800/50 sticky top-0 z-40">
       <div className="flex items-center justify-between h-16 px-6">
@@ -31,22 +35,15 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <div className="relative">
-            <Badge
-              content="5"
-              color="danger"
-              shape="circle"
-              size="sm"
-            >
-              <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-                <Bell className="w-6 h-6" />
-              </button>
-            </Badge>
-          </div>
+          <NotificationsMenu notificationCount={3} />
           
-          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <Settings className="w-6 h-6" />
-          </button>
+          <Button
+            isIconOnly
+            className="bg-transparent hover:bg-gray-800"
+            onClick={() => navigate('/dashboard/settings')}
+          >
+            <Settings className="w-6 h-6 text-gray-400" />
+          </Button>
           
           <div className="flex items-center space-x-3 pl-4 border-l border-gray-800/50">
             <div className="text-right">

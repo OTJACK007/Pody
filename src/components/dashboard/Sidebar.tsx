@@ -9,6 +9,7 @@ import {
   AppWindow,
   Share2,
   Crown,
+  Settings,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -29,6 +30,7 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
     { name: 'Analytics', path: '/dashboard/analytics', icon: <BarChart2 /> },
     { name: 'Connected Apps', path: '/dashboard/connected-apps', icon: <AppWindow /> },
     { name: 'Social Accounts', path: '/dashboard/social', icon: <Share2 /> },
+    { name: 'Settings', path: '/dashboard/settings', icon: <Settings /> },
   ];
 
   return (
@@ -105,9 +107,8 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
         >
           <div className="flex items-center">
             <Crown className="w-6 h-6" />
-            {isOpen && <span className="ml-3 font-medium">Subscribe</span>}
+            {isOpen && <span className="ml-3 font-medium">Subscribe for $5</span>}
           </div>
-          {isOpen && <span className="text-sm font-medium">$5</span>}
         </NavLink>
       </div>
     </aside>
