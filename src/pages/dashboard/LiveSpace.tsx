@@ -1,7 +1,8 @@
 import React from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { Card, CardBody, CardFooter, Button, Chip, Avatar, Badge } from "@nextui-org/react";
-import { CheckCircle2, Users, Star, Crown, Play, ExternalLink } from 'lucide-react';
+import { Card, CardBody, CardFooter, Button, Chip, Avatar } from "@nextui-org/react";
+import { CheckCircle2, Users, Star, Crown, Play } from 'lucide-react';
+import LiveBanner from '../../components/features/LiveBanner';
 
 const LiveSpace = () => {
   const [emblaRef] = useEmblaCarousel({
@@ -33,13 +34,13 @@ const LiveSpace = () => {
     },
     {
       id: '3',
-      name: 'UFC Hub',
-      avatar: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=400',
-      subscribers: '2.1M',
+      name: 'BusinessPro',
+      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
+      subscribers: '620K',
       rating: 4.7,
-      category: 'Sports',
+      category: 'Business',
       verified: true,
-      isLive: true,
+      isLive: false,
     },
     {
       id: '4',
@@ -49,56 +50,25 @@ const LiveSpace = () => {
       rating: 4.8,
       category: 'Fitness',
       verified: true,
-      isLive: false,
+      isLive: true,
     },
     {
       id: '5',
-      name: 'BusinessPro',
-      avatar: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400',
-      subscribers: '1.5M',
-      rating: 4.6,
-      category: 'Business',
-      verified: true,
-      isLive: false,
-    },
-    {
-      id: '6',
-      name: 'GamersUnite',
-      avatar: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400',
-      subscribers: '3.2M',
-      rating: 4.5,
-      category: 'Gaming',
-      verified: true,
-      isLive: true,
-    },
-    {
-      id: '7',
       name: 'CreativeMinds',
-      avatar: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400',
-      subscribers: '1.8M',
-      rating: 4.7,
-      category: 'Art & Design',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+      subscribers: '450K',
+      rating: 4.6,
+      category: 'Creativity',
       verified: true,
       isLive: false,
     },
-    {
-      id: '8',
-      name: 'HealthHub',
-      avatar: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
-      subscribers: '2.4M',
-      rating: 4.9,
-      category: 'Health',
-      verified: true,
-      isLive: true,
-    }
   ];
 
   const recentEpisodes = [
     {
       id: '1',
-      title: 'Tech Talks Daily',
-      description: 'Daily tech news and insights',
-      coverImage: 'https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=800',
+      title: 'The Future of AI in 2024',
+      coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
       genre: 'Technology',
       duration: '45 min',
       rating: 4.8,
@@ -109,11 +79,10 @@ const LiveSpace = () => {
     },
     {
       id: '2',
-      title: 'Mindset Mastery',
-      description: 'Daily motivation and success stories',
-      coverImage: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800',
-      genre: 'Motivation',
-      duration: '30 min',
+      title: 'Building Mental Resilience',
+      coverImage: 'https://images.unsplash.com/photo-1589149098258-3e9102cd63d3?w=800',
+      genre: 'Personal Growth',
+      duration: '32 min',
       rating: 4.9,
       channel: {
         name: 'MindsetGuru',
@@ -122,14 +91,49 @@ const LiveSpace = () => {
     },
     {
       id: '3',
-      title: 'UFC Fight Analysis',
-      description: 'Breaking down the biggest fights',
-      coverImage: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800',
-      genre: 'UFC',
-      duration: '60 min',
+      title: 'Startup Success Stories',
+      coverImage: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800',
+      genre: 'Business',
+      duration: '38 min',
       rating: 4.7,
       channel: {
-        name: 'UFC Hub',
+        name: 'BusinessPro',
+        verified: true
+      }
+    },
+    {
+      id: '4',
+      title: 'High-Intensity Training Guide',
+      coverImage: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800',
+      genre: 'Fitness',
+      duration: '28 min',
+      rating: 4.8,
+      channel: {
+        name: 'FitLife',
+        verified: true
+      }
+    },
+    {
+      id: '5',
+      title: 'Creative Process Mastery',
+      coverImage: 'https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?w=800',
+      genre: 'Creativity',
+      duration: '35 min',
+      rating: 4.6,
+      channel: {
+        name: 'CreativeMinds',
+        verified: true
+      }
+    },
+    {
+      id: '6',
+      title: 'Digital Marketing Trends',
+      coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
+      genre: 'Marketing',
+      duration: '42 min',
+      rating: 4.7,
+      channel: {
+        name: 'MarketPro',
         verified: true
       }
     }
@@ -138,44 +142,7 @@ const LiveSpace = () => {
   return (
     <div className="space-y-8">
       {/* Live Banner */}
-      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Badge
-              content=""
-              color="danger"
-              placement="bottom-right"
-              shape="circle"
-              size="sm"
-              classNames={{
-                badge: "animate-pulse"
-              }}
-            >
-              <Avatar
-                isBordered
-                radius="lg"
-                size="lg"
-                src="https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=400"
-              />
-            </Badge>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h3 className="text-lg font-semibold text-white">TechInsights</h3>
-                <CheckCircle2 className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-gray-400">Live on X/Twitter</p>
-            </div>
-          </div>
-          <Button
-            endContent={<ExternalLink className="w-4 h-4" />}
-            className="bg-[#1DA1F2] text-white"
-            radius="full"
-            size="sm"
-          >
-            Watch Live
-          </Button>
-        </div>
-      </div>
+      <LiveBanner />
 
       {/* Featured Channels */}
       <div>
