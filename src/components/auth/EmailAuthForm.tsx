@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { AuthMode } from '../../types';
 
 interface EmailAuthFormProps {
@@ -8,6 +9,7 @@ interface EmailAuthFormProps {
 }
 
 const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,8 +18,15 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // After successful authentication, navigate to dashboard
+    if (mode === 'signin') {
+      navigate('/dashboard/livespace');
+    }
+    
     setIsLoading(false);
   };
 
