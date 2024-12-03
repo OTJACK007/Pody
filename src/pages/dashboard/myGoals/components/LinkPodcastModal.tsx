@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Card, CardBody, Chip, Avatar } from "@nextui-org/react";
 import { Search, PlayCircle, Plus, CheckCircle, Tag, Clock } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface LinkPodcastModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPodcasts, setSelectedPodcasts] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'search' | 'recommended' | 'history'>('recommended');
+  const { theme } = useTheme();
 
   const recommendedPodcasts = [
     {
@@ -62,31 +64,35 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
       onClose={onClose}
       size="3xl"
       classNames={{
-        base: "bg-gray-800 text-white",
-        closeButton: "text-white hover:bg-gray-700"
+        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
       }}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <h2 className="text-2xl">Link Podcasts to Goal</h2>
-          <p className="text-sm text-gray-400">Connect relevant podcast episodes to track insights</p>
+          <h2 className={`text-2xl ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Link Podcasts to Goal
+          </h2>
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            Connect relevant podcast episodes to track insights
+          </p>
         </ModalHeader>
         <ModalBody>
           <div className="flex gap-4 mb-6">
             <Button
-              className={`flex-1 ${activeTab === 'recommended' ? 'bg-primary' : 'bg-gray-700'}`}
+              className={`flex-1 ${activeTab === 'recommended' ? 'bg-primary' : theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}
               onClick={() => setActiveTab('recommended')}
             >
               Recommended
             </Button>
             <Button
-              className={`flex-1 ${activeTab === 'search' ? 'bg-primary' : 'bg-gray-700'}`}
+              className={`flex-1 ${activeTab === 'search' ? 'bg-primary' : theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}
               onClick={() => setActiveTab('search')}
             >
               Search
             </Button>
             <Button
-              className={`flex-1 ${activeTab === 'history' ? 'bg-primary' : 'bg-gray-700'}`}
+              className={`flex-1 ${activeTab === 'history' ? 'bg-primary' : theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}
               onClick={() => setActiveTab('history')}
             >
               Recently Watched
@@ -101,8 +107,8 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
               startContent={<Search className="w-4 h-4 text-gray-400" />}
               className="mb-6"
               classNames={{
-                input: "bg-gray-700/50 text-white",
-                inputWrapper: "bg-gray-700/50 border-gray-600"
+                input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
               }}
             />
           )}
@@ -111,7 +117,11 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
             {recommendedPodcasts.map((podcast) => (
               <Card 
                 key={podcast.id}
-                className="bg-gray-700/50 border border-gray-600 hover:bg-gray-700 transition-colors"
+                className={`${
+                  theme === 'dark'
+                    ? 'bg-gray-700/50 border-gray-600'
+                    : 'bg-white border-gray-200'
+                } border hover:bg-${theme === 'dark' ? 'gray-700' : 'gray-50'} transition-colors`}
                 isPressable
                 onPress={() => handleToggleSelect(podcast.id)}
               >
@@ -130,8 +140,12 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
                   <div className="flex-grow">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-white mb-1">{podcast.title}</h3>
-                        <p className="text-sm text-gray-400">{podcast.channel}</p>
+                        <h3 className={`text-lg font-semibold mb-1 ${
+                          theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>{podcast.title}</h3>
+                        <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                          {podcast.channel}
+                        </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Chip color="success" size="sm">
@@ -142,7 +156,7 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
                           className={`${
                             selectedPodcasts.includes(podcast.id)
                               ? 'bg-primary text-white'
-                              : 'bg-gray-600 text-gray-300'
+                              : theme === 'dark' ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'
                           }`}
                         >
                           {selectedPodcasts.includes(podcast.id) ? (
@@ -155,12 +169,14 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
                     </div>
 
                     <div className="flex items-center gap-4 mt-2">
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <div className={`flex items-center gap-2 text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         <Clock className="w-4 h-4" />
                         <span>{podcast.duration}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-gray-400" />
+                        <Tag className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} />
                         <div className="flex gap-2">
                           {podcast.tags.map((tag) => (
                             <Chip key={tag} size="sm" variant="flat">

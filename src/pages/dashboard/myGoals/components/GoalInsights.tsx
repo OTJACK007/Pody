@@ -1,8 +1,11 @@
 import React from 'react';
 import { Card, CardBody, CardHeader, Avatar } from "@nextui-org/react";
 import { Lightbulb, PlayCircle } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 const GoalInsights = () => {
+  const { theme } = useTheme();
+  
   const insights = [
     {
       id: 1,
@@ -28,14 +31,22 @@ const GoalInsights = () => {
   ];
 
   return (
-    <Card className="bg-gray-800/50 border border-gray-700/50">
+    <Card className={`${
+      theme === 'dark' 
+        ? 'bg-gray-800/50 border-gray-700/50' 
+        : 'bg-white border-gray-200'
+    } border`}>
       <CardHeader className="flex gap-3">
         <div className="p-2 bg-primary/10 rounded-lg">
           <Lightbulb className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-white">Related Insights</h3>
-          <p className="text-sm text-gray-400">Key takeaways from podcasts</p>
+          <h3 className={`text-lg font-semibold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>Related Insights</h3>
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            Key takeaways from podcasts
+          </p>
         </div>
       </CardHeader>
       <CardBody>
@@ -43,7 +54,11 @@ const GoalInsights = () => {
           {insights.map((insight) => (
             <div
               key={insight.id}
-              className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-700/30 transition-colors cursor-pointer group"
+              className={`flex items-start gap-3 p-2 rounded-lg ${
+                theme === 'dark'
+                  ? 'hover:bg-gray-700/30'
+                  : 'hover:bg-gray-100'
+              } transition-colors cursor-pointer group`}
             >
               <div className="relative flex-shrink-0">
                 <img
@@ -59,10 +74,14 @@ const GoalInsights = () => {
                 </span>
               </div>
               <div>
-                <h4 className="text-white font-medium group-hover:text-primary transition-colors">
+                <h4 className={`font-medium group-hover:text-primary transition-colors ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>
                   {insight.title}
                 </h4>
-                <p className="text-sm text-gray-400">{insight.source}</p>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  {insight.source}
+                </p>
               </div>
             </div>
           ))}

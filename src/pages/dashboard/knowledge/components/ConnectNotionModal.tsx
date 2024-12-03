@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Card, CardBody } from "@nextui-org/react";
 import { ArrowRight } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface ConnectNotionModalProps {
   isOpen: boolean;
@@ -8,6 +9,8 @@ interface ConnectNotionModalProps {
 }
 
 const ConnectNotionModal = ({ isOpen, onClose }: ConnectNotionModalProps) => {
+  const { theme } = useTheme();
+  
   const features = [
     'Sync notes automatically',
     'Create daily summaries',
@@ -22,14 +25,18 @@ const ConnectNotionModal = ({ isOpen, onClose }: ConnectNotionModalProps) => {
       onClose={onClose}
       size="2xl"
       classNames={{
-        base: "bg-gray-800 text-white",
-        closeButton: "text-white hover:bg-gray-700"
+        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
       }}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <h2 className="text-2xl">Connect with Notion</h2>
-          <p className="text-sm text-gray-400">Sync your notes and summaries with Notion</p>
+          <h2 className={`text-2xl ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Connect with Notion
+          </h2>
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            Sync your notes and summaries with Notion
+          </p>
         </ModalHeader>
         <ModalBody>
           <div className="flex items-center justify-center py-6">
@@ -40,14 +47,22 @@ const ConnectNotionModal = ({ isOpen, onClose }: ConnectNotionModalProps) => {
             />
           </div>
 
-          <Card className="bg-gray-700/50 border border-gray-600">
+          <Card className={`${
+            theme === 'dark' 
+              ? 'bg-gray-700/50 border-gray-600' 
+              : 'bg-gray-100 border-gray-200'
+          } border`}>
             <CardBody>
-              <h3 className="text-lg font-semibold mb-4">Features</h3>
+              <h3 className={`text-lg font-semibold mb-4 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>Features</h3>
               <ul className="space-y-3">
                 {features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 text-gray-300">
+                  <li key={index} className="flex items-center gap-2">
                     <ArrowRight className="w-4 h-4 text-primary" />
-                    <span>{feature}</span>
+                    <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                      {feature}
+                    </span>
                   </li>
                 ))}
               </ul>

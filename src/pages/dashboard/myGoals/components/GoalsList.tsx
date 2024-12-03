@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Progress, Button, Avatar, Badge } from "@nextui-org/react";
 import { Link2, BarChart2, PlayCircle, ChevronRight, Plus } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 import LinkPodcastModal from './LinkPodcastModal';
 
 interface GoalsListProps {
@@ -10,6 +11,7 @@ interface GoalsListProps {
 const GoalsList = ({ status }: GoalsListProps) => {
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+  const { theme } = useTheme();
 
   const goals = [
     {
@@ -77,23 +79,35 @@ const GoalsList = ({ status }: GoalsListProps) => {
     <>
       <div className="space-y-4">
         {goals.map((goal) => (
-          <Card key={goal.id} className="bg-gray-800/50 border border-gray-700/50">
+          <Card key={goal.id} className={`${
+            theme === 'dark' 
+              ? 'bg-gray-800/50 border-gray-700/50' 
+              : 'bg-white border-gray-200'
+          } border`}>
             <CardBody className="p-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-grow">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-xl font-semibold text-white">{goal.title}</h3>
+                    <h3 className={`text-xl font-semibold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>{goal.title}</h3>
                     <Badge color="primary" variant="flat">
                       {goal.category}
                     </Badge>
                   </div>
-                  <p className="text-gray-400 mb-4">{goal.description}</p>
+                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    {goal.description}
+                  </p>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 mt-4">
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-400">Progress</span>
-                        <span className="text-sm text-white">{goal.progress}%</span>
+                        <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                          Progress
+                        </span>
+                        <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                          {goal.progress}%
+                        </span>
                       </div>
                       <Progress 
                         value={goal.progress} 
@@ -103,15 +117,17 @@ const GoalsList = ({ status }: GoalsListProps) => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
+                      <div className={`flex items-center gap-2 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         <BarChart2 className="w-4 h-4 text-primary" />
-                        <span className="text-sm text-gray-400">Due {goal.dueDate}</span>
+                        <span>Due {goal.dueDate}</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className={`flex items-center gap-2 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         <Link2 className="w-4 h-4 text-primary" />
-                        <span className="text-sm text-gray-400">
-                          {goal.linkedContent.length} linked resources
-                        </span>
+                        <span>{goal.linkedContent.length} linked resources</span>
                       </div>
                       <div 
                         onClick={() => handleLinkPodcast(goal.id)}
@@ -125,16 +141,24 @@ const GoalsList = ({ status }: GoalsListProps) => {
                 </div>
 
                 <div 
-                  className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg cursor-pointer transition-colors"
+                  className={`p-2 rounded-lg cursor-pointer transition-colors ${
+                    theme === 'dark'
+                      ? 'bg-gray-700 hover:bg-gray-600'
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  }`}
                   onClick={() => console.log('View goal details')}
                 >
-                  <ChevronRight className="w-4 h-4 text-white" />
+                  <ChevronRight className={theme === 'dark' ? 'text-white' : 'text-gray-900'} />
                 </div>
               </div>
 
               {goal.linkedContent.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-gray-700">
-                  <h4 className="text-sm font-medium text-gray-400 mb-3">Linked Content</h4>
+                <div className={`mt-6 pt-6 border-t ${
+                  theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                }`}>
+                  <h4 className={`text-sm font-medium mb-3 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Linked Content</h4>
                   <div className="flex gap-4 overflow-x-auto pb-2">
                     {goal.linkedContent.map((content) => (
                       <div
@@ -152,8 +176,12 @@ const GoalsList = ({ status }: GoalsListProps) => {
                             <PlayCircle className="w-8 h-8 text-white" />
                           </div>
                         </div>
-                        <p className="text-sm text-white truncate">{content.title}</p>
-                        <p className="text-xs text-gray-400 capitalize">{content.type}</p>
+                        <p className={`text-sm truncate ${
+                          theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>{content.title}</p>
+                        <p className={`text-xs capitalize ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>{content.type}</p>
                       </div>
                     ))}
                   </div>

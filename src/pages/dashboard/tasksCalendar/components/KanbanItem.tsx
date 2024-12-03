@@ -3,6 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card, CardBody, Avatar, Badge } from "@nextui-org/react";
 import { Calendar, Clock } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface Task {
   id: number;
@@ -21,6 +22,7 @@ interface KanbanItemProps {
 }
 
 const KanbanItem = ({ task }: KanbanItemProps) => {
+  const { theme } = useTheme();
   const {
     attributes,
     listeners,
@@ -54,15 +56,25 @@ const KanbanItem = ({ task }: KanbanItemProps) => {
       {...attributes}
       {...listeners}
     >
-      <div className="bg-gray-800/50 border border-gray-700/50 hover:bg-gray-800 transition-colors cursor-move rounded-lg">
+      <div className={`${
+        theme === 'dark'
+          ? 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-800'
+          : 'bg-white border-gray-200 hover:bg-gray-50'
+      } border transition-colors cursor-move rounded-lg`}>
         <div className="p-4">
-          <h4 className="text-white font-medium mb-2">{task.title}</h4>
-          <p className="text-sm text-gray-400 mb-4">{task.description}</p>
+          <h4 className={`font-medium mb-2 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>{task.title}</h4>
+          <p className={`text-sm mb-4 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>{task.description}</p>
 
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-gray-400">{task.dueDate}</span>
+              <Calendar className={theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} />
+              <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                {task.dueDate}
+              </span>
             </div>
             <Badge
               color={getPriorityColor(task.priority)}

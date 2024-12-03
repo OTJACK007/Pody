@@ -1,8 +1,11 @@
 import React from 'react';
 import { Share2, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { Card, CardBody, Button, Avatar } from "@nextui-org/react";
+import { useTheme } from '../../contexts/ThemeContext';
 
 const SocialAccounts = () => {
+  const { theme } = useTheme();
+
   const socialNetworks = [
     {
       id: 1,
@@ -70,14 +73,25 @@ const SocialAccounts = () => {
     <div className="space-y-8">
       <div className="flex items-center gap-3">
         <Share2 className="w-8 h-8 text-primary" />
-        <h1 className="text-3xl font-bold text-white">Social Accounts</h1>
+        <div>
+          <h1 className={`text-3xl font-bold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>Social Accounts</h1>
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            Connect and manage your social media accounts
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {socialNetworks.map((network) => (
           <Card 
             key={network.id}
-            className="bg-gray-800/50 border border-gray-700/50 hover:bg-gray-800 transition-all duration-300"
+            className={`${
+              theme === 'dark' 
+                ? 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-800' 
+                : 'bg-white border-gray-200 hover:bg-gray-50'
+            } border transition-all duration-300`}
           >
             <CardBody className="p-6">
               <div className="flex items-start justify-between mb-4">
@@ -90,13 +104,15 @@ const SocialAccounts = () => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-semibold text-white">{network.name}</h3>
+                      <h3 className={`text-lg font-semibold ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{network.name}</h3>
                       {network.isConnected && (
                         <CheckCircle2 className="w-4 h-4 text-primary" />
                       )}
                     </div>
                     {network.isConnected && (
-                      <p className={`text-sm ${network.textColor}`}>
+                      <p className={network.textColor}>
                         {network.followers} followers
                       </p>
                     )}
@@ -104,14 +120,16 @@ const SocialAccounts = () => {
                 </div>
               </div>
 
-              <p className="text-gray-400 text-sm h-10">
+              <p className={`text-sm h-10 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
                 {network.description}
               </p>
 
               <Button
                 className={`w-full ${
                   network.isConnected 
-                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                    ? `${theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
                     : 'bg-primary text-white hover:bg-primary/90'
                 }`}
                 endContent={network.isConnected ? null : <ExternalLink className="w-4 h-4" />}

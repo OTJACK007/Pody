@@ -1,8 +1,10 @@
 import React from 'react';
 import { Card, CardBody, Avatar, Badge } from "@nextui-org/react";
 import { Calendar, Clock, Flag } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 const TaskTimeline = () => {
+  const { theme } = useTheme();
   const timelineTasks = [
     {
       id: 1,
@@ -55,27 +57,45 @@ const TaskTimeline = () => {
   };
 
   return (
-    <Card className="bg-gray-800/50 border border-gray-700/50">
+    <Card className={`${
+      theme === 'dark' 
+        ? 'bg-gray-800/50 border-gray-700/50' 
+        : 'bg-white border-gray-200'
+    } border`}>
       <CardBody className="p-6">
         <div className="relative">
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gray-700" />
+          <div className={`absolute left-8 top-0 bottom-0 w-px ${
+            theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
+          }`} />
           
           <div className="space-y-8">
             {timelineTasks.map((task) => (
               <div key={task.id} className="relative flex gap-6">
-                <div className="flex-shrink-0 w-16 text-sm text-gray-400 pt-3">
+                <div className={`flex-shrink-0 w-16 text-sm ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                } pt-3`}>
                   {task.startTime}
                 </div>
 
-                <div className="absolute left-8 top-4 w-3 h-3 rounded-full bg-primary border-4 border-gray-800" />
+                <div className={`absolute left-8 top-4 w-3 h-3 rounded-full bg-primary border-4 ${
+                  theme === 'dark' ? 'border-gray-800' : 'border-white'
+                }`} />
 
                 <div className="flex-grow">
-                  <Card className="bg-gray-700/30 border border-gray-700">
+                  <Card className={`${
+                    theme === 'dark'
+                      ? 'bg-gray-700/30 border-gray-700'
+                      : 'bg-gray-50 border-gray-200'
+                  } border`}>
                     <CardBody className="p-4">
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <h4 className="text-white font-medium">{task.title}</h4>
-                          <p className="text-sm text-gray-400 mt-1">{task.description}</p>
+                          <h4 className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                            {task.title}
+                          </h4>
+                          <p className={`text-sm mt-1 ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>{task.description}</p>
                         </div>
                         <Badge
                           color={getPriorityColor(task.priority)}

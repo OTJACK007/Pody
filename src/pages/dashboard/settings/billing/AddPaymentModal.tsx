@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Card, CardBody } from "@nextui-org/react";
 import { CreditCard, Wallet } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface AddPaymentModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface AddPaymentModalProps {
 const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) => {
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'paypal' | 'crypto' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useTheme();
 
   // Card form state
   const [cardNumber, setCardNumber] = useState('');
@@ -54,8 +56,8 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
       onClose={onClose}
       size="2xl"
       classNames={{
-        base: "bg-gray-800 text-white",
-        closeButton: "text-white hover:bg-gray-700"
+        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
       }}
     >
       <ModalContent>
@@ -68,11 +70,17 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
                   key={method.id}
                   isPressable
                   onPress={() => setSelectedMethod(method.id as any)}
-                  className="bg-gray-700/50 border border-gray-600 hover:bg-gray-700 transition-colors"
+                  className={`${
+                    theme === 'dark'
+                      ? 'bg-gray-700/50 border-gray-600 hover:bg-gray-700'
+                      : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+                  } border transition-colors`}
                 >
                   <CardBody className="p-4">
                     <div className="flex flex-col items-center text-center gap-3">
-                      <div className="p-3 bg-gray-600/50 rounded-xl">
+                      <div className={`p-3 rounded-xl ${
+                        theme === 'dark' ? 'bg-gray-600/50' : 'bg-gray-200'
+                      }`}>
                         <img 
                           src={method.icon} 
                           alt={method.name}
@@ -80,8 +88,12 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
                         />
                       </div>
                       <div>
-                        <p className="font-medium text-white">{method.name}</p>
-                        <p className="text-sm text-gray-400">{method.description}</p>
+                        <p className={`font-medium ${
+                          theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>{method.name}</p>
+                        <p className={`text-sm ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>{method.description}</p>
                       </div>
                     </div>
                   </CardBody>
@@ -97,8 +109,8 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
                 onChange={(e) => setCardNumber(e.target.value)}
                 startContent={<CreditCard className="w-4 h-4 text-gray-400" />}
                 classNames={{
-                  input: "bg-gray-700/50 text-white",
-                  inputWrapper: "bg-gray-700/50 border-gray-600"
+                  input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                  inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                 }}
               />
               <Input
@@ -107,8 +119,8 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
                 value={cardName}
                 onChange={(e) => setCardName(e.target.value)}
                 classNames={{
-                  input: "bg-gray-700/50 text-white",
-                  inputWrapper: "bg-gray-700/50 border-gray-600"
+                  input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                  inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                 }}
               />
               <div className="grid grid-cols-2 gap-4">
@@ -118,8 +130,8 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
                   value={expiry}
                   onChange={(e) => setExpiry(e.target.value)}
                   classNames={{
-                    input: "bg-gray-700/50 text-white",
-                    inputWrapper: "bg-gray-700/50 border-gray-600"
+                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
                 <Input
@@ -129,8 +141,8 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
                   onChange={(e) => setCvc(e.target.value)}
                   type="password"
                   classNames={{
-                    input: "bg-gray-700/50 text-white",
-                    inputWrapper: "bg-gray-700/50 border-gray-600"
+                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
               </div>
@@ -138,10 +150,12 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
           ) : (
             <div className="text-center py-8">
               <Wallet className="w-16 h-16 text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">
+              <h3 className={`text-xl font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>
                 Continue to {selectedMethod === 'paypal' ? 'PayPal' : 'MoonPay'}
               </h3>
-              <p className="text-gray-400">
+              <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                 You'll be redirected to {selectedMethod === 'paypal' ? 'PayPal' : 'MoonPay'} to complete your payment
               </p>
             </div>
@@ -151,7 +165,11 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
           {selectedMethod && (
             <Button
               variant="flat"
-              className="mr-auto bg-gray-700 text-white hover:bg-gray-600"
+              className={`mr-auto ${
+                theme === 'dark'
+                  ? 'bg-gray-700 text-white hover:bg-gray-600'
+                  : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+              }`}
               onPress={() => setSelectedMethod(null)}
             >
               Back

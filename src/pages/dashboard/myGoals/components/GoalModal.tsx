@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
 import { Calendar, Target, Tag } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface GoalModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ const GoalModal = ({ isOpen, onClose }: GoalModalProps) => {
   const [category, setCategory] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useTheme();
 
   const categories = [
     { value: 'personal', label: 'Personal Growth' },
@@ -34,8 +36,8 @@ const GoalModal = ({ isOpen, onClose }: GoalModalProps) => {
       isOpen={isOpen} 
       onClose={onClose}
       classNames={{
-        base: "bg-gray-800 text-white",
-        closeButton: "text-white hover:bg-gray-700"
+        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
       }}
     >
       <ModalContent>
@@ -49,8 +51,8 @@ const GoalModal = ({ isOpen, onClose }: GoalModalProps) => {
               onChange={(e) => setTitle(e.target.value)}
               startContent={<Target className="w-4 h-4 text-gray-400" />}
               classNames={{
-                input: "bg-gray-700/50 text-white",
-                inputWrapper: "bg-gray-700/50 border-gray-600"
+                input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
               }}
             />
 
@@ -60,8 +62,8 @@ const GoalModal = ({ isOpen, onClose }: GoalModalProps) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               classNames={{
-                input: "bg-gray-700/50 text-white",
-                inputWrapper: "bg-gray-700/50 border-gray-600"
+                input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
               }}
             />
 
@@ -73,8 +75,8 @@ const GoalModal = ({ isOpen, onClose }: GoalModalProps) => {
                 onChange={(e) => setCategory(e.target.value)}
                 startContent={<Tag className="w-4 h-4 text-gray-400" />}
                 classNames={{
-                  trigger: "bg-gray-700/50 border-gray-600",
-                  value: "text-white"
+                  trigger: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`,
+                  value: theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }}
               >
                 {categories.map((cat) => (
@@ -91,8 +93,8 @@ const GoalModal = ({ isOpen, onClose }: GoalModalProps) => {
                 onChange={(e) => setDueDate(e.target.value)}
                 startContent={<Calendar className="w-4 h-4 text-gray-400" />}
                 classNames={{
-                  input: "bg-gray-700/50 text-white",
-                  inputWrapper: "bg-gray-700/50 border-gray-600"
+                  input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                  inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                 }}
               />
             </div>

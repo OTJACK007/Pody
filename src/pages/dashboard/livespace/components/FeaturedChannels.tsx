@@ -1,9 +1,13 @@
 import React from 'react';
 import { CheckCircle2, Users, Star } from 'lucide-react';
 import { Card, CardBody, CardFooter, Button, Avatar, Chip } from "@nextui-org/react";
+import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../../../../contexts/ThemeContext';
 import useEmblaCarousel from 'embla-carousel-react';
 
 const FeaturedChannels = () => {
+  const navigate = useNavigate();
+  const { theme } = useTheme();
   const [emblaRef] = useEmblaCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
@@ -65,10 +69,14 @@ const FeaturedChannels = () => {
 
   return (
     <div className="overflow-hidden -mx-6" ref={emblaRef}>
-      <div className="flex gap-4 px-6">
+      <div className="flex gap-4 px-6 py-4">
         {featuredChannels.map((channel) => (
           <div key={channel.id} className="flex-none w-[300px]">
-            <Card className="bg-gray-800/50 border border-gray-700">
+            <Card className={`${
+              theme === 'dark'
+                ? 'bg-gray-800/50 border-gray-700'
+                : 'bg-white border-gray-200'
+            } border`}>
               <CardBody className="overflow-visible p-4">
                 <div className="flex gap-4">
                   <div className="relative">
@@ -84,16 +92,22 @@ const FeaturedChannels = () => {
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-small font-semibold text-white">{channel.name}</h3>
+                      <h3 className={`text-small font-semibold ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{channel.name}</h3>
                       {channel.verified && (
                         <CheckCircle2 className="w-4 h-4 text-primary" />
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-tiny text-gray-400">
+                    <div className={`flex items-center gap-2 text-tiny ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
                       <Users className="w-3 h-3" />
                       <span>{channel.subscribers} subscribers</span>
                     </div>
-                    <div className="flex items-center gap-2 text-tiny text-gray-400">
+                    <div className={`flex items-center gap-2 text-tiny ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
                       <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
                       <span>{channel.rating} rating</span>
                     </div>
@@ -104,8 +118,8 @@ const FeaturedChannels = () => {
                 <Chip
                   variant="flat"
                   classNames={{
-                    base: "bg-gray-700",
-                    content: "text-white text-small"
+                    base: theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100',
+                    content: `${theme === 'dark' ? 'text-white' : 'text-gray-900'} text-small`
                   }}
                   size="sm"
                 >
@@ -117,6 +131,7 @@ const FeaturedChannels = () => {
                   size="sm"
                   variant="flat"
                   className="bg-secondary/20 text-secondary border-secondary"
+                  onClick={() => navigate('/dashboard/livespace/channel')}
                 >
                   See Channel
                 </Button>

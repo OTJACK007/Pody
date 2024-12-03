@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CreditCard, Clock, Receipt, Plus } from 'lucide-react';
 import { Card, CardBody, Button } from "@nextui-org/react";
+import { useTheme } from '../../../contexts/ThemeContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 import AddPaymentModal from './billing/AddPaymentModal';
 import UpgradePlanModal from './billing/UpgradePlanModal';
@@ -9,6 +10,7 @@ const BillingSettings = () => {
   const [showAddCardModal, setShowAddCardModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useTheme();
 
   const handleAddPayment = async (data: any) => {
     setIsLoading(true);
@@ -59,19 +61,27 @@ const BillingSettings = () => {
   return (
     <div className="max-w-4xl">
       <SettingsHeader
-        icon={<CreditCard className="w-6 h-6 text-primary" />}
+        icon={<CreditCard className="w-6 h-6 text-[#ff3366]" />}
         title="Billing"
         description="Manage your subscription and payment methods"
       />
       
       <div className="space-y-6">
         {/* Current Plan */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-white">Current Plan</h3>
-                <p className="text-gray-400">You are currently on the Basic plan</p>
+                <h3 className={`text-lg font-semibold ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Current Plan</h3>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  You are currently on the Basic plan
+                </p>
               </div>
               <Button
                 className="bg-secondary text-black font-medium hover:bg-secondary/90"
@@ -81,12 +91,18 @@ const BillingSettings = () => {
               </Button>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg">
+            <div className={`flex items-center justify-between p-4 rounded-lg ${
+              theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-100'
+            }`}>
               <div className="flex items-center gap-3">
                 <Clock className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="text-white">Next billing date</p>
-                  <p className="text-sm text-gray-400">April 1, 2024</p>
+                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                    Next billing date
+                  </p>
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>April 1, 2024</p>
                 </div>
               </div>
               <Button
@@ -101,17 +117,29 @@ const BillingSettings = () => {
         </Card>
 
         {/* Payment Methods */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-white">Payment Methods</h3>
-                <p className="text-gray-400">Manage your payment methods</p>
+                <h3 className={`text-lg font-semibold ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Payment Methods</h3>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  Manage your payment methods
+                </p>
               </div>
               <div className="flex gap-2">
                 <Button
                   startContent={<img src="https://static.wixstatic.com/media/c67dd6_7db17138923b4bcf92d85ed71f9f85ed~mv2.png" alt="Stripe" className="w-4 h-4" />}
-                  className="bg-gray-700 text-white hover:bg-gray-600"
+                  className={`${
+                    theme === 'dark'
+                      ? 'bg-gray-700 text-white hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  }`}
                 >
                   Pay with Stripe
                 </Button>
@@ -129,10 +157,14 @@ const BillingSettings = () => {
               {paymentMethods.map((method) => (
                 <div
                   key={method.id}
-                  className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg"
+                  className={`flex items-center justify-between p-4 rounded-lg ${
+                    theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-100'
+                  }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-600/50 rounded-lg">
+                    <div className={`p-2 rounded-lg ${
+                      theme === 'dark' ? 'bg-gray-600/50' : 'bg-gray-200'
+                    }`}>
                       <img 
                         src={method.icon}
                         alt={method.type}
@@ -142,20 +174,32 @@ const BillingSettings = () => {
                     <div>
                       {method.type === 'card' && (
                         <>
-                          <p className="text-white">•••• {method.last4}</p>
-                          <p className="text-sm text-gray-400">Expires {method.expiry}</p>
+                          <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                            •••• {method.last4}
+                          </p>
+                          <p className={`text-sm ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>Expires {method.expiry}</p>
                         </>
                       )}
                       {method.type === 'paypal' && (
                         <>
-                          <p className="text-white">PayPal</p>
-                          <p className="text-sm text-gray-400">{method.email}</p>
+                          <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                            PayPal
+                          </p>
+                          <p className={`text-sm ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>{method.email}</p>
                         </>
                       )}
                       {method.type === 'crypto' && (
                         <>
-                          <p className="text-white">MoonPay</p>
-                          <p className="text-sm text-gray-400">Crypto Payment</p>
+                          <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                            MoonPay
+                          </p>
+                          <p className={`text-sm ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>Crypto Payment</p>
                         </>
                       )}
                     </div>
@@ -174,16 +218,28 @@ const BillingSettings = () => {
         </Card>
 
         {/* Billing History */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-white">Billing History</h3>
-                <p className="text-gray-400">View your billing history</p>
+                <h3 className={`text-lg font-semibold ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Billing History</h3>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  View your billing history
+                </p>
               </div>
               <Button
                 startContent={<Receipt className="w-4 h-4" />}
-                className="bg-gray-700 text-white hover:bg-gray-600"
+                className={`${
+                  theme === 'dark'
+                    ? 'bg-gray-700 text-white hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                }`}
               >
                 Download All
               </Button>
@@ -193,17 +249,29 @@ const BillingSettings = () => {
               {billingHistory.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg"
+                  className={`flex items-center justify-between p-4 rounded-lg ${
+                    theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-100'
+                  }`}
                 >
                   <div>
-                    <p className="text-white">{item.description}</p>
-                    <p className="text-sm text-gray-400">{item.date}</p>
+                    <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                      {item.description}
+                    </p>
+                    <p className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>{item.date}</p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-white">{item.amount}</span>
+                    <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                      {item.amount}
+                    </span>
                     <Button
                       size="sm"
-                      className="bg-gray-600 text-white hover:bg-gray-500"
+                      className={`${
+                        theme === 'dark'
+                          ? 'bg-gray-600 text-white hover:bg-gray-500'
+                          : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+                      }`}
                     >
                       Download
                     </Button>

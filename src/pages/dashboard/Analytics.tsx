@@ -2,6 +2,7 @@ import React from 'react';
 import { BarChart2, TrendingUp, Users, Clock, PlayCircle, Star, ArrowUpRight, ArrowDownRight, Download } from 'lucide-react';
 import { Card, CardBody, Progress, Button } from "@nextui-org/react";
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { useTheme } from '../../contexts/ThemeContext';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -30,6 +31,10 @@ ChartJS.register(
 );
 
 const Analytics = () => {
+  const { theme } = useTheme();
+  const textColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
+  const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
   // Mock data for charts
   const listeningData = {
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -192,7 +197,9 @@ Jun,95,75
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <BarChart2 className="w-8 h-8 text-primary" />
-          <h1 className="text-3xl font-bold text-white">Analytics Dashboard</h1>
+          <h1 className={`text-3xl font-bold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>Analytics Dashboard</h1>
         </div>
         <Button
           color="primary"
@@ -206,10 +213,16 @@ Jun,95,75
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <Card key={stat.title} className="bg-gray-800/50 border border-gray-700/50">
+          <Card key={stat.title} className={`${
+            theme === 'dark' 
+              ? 'bg-gray-800/50 border-gray-700/50' 
+              : 'bg-white border-gray-200'
+          } border`}>
             <CardBody className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-gray-700/50 rounded-lg">
+                <div className={`p-2 ${
+                  theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'
+                } rounded-lg`}>
                   {stat.icon}
                 </div>
                 <div className={`flex items-center gap-1 text-sm ${
@@ -223,8 +236,12 @@ Jun,95,75
                   )}
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-1">{stat.value}</h3>
-              <p className="text-gray-400 text-sm">{stat.title}</p>
+              <h3 className={`text-2xl font-bold mb-1 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>{stat.value}</h3>
+              <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                {stat.title}
+              </p>
             </CardBody>
           </Card>
         ))}
@@ -233,9 +250,15 @@ Jun,95,75
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Listening Time Trend */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Listening Time Trend</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Listening Time Trend</h3>
             <Line
               data={listeningData}
               options={{
@@ -249,18 +272,18 @@ Jun,95,75
                   y: {
                     beginAtZero: true,
                     grid: {
-                      color: 'rgba(255, 255, 255, 0.1)'
+                      color: gridColor
                     },
                     ticks: {
-                      color: 'rgba(255, 255, 255, 0.7)'
+                      color: textColor
                     }
                   },
                   x: {
                     grid: {
-                      color: 'rgba(255, 255, 255, 0.1)'
+                      color: gridColor
                     },
                     ticks: {
-                      color: 'rgba(255, 255, 255, 0.7)'
+                      color: textColor
                     }
                   }
                 }
@@ -270,9 +293,15 @@ Jun,95,75
         </Card>
 
         {/* Genre Distribution */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Genre Distribution</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Genre Distribution</h3>
             <div className="flex items-center justify-center">
               <div className="w-[300px]">
                 <Doughnut
@@ -283,7 +312,7 @@ Jun,95,75
                       legend: {
                         position: 'right',
                         labels: {
-                          color: 'rgba(255, 255, 255, 0.7)'
+                          color: textColor
                         }
                       }
                     }
@@ -295,9 +324,15 @@ Jun,95,75
         </Card>
 
         {/* Engagement Metrics */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Engagement Metrics</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Engagement Metrics</h3>
             <Bar
               data={engagementData}
               options={{
@@ -306,7 +341,7 @@ Jun,95,75
                   legend: {
                     position: 'top',
                     labels: {
-                      color: 'rgba(255, 255, 255, 0.7)'
+                      color: textColor
                     }
                   }
                 },
@@ -314,18 +349,18 @@ Jun,95,75
                   y: {
                     beginAtZero: true,
                     grid: {
-                      color: 'rgba(255, 255, 255, 0.1)'
+                      color: gridColor
                     },
                     ticks: {
-                      color: 'rgba(255, 255, 255, 0.7)'
+                      color: textColor
                     }
                   },
                   x: {
                     grid: {
-                      color: 'rgba(255, 255, 255, 0.1)'
+                      color: gridColor
                     },
                     ticks: {
-                      color: 'rgba(255, 255, 255, 0.7)'
+                      color: textColor
                     }
                   }
                 }
@@ -335,9 +370,15 @@ Jun,95,75
         </Card>
 
         {/* Top Performing Channels */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Top Performing Channels</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Top Performing Channels</h3>
             <div className="space-y-6">
               {topChannels.map((channel) => (
                 <div key={channel.name} className="flex items-center gap-4">
@@ -348,7 +389,9 @@ Jun,95,75
                   />
                   <div className="flex-grow">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-white font-medium">{channel.name}</h4>
+                      <h4 className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                        {channel.name}
+                      </h4>
                       <span className="text-green-500 text-sm">{channel.growth}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -357,7 +400,9 @@ Jun,95,75
                         color="success"
                         className="max-w-md"
                       />
-                      <span className="text-sm text-gray-400">{channel.engagement}%</span>
+                      <span className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>{channel.engagement}%</span>
                     </div>
                   </div>
                 </div>

@@ -2,10 +2,12 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Settings2, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { Card, CardBody, Button, Switch } from "@nextui-org/react";
+import { useTheme } from '../../../contexts/ThemeContext';
 
 const AppConfig = () => {
   const { appId } = useParams();
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const getAppDetails = () => {
     const apps = {
@@ -158,7 +160,9 @@ const AppConfig = () => {
 
   if (!app) {
     return (
-      <div className="text-center text-gray-400 py-12">
+      <div className={`text-center ${
+        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+      } py-12`}>
         App not found
       </div>
     );
@@ -170,7 +174,9 @@ const AppConfig = () => {
         <Button
           variant="light"
           startContent={<ArrowLeft className="w-4 h-4" />}
-          className="mb-6 text-gray-400 hover:text-white"
+          className={`mb-6 ${
+            theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'
+          }`}
           onClick={() => navigate('/dashboard/connected-apps')}
         >
           Back to Connected Apps
@@ -179,14 +185,22 @@ const AppConfig = () => {
         <div className="flex items-center gap-3 mb-8">
           <Settings2 className="w-8 h-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold text-white">{app.name} Configuration</h1>
-            <p className="text-gray-400 mt-1">Manage your {app.name} integration settings</p>
+            <h1 className={`text-3xl font-bold ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>{app.name} Configuration</h1>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Manage your {app.name} integration settings
+            </p>
           </div>
         </div>
       </div>
 
       <div className="grid gap-6">
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
             <div className="flex items-center gap-4 mb-6">
               <div className={`p-3 rounded-xl ${app.color}`}>
@@ -198,16 +212,22 @@ const AppConfig = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-semibold text-white">{app.name}</h3>
+                  <h3 className={`text-lg font-semibold ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>{app.name}</h3>
                   {app.isConnected && <CheckCircle2 className="w-4 h-4 text-primary" />}
                 </div>
-                <p className={`text-sm ${app.textColor}`}>
+                <p className={app.textColor}>
                   {app.isConnected ? 'Connected' : 'Not Connected'}
                 </p>
               </div>
               <Button
                 endContent={<ExternalLink className="w-4 h-4" />}
-                className="ml-auto bg-gray-700 text-white hover:bg-gray-600"
+                className={`ml-auto ${
+                  theme === 'dark'
+                    ? 'bg-gray-700 text-white hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                }`}
                 size="sm"
               >
                 Open {app.name}
@@ -216,11 +236,15 @@ const AppConfig = () => {
 
             <div className="space-y-6">
               <div>
-                <h4 className="text-white font-medium mb-4">Integration Settings</h4>
+                <h4 className={`${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                } font-medium mb-4`}>Integration Settings</h4>
                 <div className="space-y-4">
                   {app.settings.map((setting) => (
                     <div key={setting.id} className="flex items-center justify-between">
-                      <span className="text-gray-300">{setting.label}</span>
+                      <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                        {setting.label}
+                      </span>
                       <Switch
                         defaultSelected={setting.enabled}
                         size="sm"
@@ -232,7 +256,9 @@ const AppConfig = () => {
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-gray-700">
+              <div className={`pt-6 border-t ${
+                theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              }`}>
                 <Button 
                   className={`w-full ${
                     app.isConnected 

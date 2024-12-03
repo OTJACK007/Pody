@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Target, Plus } from 'lucide-react';
-import { Button, Tabs, Tab } from "@nextui-org/react";
+import { Button, Tabs, Tab, Chip } from "@nextui-org/react";
+import { useTheme } from '../../../contexts/ThemeContext';
 import GoalsList from './components/GoalsList';
 import GoalInsights from './components/GoalInsights';
 import GoalProgress from './components/GoalProgress';
@@ -10,11 +11,12 @@ import GoalStats from './components/GoalStats';
 const MyGoals = () => {
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [selectedView, setSelectedView] = useState('active');
+  const { theme } = useTheme();
 
   const goalStats = {
     total: 8,
     completed: 3,
-    inProgress: 4,
+    pending: 4,
     upcoming: 1
   };
 
@@ -24,8 +26,12 @@ const MyGoals = () => {
         <div className="flex items-center gap-3">
           <Target className="w-8 h-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold text-white">My Goals</h1>
-            <p className="text-gray-400 mt-1">Track your progress and achievements</p>
+            <h1 className={`text-3xl font-bold ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>My Goals</h1>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Track your progress and achievements
+            </p>
           </div>
         </div>
         <Button
@@ -45,9 +51,10 @@ const MyGoals = () => {
             selectedKey={selectedView}
             onSelectionChange={(key) => setSelectedView(key.toString())}
             classNames={{
-              tabList: "bg-gray-800/50 p-1 rounded-lg",
-              cursor: "bg-gray-700",
-              tab: "text-gray-400 data-[selected=true]:text-white",
+              tabList: `${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} p-1 rounded-lg`,
+              cursor: `${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`,
+              tab: `${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} data-[selected=true]:${theme === 'dark' ? 'text-white' : 'text-gray-900'}`,
+              tabContent: "group-data-[selected=true]:text-inherit"
             }}
           >
             <Tab key="active" title="Active Goals" />

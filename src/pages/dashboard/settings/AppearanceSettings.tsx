@@ -1,9 +1,12 @@
 import React from 'react';
 import { Palette, Sun, Moon, Monitor } from 'lucide-react';
 import { Card, CardBody, RadioGroup, Radio, Button } from "@nextui-org/react";
+import { useTheme } from '../../../contexts/ThemeContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 
 const AppearanceSettings = () => {
+  const { theme } = useTheme();
+
   const themes = [
     {
       name: 'Dark Theme',
@@ -28,33 +31,47 @@ const AppearanceSettings = () => {
   return (
     <div className="max-w-4xl">
       <SettingsHeader
-        icon={<Palette className="w-6 h-6 text-primary" />}
+        icon={<Palette className="w-6 h-6 text-[#ff3366]" />}
         title="Appearance"
         description="Customize your dashboard appearance"
       />
       
       <div className="space-y-6">
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Theme Selection</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Theme Selection</h3>
             
             <RadioGroup defaultValue="dark">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {themes.map((theme) => (
+                {themes.map((themeOption) => (
                   <Radio
-                    key={theme.name}
-                    value={theme.name.toLowerCase()}
+                    key={themeOption.name}
+                    value={themeOption.name.toLowerCase()}
                     classNames={{
                       base: "max-w-full"
                     }}
                   >
-                    <div className="flex flex-col gap-2 p-4 rounded-lg bg-gray-700/30 hover:bg-gray-700/50 transition-colors cursor-pointer">
-                      <div className={`w-full h-24 rounded-lg ${theme.preview} relative overflow-hidden`}>
-                        <div className={`absolute bottom-0 left-0 right-0 h-1 ${theme.accent}`} />
+                    <div className={`flex flex-col gap-2 p-4 rounded-lg ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700/30 hover:bg-gray-700/50' 
+                        : 'bg-gray-100 hover:bg-gray-200'
+                    } transition-colors cursor-pointer`}>
+                      <div className={`w-full h-24 rounded-lg ${themeOption.preview} relative overflow-hidden`}>
+                        <div className={`absolute bottom-0 left-0 right-0 h-1 ${themeOption.accent}`} />
                       </div>
                       <div>
-                        <p className="text-white font-medium">{theme.name}</p>
-                        <p className="text-gray-400 text-sm">{theme.description}</p>
+                        <p className={`font-medium ${
+                          theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>{themeOption.name}</p>
+                        <p className={`text-sm ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>{themeOption.description}</p>
                       </div>
                     </div>
                   </Radio>
@@ -64,9 +81,15 @@ const AppearanceSettings = () => {
           </CardBody>
         </Card>
 
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Color Schemes</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Color Schemes</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {['#ff3366', '#2eff94', '#147dff', '#9333ea', '#f97316', '#06b6d4', '#14b8a6', '#8b5cf6'].map((color) => (
                 <button

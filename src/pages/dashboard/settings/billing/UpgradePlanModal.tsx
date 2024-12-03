@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, Button, Card, CardBody, CardHeader } from "@nextui-org/react";
 import { Check, Crown, Zap, Star, Rocket } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface UpgradePlanModalProps {
   isOpen: boolean;
@@ -8,6 +9,8 @@ interface UpgradePlanModalProps {
 }
 
 const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
+  const { theme } = useTheme();
+
   const plans = [
     {
       name: 'Basic',
@@ -76,24 +79,32 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
       onClose={onClose}
       size="4xl"
       classNames={{
-        base: "bg-gray-800 text-white",
-        closeButton: "text-white hover:bg-gray-700"
+        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
       }}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold">Upgrade for more features</h2>
-          <p className="text-sm text-gray-400">Choose the perfect plan for your needs</p>
+          <h2 className={`text-2xl font-bold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>Upgrade for more features</h2>
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            Choose the perfect plan for your needs
+          </p>
         </ModalHeader>
         <ModalBody className="py-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {plans.map((plan) => (
               <Card
                 key={plan.name}
-                className={`bg-gray-700/50 border ${
+                className={`${
+                  theme === 'dark'
+                    ? 'bg-gray-700/50 border-gray-600'
+                    : 'bg-white border-gray-200'
+                } border ${
                   plan.popular 
                     ? 'border-secondary relative z-10 transform hover:scale-105 transition-transform' 
-                    : 'border-gray-600 hover:border-gray-500'
+                    : 'hover:border-gray-500'
                 }`}
               >
                 <CardHeader className="flex flex-col gap-2 pb-0">
@@ -107,13 +118,19 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
                       </span>
                     )}
                   </div>
-                  <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                  <h3 className={`text-xl font-bold ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>{plan.name}</h3>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-white">{plan.price}</span>
-                    <span className="text-gray-400">/month</span>
+                    <span className={`text-3xl font-bold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>{plan.price}</span>
+                    <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>/month</span>
                   </div>
                   {plan.originalPrice && (
-                    <span className="text-sm text-gray-400 line-through">
+                    <span className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    } line-through`}>
                       {plan.originalPrice}/month
                     </span>
                   )}
@@ -126,14 +143,16 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
                     {plan.features.map((feature, index) => (
                       <li key={index} className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-secondary flex-shrink-0" />
-                        <span className="text-sm text-gray-300">{feature}</span>
+                        <span className={`text-sm ${
+                          theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                        }`}>{feature}</span>
                       </li>
                     ))}
                   </ul>
                   <Button
                     className={`w-full mt-6 ${
                       plan.current
-                        ? 'bg-gray-600 text-gray-300'
+                        ? `${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'} text-gray-300`
                         : 'bg-secondary text-black hover:bg-secondary/90'
                     }`}
                     disabled={plan.current}

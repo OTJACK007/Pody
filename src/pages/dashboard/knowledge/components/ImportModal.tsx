@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Card, CardBody, Input, Progress } from "@nextui-org/react";
 import { Upload, File, CheckCircle } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface ImportModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface ImportModalProps {
 const ImportModal = ({ isOpen, onClose }: ImportModalProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const { theme } = useTheme();
 
   const handleUpload = async () => {
     setIsUploading(true);
@@ -30,28 +32,40 @@ const ImportModal = ({ isOpen, onClose }: ImportModalProps) => {
       onClose={onClose}
       size="2xl"
       classNames={{
-        base: "bg-gray-800 text-white",
-        closeButton: "text-white hover:bg-gray-700"
+        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
       }}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <h2 className="text-2xl">Import Notes</h2>
-          <p className="text-sm text-gray-400">Import your notes from various sources</p>
+          <h2 className={`text-2xl ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Import Notes
+          </h2>
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            Import your notes from various sources
+          </p>
         </ModalHeader>
         <ModalBody>
-          <Card className="bg-gray-700/50 border border-gray-600 border-dashed">
+          <Card className={`${
+            theme === 'dark' 
+              ? 'bg-gray-700/50 border-gray-600' 
+              : 'bg-gray-100 border-gray-200'
+          } border border-dashed`}>
             <CardBody className="py-8">
               <div className="text-center">
                 <Upload className="w-12 h-12 text-primary mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Drag and drop files here</h3>
-                <p className="text-gray-400 mb-4">or click to browse</p>
+                <h3 className={`text-lg font-semibold mb-2 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Drag and drop files here</h3>
+                <p className={`mb-4 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>or click to browse</p>
                 <Input
                   type="file"
                   className="hidden"
                   classNames={{
-                    input: "bg-gray-700/50 text-white",
-                    inputWrapper: "bg-gray-700/50 border-gray-600"
+                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
                 <Button
@@ -68,8 +82,12 @@ const ImportModal = ({ isOpen, onClose }: ImportModalProps) => {
             <div className="mt-6">
               <div className="flex items-center gap-3 mb-2">
                 <File className="w-4 h-4 text-primary" />
-                <span className="text-sm text-white">Uploading files...</span>
-                <span className="text-sm text-gray-400 ml-auto">{uploadProgress}%</span>
+                <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                  Uploading files...
+                </span>
+                <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  {uploadProgress}%
+                </span>
               </div>
               <Progress 
                 value={uploadProgress}

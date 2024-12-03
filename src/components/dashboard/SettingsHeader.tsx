@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from "@nextui-org/react";
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface SettingsHeaderProps {
   icon: React.ReactNode;
@@ -11,13 +12,14 @@ interface SettingsHeaderProps {
 
 const SettingsHeader = ({ icon, title, description }: SettingsHeaderProps) => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   return (
     <div className="mb-8">
       <Button
         variant="light"
         startContent={<ArrowLeft className="w-4 h-4" />}
-        className="mb-4 text-gray-400 hover:text-white"
+        className={`mb-4 ${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}`}
         onClick={() => navigate('/dashboard/settings')}
       >
         Back to Settings
@@ -28,8 +30,12 @@ const SettingsHeader = ({ icon, title, description }: SettingsHeaderProps) => {
           {icon}
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
-          <p className="text-gray-400">{description}</p>
+          <h1 className={`text-3xl font-bold mb-2 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>{title}</h1>
+          <p className={`${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>{description}</p>
         </div>
       </div>
     </div>

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Sparkles, ThumbsUp, ThumbsDown, Send, ChevronRight, Clock, Users } from 'lucide-react';
 import { Card, CardBody, Button, Tabs, Tab, Input, Textarea, Badge, Progress } from "@nextui-org/react";
+import { useTheme } from '../../contexts/ThemeContext';
 
 const NewFeatures = () => {
   const [activeTab, setActiveTab] = useState('requested');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [reason, setReason] = useState('');
+  const { theme } = useTheme();
 
   const requestedFeatures = [
     {
@@ -86,13 +88,6 @@ const NewFeatures = () => {
     }
   ];
 
-  const handleSubmit = () => {
-    // Handle feature suggestion submission
-    setTitle('');
-    setDescription('');
-    setReason('');
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'In Development': return 'success';
@@ -107,8 +102,12 @@ const NewFeatures = () => {
       <div className="flex items-center gap-3">
         <Sparkles className="w-8 h-8 text-primary" />
         <div>
-          <h1 className="text-3xl font-bold text-white">New Features</h1>
-          <p className="text-gray-400 mt-1">Vote for upcoming features or suggest new ones</p>
+          <h1 className={`text-3xl font-bold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>New Features</h1>
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            Vote for upcoming features or suggest new ones
+          </p>
         </div>
       </div>
 
@@ -116,9 +115,10 @@ const NewFeatures = () => {
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(key.toString())}
         classNames={{
-          tabList: "bg-gray-800/50 p-1 rounded-lg",
-          cursor: "bg-gray-700",
-          tab: "text-gray-400 data-[selected=true]:text-white",
+          tabList: `${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} p-1 rounded-lg`,
+          cursor: `${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`,
+          tab: `${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} data-[selected=true]:${theme === 'dark' ? 'text-white' : 'text-gray-900'}`,
+          tabContent: "group-data-[selected=true]:text-inherit"
         }}
       >
         <Tab key="requested" title="Requested Features" />
@@ -129,38 +129,56 @@ const NewFeatures = () => {
       {activeTab === 'requested' && (
         <div className="space-y-4">
           {requestedFeatures.map((feature) => (
-            <Card key={feature.id} className="bg-gray-800/50 border border-gray-700/50">
+            <Card key={feature.id} className={`${
+              theme === 'dark' 
+                ? 'bg-gray-800/50 border-gray-700/50' 
+                : 'bg-white border-gray-200'
+            } border`}>
               <CardBody className="p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-grow">
-                    <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                    <p className="text-gray-400 mb-4">{feature.description}</p>
+                    <h3 className={`text-xl font-semibold mb-2 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>{feature.title}</h3>
+                    <p className={`mb-4 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>{feature.description}</p>
                     <div className="flex items-center gap-4 text-sm">
-                      <div className="flex items-center gap-2 text-gray-400">
+                      <div className={`flex items-center gap-2 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         <Users className="w-4 h-4" />
                         <span>{feature.supporters} supporters</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-400">
+                      <div className={`flex items-center gap-2 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         <Clock className="w-4 h-4" />
                         <span>Requested on {feature.requestedDate}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        startContent={<ThumbsUp className="w-4 h-4" />}
-                        className="bg-gray-700 text-white hover:bg-gray-600"
-                      >
-                        {feature.votes.up}
-                      </Button>
-                      <Button
-                        startContent={<ThumbsDown className="w-4 h-4" />}
-                        className="bg-gray-700 text-white hover:bg-gray-600"
-                      >
-                        {feature.votes.down}
-                      </Button>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      startContent={<ThumbsUp className="w-4 h-4" />}
+                      className={`${
+                        theme === 'dark'
+                          ? 'bg-gray-700 text-white hover:bg-gray-600'
+                          : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                      }`}
+                    >
+                      {feature.votes.up}
+                    </Button>
+                    <Button
+                      startContent={<ThumbsDown className="w-4 h-4" />}
+                      className={`${
+                        theme === 'dark'
+                          ? 'bg-gray-700 text-white hover:bg-gray-600'
+                          : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                      }`}
+                    >
+                      {feature.votes.down}
+                    </Button>
                   </div>
                 </div>
               </CardBody>
@@ -172,22 +190,34 @@ const NewFeatures = () => {
       {activeTab === 'upcoming' && (
         <div className="space-y-4">
           {upcomingFeatures.map((feature) => (
-            <Card key={feature.id} className="bg-gray-800/50 border border-gray-700/50">
+            <Card key={feature.id} className={`${
+              theme === 'dark' 
+                ? 'bg-gray-800/50 border-gray-700/50' 
+                : 'bg-white border-gray-200'
+            } border`}>
               <CardBody className="p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-grow">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
+                      <h3 className={`text-xl font-semibold ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{feature.title}</h3>
                       <Badge color={getStatusColor(feature.status)} variant="flat">
                         {feature.status}
                       </Badge>
                     </div>
-                    <p className="text-gray-400 mb-4">{feature.description}</p>
+                    <p className={`mb-4 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>{feature.description}</p>
                     
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-400">Development Progress</span>
-                        <span className="text-sm text-white">{feature.progress}%</span>
+                        <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                          Development Progress
+                        </span>
+                        <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                          {feature.progress}%
+                        </span>
                       </div>
                       <Progress 
                         value={feature.progress} 
@@ -200,14 +230,18 @@ const NewFeatures = () => {
                       {feature.details.map((detail, index) => (
                         <div key={index} className="flex items-center gap-2">
                           <ChevronRight className="w-4 h-4 text-primary" />
-                          <span className="text-sm text-gray-300">{detail}</span>
+                          <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                            {detail}
+                          </span>
                         </div>
                       ))}
                     </div>
 
                     <div className="flex items-center gap-4 mt-4 text-sm">
                       <span className="text-primary">Expected: {feature.eta}</span>
-                      <span className="text-gray-400">{feature.votes} votes</span>
+                      <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                        {feature.votes} votes
+                      </span>
                     </div>
                   </div>
                   <Button
@@ -223,7 +257,11 @@ const NewFeatures = () => {
       )}
 
       {activeTab === 'suggest' && (
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
             <div className="space-y-6">
               <div>
@@ -233,8 +271,8 @@ const NewFeatures = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   classNames={{
-                    input: "bg-gray-700/50 text-white",
-                    inputWrapper: "bg-gray-700/50 border-gray-600"
+                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
               </div>
@@ -246,8 +284,8 @@ const NewFeatures = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   classNames={{
-                    input: "bg-gray-700/50 text-white",
-                    inputWrapper: "bg-gray-700/50 border-gray-600"
+                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
               </div>
@@ -259,8 +297,8 @@ const NewFeatures = () => {
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   classNames={{
-                    input: "bg-gray-700/50 text-white",
-                    inputWrapper: "bg-gray-700/50 border-gray-600"
+                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
               </div>
@@ -268,7 +306,7 @@ const NewFeatures = () => {
               <Button
                 className="w-full bg-primary text-white"
                 endContent={<Send className="w-4 h-4" />}
-                onClick={handleSubmit}
+                onClick={() => {}}
               >
                 Submit Feature Request
               </Button>

@@ -2,9 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Tag, MessageSquare, Share2, Download } from 'lucide-react';
 import { Button, Card, CardBody, Avatar, Badge, Progress } from "@nextui-org/react";
+import { useTheme } from '../../../contexts/ThemeContext';
 
 const PodcastVideo = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const keyMoments = [
     {
@@ -36,21 +38,27 @@ const PodcastVideo = () => {
         <Button
           isIconOnly
           variant="light"
-          onClick={() => navigate('/dashboard/podcasts')}
-          className="text-gray-400 hover:text-white"
+          onClick={() => navigate('/dashboard/podroom')}
+          className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
         >
           <ArrowLeft className="w-6 h-6" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold text-white">The Future of AI Technology</h1>
+          <h1 className={`text-3xl font-bold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>The Future of AI Technology</h1>
           <div className="flex items-center gap-3 mt-2">
             <Avatar
               src="https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=400"
               className="ring-2 ring-white/20"
             />
             <div>
-              <p className="text-white font-medium">Tech Talks Daily</p>
-              <p className="text-sm text-gray-400">John Smith</p>
+              <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                Tech Talks Daily
+              </p>
+              <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                John Smith
+              </p>
             </div>
           </div>
         </div>
@@ -68,8 +76,12 @@ const PodcastVideo = () => {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Badge color="primary" variant="flat">Technology</Badge>
-              <div className="flex items-center gap-2 text-gray-400">
+              <Badge color="primary" variant="flat" className="text-white">
+                Technology
+              </Badge>
+              <div className={`flex items-center gap-2 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
                 <Clock className="w-4 h-4" />
                 <span>45 minutes</span>
               </div>
@@ -78,21 +90,21 @@ const PodcastVideo = () => {
               <Button
                 isIconOnly
                 variant="light"
-                className="text-gray-400 hover:text-white"
+                className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
               >
                 <MessageSquare className="w-5 h-5" />
               </Button>
               <Button
                 isIconOnly
                 variant="light"
-                className="text-gray-400 hover:text-white"
+                className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
               >
                 <Share2 className="w-5 h-5" />
               </Button>
               <Button
                 isIconOnly
                 variant="light"
-                className="text-gray-400 hover:text-white"
+                className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
               >
                 <Download className="w-5 h-5" />
               </Button>
@@ -101,26 +113,40 @@ const PodcastVideo = () => {
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-white">Key Moments</h2>
+          <h2 className={`text-xl font-semibold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>Key Moments</h2>
           {keyMoments.map((moment) => (
             <Card 
               key={moment.id}
-              className="bg-gray-800/50 border border-gray-700/50 hover:bg-gray-800 transition-colors cursor-pointer"
+              className={`${
+                theme === 'dark' 
+                  ? 'bg-gray-800/50 border-gray-700/50' 
+                  : 'bg-white border-gray-200'
+              } border hover:bg-${theme === 'dark' ? 'gray-800' : 'gray-50'} transition-colors cursor-pointer`}
             >
               <CardBody className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 p-2 bg-primary/10 rounded-lg">
+                  <div className={`flex-shrink-0 p-2 rounded-lg ${
+                    theme === 'dark' ? 'bg-primary/10' : 'bg-primary/5'
+                  }`}>
                     <Clock className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-medium text-white">{moment.title}</h3>
-                      <span className="text-sm text-gray-400">{moment.timestamp}</span>
+                      <h3 className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{moment.title}</h3>
+                      <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                        {moment.timestamp}
+                      </span>
                     </div>
-                    <p className="text-sm text-gray-400 mb-3">{moment.summary}</p>
+                    <p className={`text-sm mb-3 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>{moment.summary}</p>
                     <div className="flex flex-wrap gap-2">
                       {moment.tags.map((tag) => (
-                        <Badge key={tag} variant="flat" size="sm">
+                        <Badge key={tag} variant="flat" size="sm" className="text-white">
                           {tag}
                         </Badge>
                       ))}

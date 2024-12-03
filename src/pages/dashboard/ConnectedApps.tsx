@@ -2,9 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppWindow, ExternalLink } from 'lucide-react';
 import { Card, CardBody, Switch } from "@nextui-org/react";
+import { useTheme } from '../../contexts/ThemeContext';
 
 const ConnectedApps = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+
   const apps = [
     {
       id: 'youtube',
@@ -102,14 +105,25 @@ const ConnectedApps = () => {
     <div className="space-y-8">
       <div className="flex items-center gap-3">
         <AppWindow className="w-8 h-8 text-primary" />
-        <h1 className="text-3xl font-bold text-white">Connected Apps</h1>
+        <div>
+          <h1 className={`text-3xl font-bold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>Connected Apps</h1>
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            Manage your app integrations and connections
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {apps.map((app) => (
           <Card 
             key={app.id}
-            className="bg-gray-800/50 border border-gray-700/50 hover:bg-gray-800 transition-all duration-300"
+            className={`${
+              theme === 'dark' 
+                ? 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-800' 
+                : 'bg-white border-gray-200 hover:bg-gray-50'
+            } border transition-all duration-300`}
           >
             <CardBody className="p-6">
               <div className="flex items-start justify-between mb-4">
@@ -122,8 +136,10 @@ const ConnectedApps = () => {
                     />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">{app.name}</h3>
-                    <p className={`text-sm ${app.textColor}`}>
+                    <h3 className={`text-lg font-semibold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>{app.name}</h3>
+                    <p className={app.textColor}>
                       {app.isConnected ? 'Connected' : 'Not Connected'}
                     </p>
                   </div>
@@ -136,13 +152,19 @@ const ConnectedApps = () => {
                 />
               </div>
 
-              <p className="text-gray-400 text-sm">
+              <p className={`text-sm ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
                 {app.description}
               </p>
 
               <button 
                 onClick={() => navigate(`/dashboard/connected-apps/configure/${app.id}`)}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors text-sm text-gray-300"
+                className={`mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${
+                  theme === 'dark'
+                    ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-300'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
               >
                 <span>Configure</span>
                 <ExternalLink className="w-4 h-4" />

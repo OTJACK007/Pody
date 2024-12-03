@@ -1,29 +1,43 @@
 import React from 'react';
 import { Card, CardBody, CardHeader, Checkbox, RadioGroup, Radio, Divider } from "@nextui-org/react";
 import { X } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface FilterPanelProps {
   onClose: () => void;
 }
 
 const KnowledgeFilters = ({ onClose }: FilterPanelProps) => {
+  const { theme } = useTheme();
   const sources = ['Podcasts', 'Videos', 'Articles', 'Notes'];
   const tags = ['Technology', 'Business', 'Personal Growth', 'Finance', 'Health'];
 
   return (
-    <Card className="bg-gray-800/50 border border-gray-700/50">
+    <Card className={`${
+      theme === 'dark' 
+        ? 'bg-gray-800/50 border-gray-700/50' 
+        : 'bg-white border-gray-200'
+    } border`}>
       <CardHeader className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-white">Filters</h3>
+        <h3 className={`text-lg font-semibold ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>Filters</h3>
         <button
           onClick={onClose}
-          className="p-1 hover:bg-gray-700 rounded-lg transition-colors"
+          className={`p-1 rounded-lg transition-colors ${
+            theme === 'dark'
+              ? 'hover:bg-gray-700 text-gray-400'
+              : 'hover:bg-gray-100 text-gray-600'
+          }`}
         >
-          <X className="w-5 h-5 text-gray-400" />
+          <X className="w-5 h-5" />
         </button>
       </CardHeader>
       <CardBody className="space-y-6">
         <div>
-          <h4 className="text-sm font-medium text-gray-400 mb-3">Date Range</h4>
+          <h4 className={`text-sm font-medium mb-3 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>Date Range</h4>
           <RadioGroup>
             <Radio value="all">All Time</Radio>
             <Radio value="today">Today</Radio>
@@ -33,17 +47,19 @@ const KnowledgeFilters = ({ onClose }: FilterPanelProps) => {
           </RadioGroup>
         </div>
 
-        <Divider className="bg-gray-700" />
+        <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
 
         <div>
-          <h4 className="text-sm font-medium text-gray-400 mb-3">Source Type</h4>
+          <h4 className={`text-sm font-medium mb-3 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>Source Type</h4>
           <div className="space-y-2">
             {sources.map((source) => (
               <Checkbox
                 key={source}
                 value={source}
                 classNames={{
-                  wrapper: "before:border-gray-600"
+                  wrapper: theme === 'dark' ? "before:border-gray-600" : "before:border-gray-300"
                 }}
               >
                 {source}
@@ -52,17 +68,19 @@ const KnowledgeFilters = ({ onClose }: FilterPanelProps) => {
           </div>
         </div>
 
-        <Divider className="bg-gray-700" />
+        <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
 
         <div>
-          <h4 className="text-sm font-medium text-gray-400 mb-3">Tags</h4>
+          <h4 className={`text-sm font-medium mb-3 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>Tags</h4>
           <div className="space-y-2">
             {tags.map((tag) => (
               <Checkbox
                 key={tag}
                 value={tag}
                 classNames={{
-                  wrapper: "before:border-gray-600"
+                  wrapper: theme === 'dark' ? "before:border-gray-600" : "before:border-gray-300"
                 }}
               >
                 {tag}
@@ -71,10 +89,12 @@ const KnowledgeFilters = ({ onClose }: FilterPanelProps) => {
           </div>
         </div>
 
-        <Divider className="bg-gray-700" />
+        <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
 
         <div>
-          <h4 className="text-sm font-medium text-gray-400 mb-3">Status</h4>
+          <h4 className={`text-sm font-medium mb-3 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>Status</h4>
           <RadioGroup>
             <Radio value="all">All Notes</Radio>
             <Radio value="favorites">Favorites</Radio>

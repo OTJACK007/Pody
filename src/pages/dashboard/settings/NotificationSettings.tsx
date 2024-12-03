@@ -1,9 +1,12 @@
 import React from 'react';
 import { Bell, Mail, Globe, MessageSquare, Star, Gift, Radio, Smartphone, Volume2 } from 'lucide-react';
 import { Card, CardBody, Switch, Tabs, Tab, Divider, Button, Select, SelectItem } from "@nextui-org/react";
+import { useTheme } from '../../../contexts/ThemeContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 
 const NotificationSettings = () => {
+  const { theme } = useTheme();
+
   const emailFrequencies = [
     { value: 'immediate', label: 'Immediately' },
     { value: 'daily', label: 'Daily Digest' },
@@ -44,16 +47,22 @@ const NotificationSettings = () => {
   return (
     <div className="max-w-4xl">
       <SettingsHeader
-        icon={<Bell className="w-6 h-6 text-primary" />}
+        icon={<Bell className="w-6 h-6 text-[#ff3366]" />}
         title="Notification Settings"
         description="Configure how and when you want to be notified"
       />
       
       <div className="space-y-6">
         {/* Notification Channels */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Notification Channels</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Notification Channels</h3>
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -61,8 +70,12 @@ const NotificationSettings = () => {
                     <Mail className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Email Notifications</p>
-                    <p className="text-sm text-gray-400">Receive updates in your inbox</p>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Email Notifications</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      Receive updates in your inbox
+                    </p>
                   </div>
                 </div>
                 <Select
@@ -78,7 +91,7 @@ const NotificationSettings = () => {
                 </Select>
               </div>
 
-              <Divider className="bg-gray-700" />
+              <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -86,14 +99,18 @@ const NotificationSettings = () => {
                     <Globe className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Browser Notifications</p>
-                    <p className="text-sm text-gray-400">Get notified in your browser</p>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Browser Notifications</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      Get notified in your browser
+                    </p>
                   </div>
                 </div>
                 <Switch defaultSelected color="success" />
               </div>
 
-              <Divider className="bg-gray-700" />
+              <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -101,14 +118,18 @@ const NotificationSettings = () => {
                     <Smartphone className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Mobile Push Notifications</p>
-                    <p className="text-sm text-gray-400">Stay updated on your mobile device</p>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Mobile Push Notifications</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      Stay updated on your mobile device
+                    </p>
                   </div>
                 </div>
                 <Switch defaultSelected color="success" />
               </div>
 
-              <Divider className="bg-gray-700" />
+              <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -116,8 +137,12 @@ const NotificationSettings = () => {
                     <Volume2 className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Sound Notifications</p>
-                    <p className="text-sm text-gray-400">Play sound for important alerts</p>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Sound Notifications</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      Play sound for important alerts
+                    </p>
                   </div>
                 </div>
                 <Switch defaultSelected color="success" />
@@ -128,21 +153,31 @@ const NotificationSettings = () => {
 
         {/* Notification Types */}
         {notificationTypes.map((section) => (
-          <Card key={section.id} className="bg-gray-800/50 border border-gray-700/50">
+          <Card key={section.id} className={`${
+            theme === 'dark' 
+              ? 'bg-gray-800/50 border-gray-700/50' 
+              : 'bg-white border-gray-200'
+          } border`}>
             <CardBody className="p-6">
-              <h3 className="text-lg font-semibold text-white mb-6">{section.title}</h3>
+              <h3 className={`text-lg font-semibold mb-6 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>{section.title}</h3>
               <div className="space-y-6">
                 {section.items.map((item, index) => (
                   <React.Fragment key={item.id}>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-white font-medium">{item.label}</p>
-                        <p className="text-sm text-gray-400">{item.description}</p>
+                        <p className={`font-medium ${
+                          theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>{item.label}</p>
+                        <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                          {item.description}
+                        </p>
                       </div>
                       <Switch defaultSelected color="success" />
                     </div>
                     {index < section.items.length - 1 && (
-                      <Divider className="bg-gray-700" />
+                      <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
                     )}
                   </React.Fragment>
                 ))}
@@ -152,30 +187,50 @@ const NotificationSettings = () => {
         ))}
 
         {/* Quiet Hours */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-white">Quiet Hours</h3>
-                <p className="text-sm text-gray-400">Pause notifications during specific times</p>
+                <h3 className={`text-lg font-semibold ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Quiet Hours</h3>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  Pause notifications during specific times
+                </p>
               </div>
               <Switch defaultSelected color="success" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Start Time</label>
+                <label className={`block text-sm mb-2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Start Time</label>
                 <input
                   type="time"
                   defaultValue="22:00"
-                  className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                  className={`w-full px-4 py-2 rounded-lg focus:ring-1 focus:ring-primary outline-none ${
+                    theme === 'dark'
+                      ? 'bg-gray-700/50 border-gray-600 text-white'
+                      : 'bg-gray-100 border-gray-300 text-gray-900'
+                  } border`}
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-2">End Time</label>
+                <label className={`block text-sm mb-2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>End Time</label>
                 <input
                   type="time"
                   defaultValue="07:00"
-                  className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                  className={`w-full px-4 py-2 rounded-lg focus:ring-1 focus:ring-primary outline-none ${
+                    theme === 'dark'
+                      ? 'bg-gray-700/50 border-gray-600 text-white'
+                      : 'bg-gray-100 border-gray-300 text-gray-900'
+                  } border`}
                 />
               </div>
             </div>

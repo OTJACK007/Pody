@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardBody } from "@nextui-org/react";
 import { BookOpen, Tags, FolderOpen, Clock } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface KnowledgeStatsProps {
   stats: {
@@ -12,6 +13,8 @@ interface KnowledgeStatsProps {
 }
 
 const KnowledgeStats = ({ stats }: KnowledgeStatsProps) => {
+  const { theme } = useTheme();
+
   const statCards = [
     {
       title: 'Total Notes',
@@ -42,15 +45,23 @@ const KnowledgeStats = ({ stats }: KnowledgeStatsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       {statCards.map((stat, index) => (
-        <Card key={index} className="bg-gray-800/50 border border-gray-700/50">
+        <Card key={index} className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-4">
             <div className="flex items-center justify-between mb-3">
               <div className={`p-2 rounded-lg ${stat.color}`}>
                 {stat.icon}
               </div>
-              <span className="text-2xl font-bold text-white">{stat.value}</span>
+              <span className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>{stat.value}</span>
             </div>
-            <p className="text-sm text-gray-400">{stat.title}</p>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              {stat.title}
+            </p>
           </CardBody>
         </Card>
       ))}

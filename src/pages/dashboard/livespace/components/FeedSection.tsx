@@ -1,6 +1,7 @@
 import React from 'react';
 import { Play, CheckCircle2 } from 'lucide-react';
 import { Genre } from '../../../../types';
+import { useTheme } from '../../../../contexts/ThemeContext';
 import { getTrendingEmoji } from '../../../../utils/emoji';
 import useEmblaCarousel from 'embla-carousel-react';
 
@@ -10,6 +11,7 @@ interface FeedSectionProps {
 }
 
 const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
+  const { theme } = useTheme();
   const [genreEmblaRef] = useEmblaCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
@@ -72,7 +74,7 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
 
   return (
     <div>
-      <h2 className="text-5xl font-bold text-white bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent mb-8">
+      <h2 className={`text-5xl font-bold bg-gradient-to-r from-${theme === 'dark' ? 'white' : 'gray-900'} to-gray-500 bg-clip-text text-transparent mb-8`}>
         Feed
       </h2>
       
@@ -86,7 +88,9 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
               className={`flex-none px-4 py-2 rounded-full whitespace-nowrap transition-colors flex items-center space-x-2 ${
                 selectedGenre === genre
                   ? 'bg-accent text-white'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  : theme === 'dark'
+                    ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               <span>{getTrendingEmoji(genre)}</span>
@@ -119,13 +123,19 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
             </div>
             <div className="mt-3">
               <div className="flex items-center space-x-2 mb-1">
-                <span className="text-gray-300 text-sm">{item.channel.name}</span>
+                <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                  {item.channel.name}
+                </span>
                 {item.channel.verified && (
                   <CheckCircle2 className="w-4 h-4 text-primary" />
                 )}
               </div>
-              <h3 className="text-white font-semibold">{item.title}</h3>
-              <div className="flex items-center space-x-2 text-sm text-gray-400">
+              <h3 className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                {item.title}
+              </h3>
+              <div className={`flex items-center space-x-2 text-sm ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
                 <span>{item.genre}</span>
                 <span>•</span>
                 <span>{item.duration}</span>

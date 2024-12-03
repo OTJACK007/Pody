@@ -1,8 +1,11 @@
 import React from 'react';
-import { Card, CardBody, CardFooter, Avatar, Button, Chip } from "@nextui-org/react";
+import { Card, CardBody, Avatar, Badge, Button } from "@nextui-org/react";
 import { MoreVertical, Star, MessageSquare, Share2 } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 const KnowledgeGrid = () => {
+  const { theme } = useTheme();
+
   const notes = [
     {
       id: 1,
@@ -48,17 +51,25 @@ const KnowledgeGrid = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {notes.map((note) => (
-        <Card key={note.id} className="bg-gray-800/50 border border-gray-700/50">
+        <Card key={note.id} className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-white mb-2">{note.title}</h3>
-                <p className="text-gray-400 text-sm line-clamp-3">{note.content}</p>
+                <h3 className={`text-xl font-semibold mb-2 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>{note.title}</h3>
+                <p className={`mb-4 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>{note.content}</p>
               </div>
               <Button
                 isIconOnly
                 variant="light"
-                className="text-gray-400 hover:text-white"
+                className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
               >
                 <MoreVertical className="w-4 h-4" />
               </Button>
@@ -66,14 +77,16 @@ const KnowledgeGrid = () => {
 
             <div className="flex flex-wrap gap-2 mt-4">
               {note.tags.map((tag) => (
-                <Chip key={tag} size="sm" variant="flat">
+                <Badge key={tag} size="sm" variant="flat" className="text-white">
                   {tag}
-                </Chip>
+                </Badge>
               ))}
             </div>
           </CardBody>
 
-          <CardFooter className="border-t border-gray-700 px-6 py-4">
+          <CardBody className={`border-t px-6 py-4 ${
+            theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+          }`}>
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-3">
                 <Avatar
@@ -82,35 +95,39 @@ const KnowledgeGrid = () => {
                   className="ring-2 ring-white/20"
                 />
                 <div>
-                  <p className="text-white text-sm">{note.source.title}</p>
-                  <p className="text-gray-400 text-xs">{note.date}</p>
+                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                    {note.source.title}
+                  </p>
+                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    {note.date}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Button
                   isIconOnly
                   variant="light"
-                  className={note.isFavorite ? 'text-yellow-400' : 'text-gray-400'}
+                  className={note.isFavorite ? 'text-yellow-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                 >
                   <Star className="w-4 h-4" fill={note.isFavorite ? 'currentColor' : 'none'} />
                 </Button>
                 <Button
                   isIconOnly
                   variant="light"
-                  className="text-gray-400"
+                  className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                 >
                   <MessageSquare className="w-4 h-4" />
                 </Button>
                 <Button
                   isIconOnly
                   variant="light"
-                  className="text-gray-400"
+                  className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                 >
                   <Share2 className="w-4 h-4" />
                 </Button>
               </div>
             </div>
-          </CardFooter>
+          </CardBody>
         </Card>
       ))}
     </div>

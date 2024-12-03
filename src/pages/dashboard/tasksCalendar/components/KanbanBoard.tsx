@@ -3,6 +3,7 @@ import { Card, CardBody, Avatar, Badge } from "@nextui-org/react";
 import { Calendar, Clock, Flag } from 'lucide-react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
+import { useTheme } from '../../../../contexts/ThemeContext';
 import KanbanColumn from './KanbanColumn';
 import KanbanItem from './KanbanItem';
 
@@ -23,6 +24,7 @@ interface TasksByColumn {
 }
 
 const KanbanBoard = () => {
+  const { theme } = useTheme();
   const columns = [
     { id: 'todo', title: 'To Do', color: 'bg-gray-500' },
     { id: 'inProgress', title: 'In Progress', color: 'bg-blue-500' },

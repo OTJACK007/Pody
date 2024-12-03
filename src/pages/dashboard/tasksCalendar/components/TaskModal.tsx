@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
 import { Calendar, Clock, Flag, Tag } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ const TaskModal = ({ isOpen, onClose }: TaskModalProps) => {
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState('');
   const [category, setCategory] = useState('');
+  const { theme } = useTheme();
 
   const priorities = [
     { value: 'high', label: 'High Priority', color: 'danger' },
@@ -37,8 +39,8 @@ const TaskModal = ({ isOpen, onClose }: TaskModalProps) => {
       isOpen={isOpen} 
       onClose={onClose}
       classNames={{
-        base: "bg-gray-800 text-white",
-        closeButton: "text-white hover:bg-gray-700"
+        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
       }}
     >
       <ModalContent>
@@ -50,9 +52,10 @@ const TaskModal = ({ isOpen, onClose }: TaskModalProps) => {
               placeholder="Enter task title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              startContent={<Tag className="w-4 h-4 text-gray-400" />}
               classNames={{
-                input: "bg-gray-700/50 text-white",
-                inputWrapper: "bg-gray-700/50 border-gray-600"
+                input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
               }}
             />
 
@@ -62,8 +65,8 @@ const TaskModal = ({ isOpen, onClose }: TaskModalProps) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               classNames={{
-                input: "bg-gray-700/50 text-white",
-                inputWrapper: "bg-gray-700/50 border-gray-600"
+                input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
               }}
             />
 
@@ -75,8 +78,8 @@ const TaskModal = ({ isOpen, onClose }: TaskModalProps) => {
                 onChange={(e) => setDueDate(e.target.value)}
                 startContent={<Calendar className="w-4 h-4 text-gray-400" />}
                 classNames={{
-                  input: "bg-gray-700/50 text-white",
-                  inputWrapper: "bg-gray-700/50 border-gray-600"
+                  input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                  inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                 }}
               />
 
@@ -87,8 +90,8 @@ const TaskModal = ({ isOpen, onClose }: TaskModalProps) => {
                 onChange={(e) => setPriority(e.target.value)}
                 startContent={<Flag className="w-4 h-4 text-gray-400" />}
                 classNames={{
-                  trigger: "bg-gray-700/50 border-gray-600",
-                  value: "text-white"
+                  trigger: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`,
+                  value: theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }}
               >
                 {priorities.map((p) => (
@@ -106,8 +109,8 @@ const TaskModal = ({ isOpen, onClose }: TaskModalProps) => {
               onChange={(e) => setCategory(e.target.value)}
               startContent={<Tag className="w-4 h-4 text-gray-400" />}
               classNames={{
-                trigger: "bg-gray-700/50 border-gray-600",
-                value: "text-white"
+                trigger: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`,
+                value: theme === 'dark' ? 'text-white' : 'text-gray-900'
               }}
             >
               {categories.map((c) => (

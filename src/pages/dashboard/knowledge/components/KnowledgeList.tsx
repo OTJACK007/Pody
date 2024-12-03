@@ -1,8 +1,11 @@
 import React from 'react';
-import { Card, CardBody, Avatar, Button, Chip } from "@nextui-org/react";
+import { Card, CardBody, Avatar, Button, Badge } from "@nextui-org/react";
 import { MoreVertical, Star, MessageSquare, Share2, Calendar } from 'lucide-react';
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 const KnowledgeList = () => {
+  const { theme } = useTheme();
+
   const notes = [
     {
       id: 1,
@@ -48,7 +51,11 @@ const KnowledgeList = () => {
   return (
     <div className="space-y-4">
       {notes.map((note) => (
-        <Card key={note.id} className="bg-gray-800/50 border border-gray-700/50">
+        <Card key={note.id} className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-4">
             <div className="flex items-start gap-4">
               <Avatar
@@ -58,49 +65,55 @@ const KnowledgeList = () => {
               <div className="flex-grow">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">{note.title}</h3>
-                    <p className="text-gray-400 text-sm">{note.content}</p>
+                    <h3 className={`text-xl font-semibold mb-2 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>{note.title}</h3>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      {note.content}
+                    </p>
                   </div>
                   <Button
                     isIconOnly
                     variant="light"
-                    className="text-gray-400 hover:text-white"
+                    className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
                   >
                     <MoreVertical className="w-4 h-4" />
                   </Button>
                 </div>
 
                 <div className="flex items-center gap-4 mt-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <div className={`flex items-center gap-2 text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
                     <Calendar className="w-4 h-4" />
                     <span>{note.date}</span>
                   </div>
                   <div className="flex gap-2">
                     {note.tags.map((tag) => (
-                      <Chip key={tag} size="sm" variant="flat">
+                      <Badge key={tag} size="sm" variant="flat" className="text-white">
                         {tag}
-                      </Chip>
+                      </Badge>
                     ))}
                   </div>
                   <div className="flex items-center gap-2 ml-auto">
                     <Button
                       isIconOnly
                       variant="light"
-                      className={note.isFavorite ? 'text-yellow-400' : 'text-gray-400'}
+                      className={note.isFavorite ? 'text-yellow-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                     >
                       <Star className="w-4 h-4" fill={note.isFavorite ? 'currentColor' : 'none'} />
                     </Button>
                     <Button
                       isIconOnly
                       variant="light"
-                      className="text-gray-400"
+                      className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                     >
                       <MessageSquare className="w-4 h-4" />
                     </Button>
                     <Button
                       isIconOnly
                       variant="light"
-                      className="text-gray-400"
+                      className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                     >
                       <Share2 className="w-4 h-4" />
                     </Button>

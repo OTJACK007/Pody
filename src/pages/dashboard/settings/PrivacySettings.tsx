@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Shield, Lock, Smartphone, QrCode, Key, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Card, CardBody, Input, Button, Switch, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
+import { useTheme } from '../../../contexts/ThemeContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 
 const PrivacySettings = () => {
@@ -16,6 +17,7 @@ const PrivacySettings = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<'phone' | 'verify'>('phone');
+  const { theme } = useTheme();
 
   const calculatePasswordStrength = (password: string) => {
     let strength = 0;
@@ -68,16 +70,22 @@ const PrivacySettings = () => {
   return (
     <div className="max-w-4xl">
       <SettingsHeader
-        icon={<Shield className="w-6 h-6 text-primary" />}
+        icon={<Shield className="w-6 h-6 text-[#ff3366]" />}
         title="Privacy & Security"
         description="Control your privacy settings and security options"
       />
       
       <div className="space-y-6">
         {/* Password Settings */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Password & Authentication</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Password & Authentication</h3>
             
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -86,12 +94,20 @@ const PrivacySettings = () => {
                     <Lock className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Change Password</p>
-                    <p className="text-sm text-gray-400">Update your account password</p>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Change Password</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      Update your account password
+                    </p>
                   </div>
                 </div>
                 <Button
-                  className="bg-gray-700 text-white hover:bg-gray-600"
+                  className={`${
+                    theme === 'dark'
+                      ? 'bg-gray-700 text-white hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  }`}
                   onClick={() => setShowPasswordModal(true)}
                 >
                   Change Password
@@ -104,12 +120,20 @@ const PrivacySettings = () => {
                     <Smartphone className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Phone Number Authentication</p>
-                    <p className="text-sm text-gray-400">Add an extra layer of security with SMS verification</p>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Phone Number Authentication</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      Add an extra layer of security with SMS verification
+                    </p>
                   </div>
                 </div>
                 <Button
-                  className="bg-gray-700 text-white hover:bg-gray-600"
+                  className={`${
+                    theme === 'dark'
+                      ? 'bg-gray-700 text-white hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  }`}
                   onClick={() => setShowPhoneModal(true)}
                 >
                   Setup
@@ -122,12 +146,20 @@ const PrivacySettings = () => {
                     <QrCode className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Authenticator App</p>
-                    <p className="text-sm text-gray-400">Use an authenticator app for 2FA</p>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Authenticator App</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      Use an authenticator app for 2FA
+                    </p>
                   </div>
                 </div>
                 <Button
-                  className="bg-gray-700 text-white hover:bg-gray-600"
+                  className={`${
+                    theme === 'dark'
+                      ? 'bg-gray-700 text-white hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  }`}
                   onClick={() => setShowQRModal(true)}
                 >
                   Setup
@@ -138,25 +170,39 @@ const PrivacySettings = () => {
         </Card>
 
         {/* Privacy Settings */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Privacy Settings</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Privacy Settings</h3>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-gray-300">Show my profile to other users</span>
+                <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                  Show my profile to other users
+                </span>
                 <Switch defaultSelected color="success" />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-300">Allow others to see my listening activity</span>
+                <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                  Allow others to see my listening activity
+                </span>
                 <Switch defaultSelected color="success" />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-300">Share my library with followers</span>
+                <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                  Share my library with followers
+                </span>
                 <Switch color="success" />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-300">Allow friend requests</span>
+                <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                  Allow friend requests
+                </span>
                 <Switch defaultSelected color="success" />
               </div>
             </div>
@@ -164,22 +210,40 @@ const PrivacySettings = () => {
         </Card>
 
         {/* Security Log */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">Security Log</h3>
+            <h3 className={`text-lg font-semibold mb-6 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Security Log</h3>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+              <div className={`flex items-center justify-between p-3 rounded-lg ${
+                theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-100'
+              }`}>
                 <div>
-                  <p className="text-white">Password changed</p>
-                  <p className="text-sm text-gray-400">2 days ago • New York, USA</p>
+                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                    Password changed
+                  </p>
+                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    2 days ago • New York, USA
+                  </p>
                 </div>
                 <AlertCircle className="w-5 h-5 text-primary" />
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+              <div className={`flex items-center justify-between p-3 rounded-lg ${
+                theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-100'
+              }`}>
                 <div>
-                  <p className="text-white">New device logged in</p>
-                  <p className="text-sm text-gray-400">5 days ago • London, UK</p>
+                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                    New device logged in
+                  </p>
+                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    5 days ago • London, UK
+                  </p>
                 </div>
                 <AlertCircle className="w-5 h-5 text-primary" />
               </div>
@@ -192,8 +256,8 @@ const PrivacySettings = () => {
           isOpen={showPasswordModal} 
           onClose={() => setShowPasswordModal(false)}
           classNames={{
-            base: "bg-gray-800 text-white",
-            closeButton: "text-white hover:bg-gray-700"
+            base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+            closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
           }}
         >
           <ModalContent>
@@ -201,7 +265,9 @@ const PrivacySettings = () => {
             <ModalBody>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-gray-300 mb-2">Current Password</label>
+                  <label className={`block text-sm mb-2 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>Current Password</label>
                   <div className="relative">
                     <Input
                       type={showCurrentPassword ? "text" : "password"}
@@ -217,15 +283,17 @@ const PrivacySettings = () => {
                         </button>
                       }
                       classNames={{
-                        input: "bg-gray-700/50 text-white",
-                        inputWrapper: "bg-gray-700/50 border-gray-600"
+                        input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                        inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                       }}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-300 mb-2">New Password</label>
+                  <label className={`block text-sm mb-2 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>New Password</label>
                   <div className="relative">
                     <Input
                       type={showNewPassword ? "text" : "password"}
@@ -241,8 +309,8 @@ const PrivacySettings = () => {
                         </button>
                       }
                       classNames={{
-                        input: "bg-gray-700/50 text-white",
-                        inputWrapper: "bg-gray-700/50 border-gray-600"
+                        input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                        inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                       }}
                     />
                   </div>
@@ -253,7 +321,9 @@ const PrivacySettings = () => {
                         color={getStrengthColor()}
                         className="h-1"
                       />
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className={`text-xs mt-1 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         Password strength: {passwordStrength}%
                       </p>
                     </div>
@@ -261,15 +331,17 @@ const PrivacySettings = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-300 mb-2">Confirm New Password</label>
+                  <label className={`block text-sm mb-2 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>Confirm New Password</label>
                   <Input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm new password"
                     classNames={{
-                      input: "bg-gray-700/50 text-white",
-                      inputWrapper: "bg-gray-700/50 border-gray-600"
+                      input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                      inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                     }}
                   />
                 </div>
@@ -302,8 +374,8 @@ const PrivacySettings = () => {
             setStep('phone');
           }}
           classNames={{
-            base: "bg-gray-800 text-white",
-            closeButton: "text-white hover:bg-gray-700"
+            base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+            closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
           }}
         >
           <ModalContent>
@@ -311,7 +383,7 @@ const PrivacySettings = () => {
             <ModalBody>
               {step === 'phone' ? (
                 <div className="space-y-4">
-                  <p className="text-gray-400">
+                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                     Enter your phone number to receive verification codes when signing in.
                   </p>
                   <Input
@@ -321,14 +393,14 @@ const PrivacySettings = () => {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     classNames={{
-                      input: "bg-gray-700/50 text-white",
-                      inputWrapper: "bg-gray-700/50 border-gray-600"
+                      input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                      inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                     }}
                   />
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-gray-400">
+                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                     Enter the 6-digit code sent to your phone.
                   </p>
                   <Input
@@ -338,8 +410,8 @@ const PrivacySettings = () => {
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
                     classNames={{
-                      input: "bg-gray-700/50 text-white",
-                      inputWrapper: "bg-gray-700/50 border-gray-600"
+                      input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                      inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                     }}
                   />
                 </div>
@@ -372,8 +444,8 @@ const PrivacySettings = () => {
           isOpen={showQRModal} 
           onClose={() => setShowQRModal(false)}
           classNames={{
-            base: "bg-gray-800 text-white",
-            closeButton: "text-white hover:bg-gray-700"
+            base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+            closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
           }}
         >
           <ModalContent>
@@ -387,7 +459,7 @@ const PrivacySettings = () => {
                     className="w-40 h-40"
                   />
                 </div>
-                <p className="text-gray-400 text-sm">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                   Scan this QR code with your authenticator app to enable two-factor authentication
                 </p>
               </div>

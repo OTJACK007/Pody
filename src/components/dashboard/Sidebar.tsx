@@ -13,8 +13,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Headphones,
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useTheme } from '../../contexts/ThemeContext';
 import UpgradePlanModal from '../../pages/dashboard/settings/billing/UpgradePlanModal';
 
 interface SidebarProps {
@@ -25,10 +28,11 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
   const location = useLocation();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const navItems = [
     { name: 'Live Space', path: '/dashboard/livespace', icon: <LayoutDashboard /> },
-    { name: 'Podcasts', path: '/dashboard/podcasts', icon: <Headphones /> },
+    { name: 'Pod Room', path: '/dashboard/podroom', icon: <Headphones /> },
     { name: 'Knowledge Library', path: '/dashboard/knowledge', icon: <Library /> },
     { name: 'My Goals', path: '/dashboard/goals', icon: <Target /> },
     { name: 'Tasks & Calendar', path: '/dashboard/tasks', icon: <Calendar /> },
@@ -42,15 +46,22 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
   return (
     <>
       <aside 
-        className={`fixed md:sticky top-0 h-screen z-50 bg-gray-900 text-white transition-all duration-300 flex flex-col shadow-2xl ${
+        className={`fixed md:sticky top-0 h-screen z-50 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-white'
+        } transition-all duration-300 flex flex-col shadow-2xl ${
           isOpen ? 'w-64' : 'w-20'
         }`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-gray-800/50">
+        <div className={`flex items-center justify-between p-4 border-b ${
+          theme === 'dark' ? 'border-gray-800/50' : 'border-gray-200'
+        }`}>
           <div className="flex items-center">
             {isOpen ? (
               <img 
-                src="https://static.wixstatic.com/media/c67dd6_c825b43e10db4bd1b336eec46c3bce30~mv2.gif"
+                src={theme === 'dark' 
+                  ? "https://static.wixstatic.com/media/c67dd6_c825b43e10db4bd1b336eec46c3bce30~mv2.gif"
+                  : "https://static.wixstatic.com/media/c67dd6_92127c0a8be5424a97bdcfac59c7559d~mv2.gif"
+                }
                 alt="Logo"
                 className="w-32"
               />
@@ -64,7 +75,9 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
           </div>
           <button 
             onClick={onToggle}
-            className="p-2 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-white"
+            className={`p-2 hover:bg-gray-800 rounded-lg transition-colors ${
+              theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'
+            }`}
           >
             {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
           </button>
@@ -83,17 +96,17 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
                       group relative overflow-hidden
                       ${isActive 
                         ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                        : 'text-gray-400 hover:bg-gray-800/50 hover:text-white'
+                        : `${theme === 'dark' ? 'text-gray-400 hover:bg-gray-800/50 hover:text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-black'}`
                       }
                     `}
                   >
                     <span className="relative z-10 flex items-center">
-                      <span className={`w-6 h-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
+                      <span className={`w-6 h-6 ${isActive ? 'text-white' : theme === 'dark' ? 'text-gray-400 group-hover:text-white' : 'text-gray-600 group-hover:text-black'}`}>
                         {item.icon}
                       </span>
                       {isOpen && (
                         <span className={`ml-3 font-medium transition-all duration-200 ${
-                          isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                          isActive ? 'text-white' : theme === 'dark' ? 'text-gray-400 group-hover:text-white' : 'text-gray-600 group-hover:text-black'
                         }`}>
                           {item.name}
                         </span>
@@ -109,19 +122,31 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
           </ul>
         </nav>
 
-        <div className="p-4 mt-auto border-t border-gray-800/50">
-          <button
-            onClick={() => setShowUpgradeModal(true)}
-            className={`
-              w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200
-              bg-secondary/10 text-secondary hover:bg-secondary/20
-            `}
-          >
-            <div className="flex items-center">
-              <Crown className="w-6 h-6" />
-              {isOpen && <span className="ml-3 font-medium">Subscribe for $5</span>}
-            </div>
-          </button>
+        <div className={`p-4 mt-auto border-t ${theme === 'dark' ? 'border-gray-800/50' : 'border-gray-200'}`}>
+          <div className="flex flex-col gap-4">
+            <button
+              onClick={toggleTheme}
+              className={`
+                flex items-center justify-center p-2 rounded-lg transition-all duration-200
+                ${theme === 'dark' ? 'bg-gray-800 text-gray-400 hover:text-white' : 'bg-gray-100 text-gray-600 hover:text-black'}
+              `}
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+
+            <button
+              onClick={() => setShowUpgradeModal(true)}
+              className={`
+                w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200
+                bg-secondary/10 text-secondary hover:bg-secondary/20
+              `}
+            >
+              <div className="flex items-center">
+                <Crown className="w-6 h-6" />
+                {isOpen && <span className="ml-3 font-medium">Subscribe for $5</span>}
+              </div>
+            </button>
+          </div>
         </div>
       </aside>
 

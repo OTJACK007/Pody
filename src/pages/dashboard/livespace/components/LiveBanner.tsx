@@ -1,10 +1,17 @@
 import React from 'react';
 import { ExternalLink, CheckCircle2 } from 'lucide-react';
 import { Button, Badge, Avatar } from "@nextui-org/react";
+import { useTheme } from '../../../../contexts/ThemeContext';
 
 const LiveBanner = () => {
+  const { theme } = useTheme();
+
   return (
-    <div className="bg-gradient-to-r from-gray-800/50 via-gray-800/30 to-gray-800/50 border border-gray-700 rounded-lg p-6 relative overflow-hidden">
+    <div className={`${
+      theme === 'dark'
+        ? 'bg-gradient-to-r from-gray-800/50 via-gray-800/30 to-gray-800/50 border-gray-700'
+        : 'bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 border-gray-200'
+    } border rounded-lg p-6 relative overflow-hidden`}>
       <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-transparent to-red-500/10 animate-pulse"></div>
       <div className="relative flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -33,7 +40,9 @@ const LiveBanner = () => {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h3 className="text-lg font-semibold text-white">TechInsights</h3>
+              <h3 className={`text-lg font-semibold ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>TechInsights</h3>
               <CheckCircle2 className="w-5 h-5 text-primary" />
             </div>
             <div className="flex items-center space-x-2 text-gray-400">

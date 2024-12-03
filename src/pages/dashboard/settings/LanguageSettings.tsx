@@ -1,9 +1,12 @@
 import React from 'react';
-import { Globe, Search, Check } from 'lucide-react';
+import { Globe, Search } from 'lucide-react';
 import { Card, CardBody, Input, Button, RadioGroup, Radio } from "@nextui-org/react";
+import { useTheme } from '../../../contexts/ThemeContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 
 const LanguageSettings = () => {
+  const { theme } = useTheme();
+
   const languages = [
     { 
       code: 'en', 
@@ -79,30 +82,40 @@ const LanguageSettings = () => {
   return (
     <div className="max-w-4xl">
       <SettingsHeader
-        icon={<Globe className="w-6 h-6 text-primary" />}
+        icon={<Globe className="w-6 h-6 text-[#ff3366]" />}
         title="Language & Region"
         description="Set your preferred language and region settings"
       />
       
       <div className="space-y-6">
         {/* Language Selection */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Language</h3>
+            <h3 className={`text-lg font-semibold mb-4 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Language</h3>
             <div className="space-y-4">
               <Input
                 placeholder="Search languages..."
                 startContent={<Search className="w-4 h-4 text-gray-400" />}
                 classNames={{
-                  input: "bg-gray-700/50 text-white",
-                  inputWrapper: "bg-gray-700/50 border-gray-600"
+                  input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                  inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                 }}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-gray-700/30 hover:bg-gray-700/50 transition-colors text-left group"
+                    className={`flex items-center gap-3 p-3 rounded-lg ${
+                      theme === 'dark'
+                        ? 'bg-gray-700/30 hover:bg-gray-700/50'
+                        : 'bg-gray-100 hover:bg-gray-200'
+                    } transition-colors text-left group`}
                   >
                     <img 
                       src={lang.flag} 
@@ -110,10 +123,13 @@ const LanguageSettings = () => {
                       className="w-8 h-8 object-cover rounded-full"
                     />
                     <div className="flex-grow">
-                      <p className="text-white font-medium">{lang.name}</p>
-                      <p className="text-gray-400 text-sm">{lang.region}</p>
+                      <p className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{lang.name}</p>
+                      <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                        {lang.region}
+                      </p>
                     </div>
-                    <Check className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 ))}
               </div>
@@ -122,9 +138,15 @@ const LanguageSettings = () => {
         </Card>
 
         {/* Time Zone */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Time Zone</h3>
+            <h3 className={`text-lg font-semibold mb-4 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Time Zone</h3>
             <RadioGroup defaultValue="auto">
               <div className="space-y-3">
                 {timeZones.map((tz) => (
@@ -136,8 +158,12 @@ const LanguageSettings = () => {
                     }}
                   >
                     <div className="flex flex-col">
-                      <span className="text-white">{tz.name}</span>
-                      <span className="text-gray-400 text-sm">{tz.description}</span>
+                      <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                        {tz.name}
+                      </span>
+                      <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                        {tz.description}
+                      </span>
                     </div>
                   </Radio>
                 ))}
@@ -147,9 +173,15 @@ const LanguageSettings = () => {
         </Card>
 
         {/* Date Format */}
-        <Card className="bg-gray-800/50 border border-gray-700/50">
+        <Card className={`${
+          theme === 'dark' 
+            ? 'bg-gray-800/50 border-gray-700/50' 
+            : 'bg-white border-gray-200'
+        } border`}>
           <CardBody className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Date Format</h3>
+            <h3 className={`text-lg font-semibold mb-4 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Date Format</h3>
             <RadioGroup defaultValue="mdy">
               <div className="space-y-3">
                 {dateFormats.map((format) => (
@@ -161,8 +193,12 @@ const LanguageSettings = () => {
                     }}
                   >
                     <div className="flex flex-col">
-                      <span className="text-white">{format.format}</span>
-                      <span className="text-gray-400 text-sm">Example: {format.example}</span>
+                      <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                        {format.format}
+                      </span>
+                      <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                        Example: {format.example}
+                      </span>
                     </div>
                   </Radio>
                 ))}
