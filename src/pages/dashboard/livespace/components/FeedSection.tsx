@@ -1,9 +1,11 @@
-import React from 'react';
-import { Play, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, CheckCircle2, Search, Sparkles } from 'lucide-react';
 import { Genre } from '../../../../types';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import { getTrendingEmoji } from '../../../../utils/emoji';
+import { Input, Button } from "@nextui-org/react";
 import useEmblaCarousel from 'embla-carousel-react';
+import CodyAIChat from '../../../../components/features/CodyAIChat';
 
 interface FeedSectionProps {
   selectedGenre: Genre;
@@ -12,6 +14,7 @@ interface FeedSectionProps {
 
 const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
   const { theme } = useTheme();
+  const [showCodyChat, setShowCodyChat] = useState(false);
   const [genreEmblaRef] = useEmblaCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
@@ -78,6 +81,30 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
         Feed
       </h2>
       
+      {/* Search and AI Assistant */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-64">
+          <Input
+            placeholder="Search videos..."
+            startContent={<Search className="w-4 h-4 text-gray-400" />}
+            classNames={{
+              input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+              inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
+            }}
+          />
+        </div>
+        <Button
+          isIconOnly
+          className="group relative bg-secondary text-black font-medium hover:bg-secondary/90 w-10 h-10"
+          onClick={() => setShowCodyChat(true)}
+        >
+          <Sparkles className="w-5 h-5" />
+          <span className="absolute left-12 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-200">
+            Ask Cody!
+          </span>
+        </Button>
+      </div>
+
       {/* Genre Filter */}
       <div className="overflow-hidden -mx-6 mb-6" ref={genreEmblaRef}>
         <div className="flex space-x-4 px-6">
@@ -146,6 +173,8 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
           </div>
         ))}
       </div>
+
+      <CodyAIChat isOpen={showCodyChat} onClose={() => setShowCodyChat(false)} />
     </div>
   );
 };
