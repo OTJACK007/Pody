@@ -8,6 +8,7 @@ import KeyMoments from './components/KeyMoments';
 import InsightsList from './components/InsightsList';
 import TopicInsights from './components/TopicInsights';
 import CodyAIChat from '../../../components/features/CodyAIChat';
+import RelatedContent from '../podcasts/components/RelatedContent';
 import NotionConnect from './components/NotionConnect';
 
 const FeedVideo = () => {
@@ -104,7 +105,11 @@ const FeedVideo = () => {
               Add to PodRoom
             </Button>
             <Button
-              startContent={<LinkIcon className="w-4 h-4" />}
+              startContent={<img 
+                src="https://static.wixstatic.com/media/c67dd6_c0f6b842de844dff9ac8e0e71e7e5a18~mv2.png"
+                alt="Notion"
+                className="w-4 h-4"
+              />}
               className={`${
                 theme === 'dark'
                   ? 'bg-gray-700 text-white hover:bg-gray-600'
@@ -284,6 +289,7 @@ const FeedVideo = () => {
                 </div>
               </CardBody>
             </Card>
+            <RelatedContent topics={podcastData.topics} />
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera, Mail, Building, MapPin, Globe, DollarSign, CreditCard, Wallet } from 'lucide-react';
+import { ArrowLeft, Camera, Mail, Building, MapPin, Globe, DollarSign, CreditCard, Wallet, Crown } from 'lucide-react';
 import { Button, Card, CardBody, Input, Avatar, Tabs, Tab, Progress } from "@nextui-org/react";
 import { useTheme } from '../../../../contexts/ThemeContext';
 
@@ -8,6 +8,7 @@ const ManageChannel = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const [selectedTab, setSelectedTab] = useState('account');
+  const [subscriptionPrice, setSubscriptionPrice] = useState('');
 
   const stats = {
     totalEarnings: '$2.8K',
@@ -66,6 +67,7 @@ const ManageChannel = () => {
       >
         <Tab key="account" title="Account Info" />
         <Tab key="revenue" title="Revenue Details" />
+        <Tab key="monetization" title="Monetization" />
       </Tabs>
 
       {selectedTab === 'account' && (
@@ -294,6 +296,118 @@ const ManageChannel = () => {
                     </Button>
                   </div>
                 ))}
+              </div>
+            </CardBody>
+          </Card>
+        </div>
+      )}
+
+      {selectedTab === 'monetization' && (
+        <div className="space-y-6">
+          <Card className={`${
+            theme === 'dark' 
+              ? 'bg-gray-800/50 border-gray-700/50' 
+              : 'bg-white border-gray-200'
+          } border`}>
+            <CardBody className="p-6">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 bg-secondary/10 rounded-xl">
+                  <DollarSign className="w-8 h-8 text-secondary" />
+                </div>
+                <div>
+                  <h3 className={`text-xl font-bold ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Monetize Your Channel</h3>
+                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    Start earning from your content
+                  </p>
+                </div>
+              </div>
+
+              <div className={`p-6 rounded-xl mb-6 ${
+                theme === 'dark' ? 'bg-gray-900/50' : 'bg-gray-50'
+              }`}>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 className={`text-lg font-semibold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Channel Monetization</h4>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      Enable monetization features for your channel
+                    </p>
+                  </div>
+                  <Button
+                    className="bg-secondary/20 text-secondary border border-secondary hover:bg-secondary/30"
+                    startContent={<Crown className="w-4 h-4" />}
+                    isDisabled
+                  >
+                    Coming Soon
+                  </Button>
+                </div>
+                <div className={`mt-4 p-4 rounded-lg ${
+                  theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'
+                }`}>
+                  <h5 className={`font-medium mb-2 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Requirements:</h5>
+                  <ul className={`list-disc list-inside space-y-1 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
+                    <li>500K views on videos published on Pody</li>
+                    <li>No active Community Guidelines strikes</li>
+                    <li>Complete channel review process</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className={`p-6 rounded-xl ${
+                theme === 'dark' ? 'bg-gray-900/50' : 'bg-gray-50'
+              }`}>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 className={`text-lg font-semibold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Creator Subscriptions</h4>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      Let your audience support you with monthly subscriptions
+                    </p>
+                  </div>
+                  <Button
+                    className="bg-primary text-white hover:bg-primary/90"
+                    startContent={<DollarSign className="w-4 h-4" />}
+                  >
+                    Activate Subscriptions
+                  </Button>
+                </div>
+                
+                <div className="mt-6">
+                  <label className={`block text-sm font-medium mb-2 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    Monthly Subscription Price
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-grow max-w-xs">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <Input
+                        type="number"
+                        min="1"
+                        step="0.01"
+                        placeholder="5.00"
+                        value={subscriptionPrice}
+                        onChange={(e) => setSubscriptionPrice(e.target.value)}
+                        classNames={{
+                          input: `${theme === 'dark' ? 'bg-gray-700/50 text-white pl-7' : 'bg-gray-100 text-gray-900 pl-7'}`,
+                          inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
+                        }}
+                      />
+                    </div>
+                    <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>USD per month</span>
+                  </div>
+                  <p className={`mt-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Set your monthly subscription price. Subscribers will get access to exclusive content and perks.
+                  </p>
+                </div>
               </div>
             </CardBody>
           </Card>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, Button } from "@nextui-org/react";
-import { Crown, TrendingUp, Youtube, Upload, Wand2, Subtitles, VideoIcon, Megaphone, Rocket, DollarSign, Wallet, CreditCard } from 'lucide-react';
+import { Card, CardBody, Button, Badge } from "@nextui-org/react";
+import { Crown, TrendingUp, Youtube, Upload, Wand2, Subtitles, VideoIcon, Megaphone, Rocket, DollarSign, Wallet, CreditCard, Settings } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import CreatorStats from './creatorSpace/components/CreatorStats';
 import PublishPodcastModal from './creatorSpace/components/PublishPodcastModal';
@@ -9,8 +9,10 @@ import CreatorToolCard from './creatorSpace/components/CreatorToolCard';
 
 const CreatorSpace = () => {
   const navigate = useNavigate();
-  const { theme } = useTheme();
   const [showPublishPodcast, setShowPublishPodcast] = useState(false);
+  const { theme } = useTheme();
+
+  const monetizationActive = true; // This would come from your actual data
 
   const stats = {
     totalEarnings: '$2.8K',
@@ -72,9 +74,39 @@ const CreatorSpace = () => {
                   <div className="p-3 rounded-xl bg-secondary/10">
                     <Crown className="w-8 h-8 text-secondary animate-pulse" />
                   </div>
-                  <h1 className={`text-4xl font-bold ${
-                    theme === 'dark' ? 'text-white' : 'text-gray-900'
-                  }`}>Creator Space</h1>
+                  <div>
+                    <h1 className={`text-4xl font-bold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Creator Space</h1>
+                    <div className="flex items-center gap-3 mt-2">
+                      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${
+                        monetizationActive 
+                          ? theme === 'dark' ? 'bg-green-500/10 text-green-500' : 'bg-green-600/20 text-green-700'
+                          : 'bg-red-500/10 text-red-500'
+                      }`}>
+                        {monetizationActive ? (
+                          <DollarSign className="w-4 h-4 animate-bounce" />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full bg-red-500" />
+                        )}
+                        <span className="text-sm font-medium">
+                          Monetization {monetizationActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        startContent={<Settings className="w-4 h-4" />}
+                        className={`${
+                          theme === 'dark'
+                            ? 'bg-secondary/20 text-secondary border border-secondary hover:bg-secondary/30'
+                            : 'bg-secondary/30 text-secondary-700 border border-secondary-600 hover:bg-secondary/40'
+                        } transition-colors`}
+                        onClick={() => navigate('/dashboard/creator-space/manage-channel', { state: { activeTab: 'monetization' } })}
+                      >
+                        Manage Monetization
+                      </Button>
+                    </div>
+                  </div>
                 </div>
                 <p className={`text-lg mb-6 ${
                   theme === 'dark' ? 'text-gray-300' : 'text-gray-700'

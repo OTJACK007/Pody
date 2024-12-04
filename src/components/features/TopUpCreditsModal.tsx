@@ -15,37 +15,37 @@ const TopUpCreditsModal = ({ isOpen, onClose }: TopUpCreditsModalProps) => {
     {
       credits: 100,
       price: '$5',
-      icon: <Sparkles className="w-6 h-6" />,
+      icon: <Sparkles className="w-6 h-6 text-primary" />,
       name: 'Starter Pack',
-      color: 'bg-blue-500/10',
-      textColor: 'text-blue-500',
+      color: 'bg-primary/20',
+      textColor: 'text-primary',
       popular: false
     },
     {
       credits: 300,
       price: '$12',
-      icon: <Zap className="w-6 h-6" />,
+      icon: <Zap className="w-6 h-6 text-secondary" />,
       name: 'Power Pack',
-      color: 'bg-primary/10',
-      textColor: 'text-primary',
+      color: 'bg-secondary/20',
+      textColor: 'text-secondary',
       popular: true
     },
     {
       credits: 500,
       price: '$18',
-      icon: <Star className="w-6 h-6" />,
+      icon: <Star className="w-6 h-6 text-accent" />,
       name: 'Pro Pack',
-      color: 'bg-purple-500/10',
-      textColor: 'text-purple-500',
+      color: 'bg-accent/20',
+      textColor: 'text-accent',
       popular: false
     },
     {
       credits: 1000,
       price: '$30',
-      icon: <Crown className="w-6 h-6" />,
+      icon: <Crown className="w-6 h-6 text-yellow-400" />,
       name: 'Ultimate Pack',
-      color: 'bg-secondary/10',
-      textColor: 'text-secondary',
+      color: 'bg-yellow-400/20',
+      textColor: 'text-yellow-400',
       popular: false
     }
   ];
@@ -83,7 +83,7 @@ const TopUpCreditsModal = ({ isOpen, onClose }: TopUpCreditsModalProps) => {
                       </span>
                     )}
                     <div className="flex items-center gap-4 mb-4">
-                      <div className={`p-3 rounded-xl ${pkg.color}`}>
+                      <div className={`p-3 rounded-xl ${pkg.color} backdrop-blur-sm`}>
                         {pkg.icon}
                       </div>
                       <div>

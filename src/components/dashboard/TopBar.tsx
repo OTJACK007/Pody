@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, Settings, Search } from 'lucide-react';
-import { Avatar, Button, Badge } from "@nextui-org/react";
+import { Menu, Settings, Search, Crown, Edit3, CreditCard, Bug, MessageCircle, LogOut, ArrowRight } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import NotificationsMenu from './NotificationsMenu';
+import ReportBugModal from './modals/ReportBugModal';
+import ContactUsModal from './modals/ContactUsModal';
+import UpgradePlanModal from './modals/UpgradePlanModal';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -12,6 +14,14 @@ interface TopBarProps {
 const TopBar = ({ onMenuClick }: TopBarProps) => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [showBugModal, setShowBugModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  const toggleProfileMenu = () => {
+    setIsProfileMenuOpen(!isProfileMenuOpen);
+  };
 
   return (
     <header className={`${
@@ -51,43 +61,191 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
         <div className="flex items-center space-x-4">
           <NotificationsMenu notificationCount={3} />
           
-          <Button
-            isIconOnly
-            className={`${
-              theme === 'dark' 
-                ? 'bg-transparent hover:bg-gray-800' 
-                : 'bg-transparent hover:bg-gray-100'
-            }`}
+          <button
             onClick={() => navigate('/dashboard/settings')}
+            className={`p-2 rounded-lg transition-colors ${
+              theme === 'dark' 
+                ? 'hover:bg-gray-800 text-gray-400 hover:text-white' 
+                : 'hover:bg-gray-100 text-gray-600 hover:text-black'
+            }`}
           >
-            <Settings className={`w-6 h-6 ${
-              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-            }`} />
-          </Button>
+            <Settings className="w-6 h-6" />
+          </button>
           
-          <div className={`flex items-center space-x-3 pl-4 border-l ${
+          <div className={`relative flex items-center space-x-3 pl-4 border-l ${
             theme === 'dark' ? 'border-gray-800/50' : 'border-gray-200'
           }`}>
-            <div className="text-right">
-              <p className={`text-sm font-medium ${
-                theme === 'dark' ? 'text-white' : 'text-black'
-              }`}>John Doe</p>
-              <p className={`text-xs ${
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-              }`}>Premium Member</p>
-            </div>
-            <div className="relative">
-              <Avatar
-                isBordered
-                color="primary"
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
-                className="w-10 h-10"
-              />
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full" />
-            </div>
+            <button
+              onClick={toggleProfileMenu}
+              className="flex items-center space-x-3 focus:outline-none"
+            >
+              <div className="text-right hidden sm:block">
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-white' : 'text-black'
+                }`}>John Doe</p>
+                <p className={`text-xs ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Premium Member</p>
+              </div>
+              <div className="relative">
+                <img
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full ring-2 ring-primary"
+                />
+                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full" />
+              </div>
+            </button>
+
+            {isProfileMenuOpen && (
+              <div className={`absolute right-0 top-full mt-2 w-72 rounded-lg shadow-xl border transform transition-all duration-200 ease-out ${
+                theme === 'dark'
+                  ? 'bg-gray-800 border-gray-700'
+                  : 'bg-white border-gray-200'
+              }`}>
+                <div className="p-4 border-b border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-secondary/10">
+                      <Crown className="w-6 h-6 text-secondary" />
+                    </div>
+                    <div>
+                      <p className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>Premium Plan</p>
+                      <p className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Unlimited access to all features</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowUpgradeModal(true);
+                      setIsProfileMenuOpen(false);
+                    }}
+                    className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-black rounded-lg hover:bg-secondary/90 transition-colors"
+                  >
+                    <Crown className="w-4 h-4" />
+                    <span>Upgrade Plan</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="py-2">
+                  <button
+                    onClick={() => {
+                      navigate('/dashboard/settings/account');
+                      setIsProfileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                      theme === 'dark'
+                        ? 'hover:bg-gray-700/50 text-gray-300 hover:text-white'
+                        : 'hover:bg-gray-100 text-gray-700 hover:text-black'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${
+                      theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                    }`}>
+                      <Edit3 className="w-4 h-4" />
+                    </div>
+                    <span>Edit Profile</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      navigate('/dashboard/settings/billing');
+                      setIsProfileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                      theme === 'dark'
+                        ? 'hover:bg-gray-700/50 text-gray-300 hover:text-white'
+                        : 'hover:bg-gray-100 text-gray-700 hover:text-black'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${
+                      theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                    }`}>
+                      <CreditCard className="w-4 h-4" />
+                    </div>
+                    <span>Manage Subscription</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowBugModal(true);
+                      setIsProfileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                      theme === 'dark'
+                        ? 'hover:bg-gray-700/50 text-gray-300 hover:text-white'
+                        : 'hover:bg-gray-100 text-gray-700 hover:text-black'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${
+                      theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                    }`}>
+                      <Bug className="w-4 h-4" />
+                    </div>
+                    <span>Report a Bug</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowContactModal(true);
+                      setIsProfileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                      theme === 'dark'
+                        ? 'hover:bg-gray-700/50 text-gray-300 hover:text-white'
+                        : 'hover:bg-gray-100 text-gray-700 hover:text-black'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${
+                      theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                    }`}>
+                      <MessageCircle className="w-4 h-4" />
+                    </div>
+                    <span>Contact Us</span>
+                  </button>
+
+                  <div className={`px-2 mx-2 my-2 border-t ${
+                    theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                  }`} />
+
+                  <button
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                      theme === 'dark'
+                        ? 'hover:bg-red-500/10 text-red-500'
+                        : 'hover:bg-red-50 text-red-600'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${
+                      theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                    }`}>
+                      <LogOut className="w-4 h-4" />
+                    </div>
+                    <span>Log Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      <ReportBugModal
+        isOpen={showBugModal}
+        onClose={() => setShowBugModal(false)}
+      />
+
+      <ContactUsModal
+        isOpen={showContactModal}
+        onClose={() => setShowContactModal(false)}
+      />
+
+      <UpgradePlanModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
     </header>
   );
 };
