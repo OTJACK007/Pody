@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Send, Paperclip, Image, AtSign, Wand2, Brain, Zap, MessageSquare, Star, TrendingUp, Headphones, Library, Target } from 'lucide-react';
-import { Input, Button, Avatar, Card, CardBody, Progress } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Avatar, Card, CardBody, Progress } from "@nextui-org/react";
+import { Send, Paperclip, Image, AtSign, Sparkles, Brain, Wand2, MessageSquare, Star, TrendingUp, Headphones, Library, Target, Plus, Coins } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+import CreditOptionsModal from '../../components/features/CreditOptionsModal';
+import TopUpCreditsModal from '../../components/features/TopUpCreditsModal';
+import UpgradePlanModal from './settings/billing/UpgradePlanModal';
 
 interface Message {
   id: string;
@@ -15,6 +18,9 @@ const CodyAI = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showCreditOptions, setShowCreditOptions] = useState(false);
+  const [showTopUpModal, setShowTopUpModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const suggestions = [
@@ -52,7 +58,7 @@ const CodyAI = () => {
       description: 'Create summaries, scripts, and content ideas'
     },
     {
-      icon: <Zap className="w-6 h-6 text-yellow-500" />,
+      icon: <Star className="w-6 h-6 text-yellow-500" />,
       title: 'Quick Analysis',
       description: 'Instant insights from your podcast content'
     },
@@ -137,6 +143,17 @@ const CodyAI = () => {
                   </span>
                 </div>
                 <Progress value={75} color="primary" size="sm" />
+                <Button
+                  className={`w-full mt-2 ${
+                    theme === 'dark'
+                      ? 'bg-gray-700 hover:bg-gray-600'
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  } transition-colors`}
+                  startContent={<Coins className="w-4 h-4" />}
+                  onClick={() => setShowCreditOptions(true)}
+                >
+                  Add Credits
+                </Button>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
@@ -313,6 +330,29 @@ const CodyAI = () => {
           </div>
         </div>
       </div>
+
+      <CreditOptionsModal
+        isOpen={showCreditOptions}
+        onClose={() => setShowCreditOptions(false)}
+        onUpgrade={() => {
+          setShowCreditOptions(false);
+          setShowUpgradeModal(true);
+        }}
+        onTopUp={() => {
+          setShowCreditOptions(false);
+          setShowTopUpModal(true);
+        }}
+      />
+
+      <TopUpCreditsModal
+        isOpen={showTopUpModal}
+        onClose={() => setShowTopUpModal(false)}
+      />
+
+      <UpgradePlanModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
     </div>
   );
 };
