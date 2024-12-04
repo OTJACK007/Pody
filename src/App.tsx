@@ -7,6 +7,7 @@ import LiveSpace from './pages/dashboard/LiveSpace';
 import CreatorSpace from './pages/dashboard/CreatorSpace';
 import ManageChannel from './pages/dashboard/creatorSpace/pages/ManageChannel';
 import Channel from './pages/dashboard/livespace/channel/Channel';
+import FeedVideo from './pages/dashboard/feedvideo/FeedVideo';
 import GuestVideos from './pages/dashboard/guestvideos/GuestVideos';
 import KnowledgeLibrary from './pages/dashboard/KnowledgeLibrary';
 import CodyAI from './pages/dashboard/CodyAI';
@@ -41,6 +42,7 @@ function App() {
             <Route path="creator-space" element={<CreatorSpace />} />
             <Route path="creator-space/manage-channel" element={<ManageChannel />} />
             <Route path="livespace/channel" element={<Channel />} />
+            <Route path="feedvideo/:id" element={<FeedVideo />} />
             <Route path="guestvideos/:id" element={<GuestVideos />} />
             <Route path="podroom" element={<PodRoom />} />
             <Route path="podroom/podcastvideo" element={<PodcastVideo />} />

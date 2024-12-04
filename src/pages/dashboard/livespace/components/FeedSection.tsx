@@ -6,6 +6,7 @@ import { getTrendingEmoji } from '../../../../utils/emoji';
 import { Input, Button } from "@nextui-org/react";
 import useEmblaCarousel from 'embla-carousel-react';
 import CodyAIChat from '../../../../components/features/CodyAIChat';
+import { useNavigate } from 'react-router-dom';
 
 interface FeedSectionProps {
   selectedGenre: Genre;
@@ -13,6 +14,7 @@ interface FeedSectionProps {
 }
 
 const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const [showCodyChat, setShowCodyChat] = useState(false);
   const [genreEmblaRef] = useEmblaCarousel({
@@ -72,6 +74,42 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
         name: 'BusinessPro',
         verified: true
       }
+    },
+    {
+      id: '4',
+      title: 'Web3 Revolution: The Future of Internet',
+      coverImage: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800',
+      genre: 'Web3',
+      duration: '42 min',
+      rating: 4.6,
+      channel: {
+        name: 'CryptoVision',
+        verified: true
+      }
+    },
+    {
+      id: '5',
+      title: 'Mastering E-commerce Growth',
+      coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
+      genre: 'Ecommerce',
+      duration: '35 min',
+      rating: 4.8,
+      channel: {
+        name: 'BusinessGrowth',
+        verified: true
+      }
+    },
+    {
+      id: '6',
+      title: 'Wealth Building Strategies 2024',
+      coverImage: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800',
+      genre: 'Wealth',
+      duration: '50 min',
+      rating: 4.9,
+      channel: {
+        name: 'WealthMastery',
+        verified: true
+      }
     }
   ].filter(item => selectedGenre === 'Trending' || item.genre === selectedGenre);
 
@@ -80,7 +118,7 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
       <h2 className={`text-5xl font-bold bg-gradient-to-r from-${theme === 'dark' ? 'white' : 'gray-900'} to-gray-500 bg-clip-text text-transparent mb-8`}>
         Feed
       </h2>
-      
+
       {/* Search and AI Assistant */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-64">
@@ -133,6 +171,7 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
           <div 
             key={item.id}
             className="relative group cursor-pointer"
+            onClick={() => navigate(`/dashboard/feedvideo/${item.id}`)}
           >
             <div className="relative aspect-video rounded-lg overflow-hidden">
               <img
