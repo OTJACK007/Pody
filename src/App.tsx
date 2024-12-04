@@ -7,6 +7,7 @@ import LiveSpace from './pages/dashboard/LiveSpace';
 import Channel from './pages/dashboard/livespace/channel/Channel';
 import GuestVideos from './pages/dashboard/guestvideos/GuestVideos';
 import KnowledgeLibrary from './pages/dashboard/KnowledgeLibrary';
+import CodyAI from './pages/dashboard/CodyAI';
 import MyGoals from './pages/dashboard/myGoals/MyGoals';
 import TasksCalendar from './pages/dashboard/TasksCalendar';
 import Analytics from './pages/dashboard/Analytics';
@@ -40,6 +41,7 @@ function App() {
             <Route path="podroom" element={<PodRoom />} />
             <Route path="podroom/podcastvideo" element={<PodcastVideo />} />
             <Route path="knowledge" element={<KnowledgeLibrary />} />
+            <Route path="cody-ai" element={<CodyAI />} />
             <Route path="goals" element={<MyGoals />} />
             <Route path="tasks" element={<TasksCalendar />} />
             <Route path="analytics" element={<Analytics />} />

@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Avatar } from "@nextui-org/react";
-import { Send, Paperclip, AtSign, Image, Sparkles } from 'lucide-react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Avatar, Card, CardBody } from "@nextui-org/react";
+import { Send, Paperclip, AtSign, Image, Sparkles, ExternalLink, TrendingUp, Headphones, Library, Target } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -17,10 +18,34 @@ interface CodyAIChatProps {
 
 const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const suggestions = [
+    {
+      icon: <TrendingUp className="w-4 h-4" />,
+      text: "What are the latest trends in technology and podcasting?",
+      color: "text-primary"
+    },
+    {
+      icon: <Headphones className="w-4 h-4" />,
+      text: "Recommend a podcast based on my interests",
+      color: "text-secondary"
+    },
+    {
+      icon: <Library className="w-4 h-4" />,
+      text: "Search my knowledge library",
+      color: "text-blue-500"
+    },
+    {
+      icon: <Target className="w-4 h-4" />,
+      text: "Help me with my goals and projects",
+      color: "text-purple-500"
+    }
+  ];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -30,14 +55,13 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return;
+  const handleSend = async (content: string = inputValue) => {
+    if (!content.trim()) return;
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
-      content: inputValue,
+      content: content,
       timestamp: new Date()
     };
 
@@ -45,7 +69,6 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response
     setTimeout(() => {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -77,7 +100,7 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
             />
             <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full animate-pulse"></span>
           </div>
-          <div>
+          <div className="flex-grow">
             <h3 className={`text-xl font-semibold ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'
             }`}>Cody AI</h3>
@@ -85,11 +108,46 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
               Your AI podcast assistant
             </p>
           </div>
+          <Button
+            endContent={<ExternalLink className="w-4 h-4" />}
+            className="bg-primary text-white"
+            onClick={() => {
+              onClose();
+              navigate('/dashboard/cody-ai');
+            }}
+          >
+            Open Full Version
+          </Button>
         </ModalHeader>
         <ModalBody className="p-0">
           <div className={`flex-1 overflow-y-auto p-4 ${
             theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
           }`}>
+            {messages.length === 0 && (
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {suggestions.map((suggestion, index) => (
+                  <Card
+                    key={index}
+                    isPressable
+                    className={`${
+                      theme === 'dark'
+                        ? 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-800'
+                        : 'bg-white border-gray-200 hover:bg-gray-50'
+                    } border transition-colors cursor-pointer`}
+                    onClick={() => handleSend(suggestion.text)}
+                  >
+                    <CardBody className="p-3">
+                      <div className="flex items-center gap-2">
+                        <span className={suggestion.color}>{suggestion.icon}</span>
+                        <span className={`text-sm ${
+                          theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                        }`}>{suggestion.text}</span>
+                      </div>
+                    </CardBody>
+                  </Card>
+                ))}
+              </div>
+            )}
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
@@ -186,7 +244,7 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
               isIconOnly
               color="success"
               className="bg-secondary text-black"
-              onClick={handleSend}
+              onClick={() => handleSend()}
             >
               <Send className="w-5 h-5" />
             </Button>

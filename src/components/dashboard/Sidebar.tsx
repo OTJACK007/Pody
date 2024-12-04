@@ -15,7 +15,8 @@ import {
   Headphones,
   Sparkles,
   Sun,
-  Moon
+  Moon,
+  Bot
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import UpgradePlanModal from '../../pages/dashboard/settings/billing/UpgradePlanModal';
@@ -34,6 +35,7 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
     { name: 'Live Space', path: '/dashboard/livespace', icon: <LayoutDashboard /> },
     { name: 'Pod Room', path: '/dashboard/podroom', icon: <Headphones /> },
     { name: 'Knowledge Library', path: '/dashboard/knowledge', icon: <Library /> },
+    { name: 'Cody AI', path: '/dashboard/cody-ai', icon: <Bot /> },
     { name: 'My Goals', path: '/dashboard/goals', icon: <Target /> },
     { name: 'Tasks & Calendar', path: '/dashboard/tasks', icon: <Calendar /> },
     { name: 'Analytics', path: '/dashboard/analytics', icon: <BarChart2 /> },

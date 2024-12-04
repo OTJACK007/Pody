@@ -95,11 +95,11 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
         </div>
         <Button
           isIconOnly
-          className="group relative bg-secondary text-black font-medium hover:bg-secondary/90 w-10 h-10"
+          className="group relative bg-secondary text-black font-medium hover:bg-secondary/90 w-10 h-10 hover:w-32 transition-[width,background] duration-500 ease-in-out overflow-hidden"
           onClick={() => setShowCodyChat(true)}
         >
-          <Sparkles className="w-5 h-5" />
-          <span className="absolute left-12 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-200">
+          <Sparkles className="w-5 h-5 absolute left-2.5 transition-transform duration-500 group-hover:scale-110" />
+          <span className="absolute left-10 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 transform translate-x-2 group-hover:translate-x-0 whitespace-nowrap">
             Ask Cody!
           </span>
         </Button>
