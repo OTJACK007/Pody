@@ -4,6 +4,8 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import LandingPage from './pages/LandingPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import LiveSpace from './pages/dashboard/LiveSpace';
+import CreatorSpace from './pages/dashboard/CreatorSpace';
+import ManageChannel from './pages/dashboard/creatorSpace/pages/ManageChannel';
 import Channel from './pages/dashboard/livespace/channel/Channel';
 import GuestVideos from './pages/dashboard/guestvideos/GuestVideos';
 import KnowledgeLibrary from './pages/dashboard/KnowledgeLibrary';
@@ -36,6 +38,8 @@ function App() {
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Navigate to="/dashboard/livespace" replace />} />
             <Route path="livespace" element={<LiveSpace />} />
+            <Route path="creator-space" element={<CreatorSpace />} />
+            <Route path="creator-space/manage-channel" element={<ManageChannel />} />
             <Route path="livespace/channel" element={<Channel />} />
             <Route path="guestvideos/:id" element={<GuestVideos />} />
             <Route path="podroom" element={<PodRoom />} />
