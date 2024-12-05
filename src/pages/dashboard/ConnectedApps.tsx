@@ -84,7 +84,7 @@ const ConnectedApps = () => {
     {
       id: 'skool',
       name: 'Skool',
-      icon: 'https://static.wixstatic.com/media/c67dd6_bd2d62a49a6d4cf3b0f670cda8876925~mv2.png',
+      icon: 'https://static.wixstatic.com/media/c67dd6_183e7da825044704859844a354659a3e~mv2.png',
       description: 'Build your learning community',
       isConnected: false,
       color: 'bg-pink-500/10',
@@ -93,7 +93,7 @@ const ConnectedApps = () => {
     {
       id: 'bonzai',
       name: 'Bonzai',
-      icon: 'https://static.wixstatic.com/media/c67dd6_f81b724e8fd74c379d41d02ba1b335d9~mv2.png',
+      icon: 'https://static.wixstatic.com/media/c67dd6_79b52518fc054f2ba3c38af876ecf7d8~mv2.png',
       description: 'Optimize your content reach',
       isConnected: false,
       color: 'bg-teal-500/10',

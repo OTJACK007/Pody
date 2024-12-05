@@ -15,8 +15,8 @@ const ConnectAppsDropdown = ({ isOpen }: ConnectAppsDropdownProps) => {
     { name: 'Opus Clip', icon: 'https://static.wixstatic.com/media/c67dd6_c8ef1b8e181340c0a540162c50c059a1~mv2.png', comingSoon: true },
     { name: 'Miro', icon: 'https://static.wixstatic.com/media/c67dd6_db7bcff2a108431cab79c8c90c531d62~mv2.png', comingSoon: true },
     { name: 'Google Tasks', icon: 'https://static.wixstatic.com/media/c67dd6_a9320374565d487ab96fa91c5c0ad8fd~mv2.avif', connected: true },
-    { name: 'Skool', icon: 'https://static.wixstatic.com/media/c67dd6_bd2d62a49a6d4cf3b0f670cda8876925~mv2.png', comingSoon: true },
-    { name: 'Bonzai', icon: 'https://static.wixstatic.com/media/c67dd6_f81b724e8fd74c379d41d02ba1b335d9~mv2.png', comingSoon: true },
+    { name: 'Skool', icon: 'https://static.wixstatic.com/media/c67dd6_183e7da825044704859844a354659a3e~mv2.png', comingSoon: true },
+    { name: 'Bonzai', icon: 'https://static.wixstatic.com/media/c67dd6_79b52518fc054f2ba3c38af876ecf7d8~mv2.png', comingSoon: true },
   ];
 
   if (!isOpen) return null;
