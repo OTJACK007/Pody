@@ -7,8 +7,10 @@ export interface Podcast {
   duration: string;
   year?: string;
   rating?: number;
+  views?: string;
   channel?: {
     name: string;
+    avatar?: string;
     verified?: boolean;
   };
 }

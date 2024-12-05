@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Play, CheckCircle2, Search, Sparkles } from 'lucide-react';
+import { Play, CheckCircle2, Search, Sparkles, Eye } from 'lucide-react';
 import { Genre } from '../../../../types';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import { getTrendingEmoji } from '../../../../utils/emoji';
-import { Input, Button } from "@nextui-org/react";
+import { Input, Button, Avatar } from "@nextui-org/react";
 import useEmblaCarousel from 'embla-carousel-react';
 import CodyAIChat from '../../../../components/features/CodyAIChat';
 import { useNavigate } from 'react-router-dom';
@@ -46,8 +46,10 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
       genre: 'Technology',
       duration: '45 min',
       rating: 4.8,
+      views: '125K',
       channel: {
         name: 'TechInsights',
+        avatar: 'https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=400',
         verified: true
       }
     },
@@ -58,8 +60,10 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
       genre: 'Personal Growth',
       duration: '32 min',
       rating: 4.9,
+      views: '98K',
       channel: {
         name: 'MindsetGuru',
+        avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400',
         verified: true
       }
     },
@@ -70,8 +74,10 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
       genre: 'Business',
       duration: '38 min',
       rating: 4.7,
+      views: '156K',
       channel: {
         name: 'BusinessPro',
+        avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
         verified: true
       }
     },
@@ -82,8 +88,10 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
       genre: 'Web3',
       duration: '42 min',
       rating: 4.6,
+      views: '112K',
       channel: {
         name: 'CryptoVision',
+        avatar: 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=400',
         verified: true
       }
     },
@@ -94,8 +102,10 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
       genre: 'Ecommerce',
       duration: '35 min',
       rating: 4.8,
+      views: '89K',
       channel: {
         name: 'BusinessGrowth',
+        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
         verified: true
       }
     },
@@ -106,8 +116,10 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
       genre: 'Wealth',
       duration: '50 min',
       rating: 4.9,
+      views: '203K',
       channel: {
         name: 'WealthMastery',
+        avatar: 'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=400',
         verified: true
       }
     }
@@ -188,8 +200,14 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
               </div>
             </div>
             <div className="mt-3">
-              <div className="flex items-center space-x-2 mb-1">
-                <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+              <div className="flex items-center gap-2 mb-1">
+                <Avatar
+                  src={item.channel.avatar}
+                  className="w-6 h-6 ring-2 ring-white/20"
+                />
+                <span className={`${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   {item.channel.name}
                 </span>
                 {item.channel.verified && (
@@ -207,6 +225,11 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
                 <span>{item.duration}</span>
                 <span>•</span>
                 <span className="text-secondary">★ {item.rating}</span>
+                <span>•</span>
+                <div className="flex items-center gap-1">
+                  <Eye className="w-4 h-4" />
+                  <span>{item.views}</span>
+                </div>
               </div>
             </div>
           </div>

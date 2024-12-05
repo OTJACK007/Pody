@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Play, Clock, Tag, MessageSquare, Plus, Link as LinkIcon, Brain, Sparkles } from 'lucide-react';
-import { Button, Card, CardBody, Tabs, Tab, Chip, Progress, Avatar } from "@nextui-org/react";
+import { ArrowLeft, Play, Clock, Tag, Eye, Plus, Link as LinkIcon, Brain, Sparkles, X } from 'lucide-react';
+import { Button, Card, CardBody, Tabs, Tab, Chip, Progress, Avatar, Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
 import VideoPlayer from './components/VideoPlayer';
 import KeyMoments from './components/KeyMoments';
@@ -161,16 +161,47 @@ const FeedVideo = () => {
                 <div className={`flex items-center gap-2 text-sm ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                 }`}>
-                  <MessageSquare className="w-4 h-4" />
-                  <span>{podcastData.views} views</span>
+                  <Eye className="w-4 h-4" />
+                  <span>{podcastData.views}</span>
                 </div>
               </div>
               <div className="flex gap-2">
-                {podcastData.topics.map((topic) => (
+                {podcastData.topics.slice(0, 3).map((topic) => (
                   <Chip key={topic} color="primary" variant="flat">
                     {topic}
                   </Chip>
                 ))}
+                {podcastData.topics.length > 3 && (
+                  <Popover placement="bottom">
+                    <PopoverTrigger>
+                      <Button
+                        isIconOnly
+                        size="sm" 
+                        variant="flat"
+                        className={`${
+                          theme === 'dark'
+                            ? 'bg-gray-700/50 text-white hover:bg-gray-600'
+                            : 'bg-gray-100 text-gray-900 hover:bg-gray-200' 
+                        } w-7 h-7 min-w-0 rounded-full text-sm font-medium`}
+                      >
+                        +{podcastData.topics.length - 3}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className={`${
+                      theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+                    } p-3 rounded-lg border ${
+                      theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                    }`}>
+                      <div className="flex flex-wrap gap-2 max-w-[200px]">
+                        {podcastData.topics.slice(3).map((topic) => (
+                          <Chip key={topic} color="primary" variant="flat">
+                            {topic}
+                          </Chip>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
               </div>
             </div>
 
