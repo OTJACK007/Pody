@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Settings, Search, Crown, Edit3, CreditCard, Bug, MessageCircle, LogOut, ArrowRight } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import NotificationsMenu from './NotificationsMenu';
 import ReportBugModal from './modals/ReportBugModal';
@@ -18,6 +19,16 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
   const [showBugModal, setShowBugModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
@@ -217,6 +228,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         ? 'hover:bg-red-500/10 text-red-500'
                         : 'hover:bg-red-50 text-red-600'
                     }`}
+                    onClick={handleLogout}
                   >
                     <div className={`p-2 rounded-lg ${
                       theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'

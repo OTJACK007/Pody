@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AuthMode } from '../../types';
+import { useAuth } from '../../contexts/AuthContext';
+import { AuthError } from 'firebase/auth';
 
 interface EmailAuthFormProps {
   mode: AuthMode;
@@ -14,20 +16,48 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const { signIn, signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // After successful authentication, navigate to dashboard
-    if (mode === 'signin') {
-      navigate('/dashboard/livespace');
+    try {
+      if (mode === 'signin') {
+        await signIn(email, password);
+        navigate('/dashboard/livespace');
+      } else {
+        await signUp(email, password);
+        navigate('/dashboard/livespace');
+      }
+    } catch (error: unknown) {
+      if ((error as AuthError)?.code) {
+        const errorCode = (error as AuthError).code;
+        switch (error.code) {
+          case 'auth/invalid-credential':
+            setError('Invalid email or password');
+            break;
+          case 'auth/user-not-found':
+            setError('No account found with this email');
+            break;
+          case 'auth/wrong-password':
+            setError('Invalid email or password');
+            break;
+          case 'auth/email-already-in-use':
+            setError('An account with this email already exists');
+            break;
+          case 'auth/weak-password':
+            setError('Password should be at least 6 characters');
+            break;
+          default:
+            setError('An error occurred. Please try again.');
+        }
+      }
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
@@ -97,6 +127,12 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
           required
         />
       </div>
+      
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-2 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
 
       <button
         type="submit"

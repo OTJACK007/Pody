@@ -2,14 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { X, Mail } from 'lucide-react';
 import EmailAuthForm from './EmailAuthForm';
 import { AuthMode } from '../../types';
+import { useAuth } from '../../contexts/AuthContext'; 
+import { useNavigate } from 'react-router-dom';
 
 interface AuthDialogProps {
   onClose: () => void;
 }
 
 const AuthDialog = ({ onClose }: AuthDialogProps) => {
+  const navigate = useNavigate();
+  const { signInWithGoogle } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -20,6 +25,20 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
 
   const handleEmailContinue = () => {
     setShowEmailForm(true);
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setError('');
+      await signInWithGoogle();
+      navigate('/dashboard/livespace');
+    } catch (error: any) {
+      if (error.code === 'auth/popup-blocked') {
+        setError('Please allow popups for this site to sign in with Google');
+      } else {
+        setError('Failed to sign in with Google. Please try again.');
+      }
+    }
   };
 
   return (
@@ -60,7 +79,10 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
               </p>
 
               <div className="space-y-4">
-                <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-white hover:bg-gray-100 text-black rounded-lg transition-colors">
+                <button 
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-white hover:bg-gray-100 text-black rounded-lg transition-colors"
+                  onClick={handleGoogleSignIn}
+                >
                   <img 
                     src="https://static.wixstatic.com/media/c67dd6_578c043e4fee43fc8c1ff1ec13369c17~mv2.png" 
                     alt="Google"
@@ -86,6 +108,12 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
                   <span>Continue with Email</span>
                 </button>
               </div>
+              
+              {error && (
+                <div className="mt-4 p-3 bg-red-500/10 border border-red-500/50 text-red-500 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
 
               <div className="mt-6 text-center text-sm text-gray-400">
                 {isSignUp ? "Already have an account? " : "Don't have an account? "}
