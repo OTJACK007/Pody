@@ -19,6 +19,24 @@ const ConnectedApps = () => {
       textColor: 'text-red-500'
     },
     {
+      id: 'x-twitter',
+      name: 'X/Twitter',
+      icon: 'https://static.wixstatic.com/media/c67dd6_a7b28b585b034f56ad6ab32232e745fc~mv2.webp',
+      description: 'Engage with your audience',
+      isConnected: false,
+      color: 'bg-blue-500/10',
+      textColor: 'text-blue-500'
+    },
+    {
+      id: 'meta',
+      name: 'Meta',
+      icon: 'https://static.wixstatic.com/media/c67dd6_e11a6a0bb99345839dbdc7cf12357c0b~mv2.png',
+      description: 'Connect with Meta platforms',
+      isConnected: false,
+      color: 'bg-blue-500/10',
+      textColor: 'text-blue-500'
+    },
+    {
       id: 'notion',
       name: 'Notion',
       icon: 'https://static.wixstatic.com/media/c67dd6_c0f6b842de844dff9ac8e0e71e7e5a18~mv2.png',
@@ -35,15 +53,6 @@ const ConnectedApps = () => {
       isConnected: true,
       color: 'bg-green-500/10',
       textColor: 'text-green-500'
-    },
-    {
-      id: 'creator-os',
-      name: 'CreatorOS',
-      icon: 'https://static.wixstatic.com/media/c67dd6_1244908d1b0545f6ac85b9f17e808a66~mv2.png',
-      description: 'Manage your content workflow',
-      isConnected: false,
-      color: 'bg-blue-500/10',
-      textColor: 'text-blue-500'
     },
     {
       id: 'zapier',
@@ -98,6 +107,33 @@ const ConnectedApps = () => {
       isConnected: false,
       color: 'bg-teal-500/10',
       textColor: 'text-teal-500'
+    },
+    {
+      id: 'patreon',
+      name: 'Patreon',
+      icon: 'https://static.wixstatic.com/media/c67dd6_1ea98dca9e6b42e5914438202de7b6bb~mv2.png',
+      description: 'Monetize your content',
+      isConnected: false,
+      color: 'bg-red-400/10',
+      textColor: 'text-red-400'
+    },
+    {
+      id: 'meta',
+      name: 'Meta',
+      icon: 'https://static.wixstatic.com/media/c67dd6_e11a6a0bb99345839dbdc7cf12357c0b~mv2.png',
+      description: 'Connect with Meta platforms',
+      isConnected: false,
+      color: 'bg-blue-500/10',
+      textColor: 'text-blue-500'
+    },
+    {
+      id: 'patreon',
+      name: 'Patreon',
+      icon: 'https://static.wixstatic.com/media/c67dd6_1ea98dca9e6b42e5914438202de7b6bb~mv2.png',
+      description: 'Monetize your content',
+      isConnected: false,
+      color: 'bg-red-400/10',
+      textColor: 'text-red-400'
     }
   ];
 

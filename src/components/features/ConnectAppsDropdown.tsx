@@ -8,9 +8,9 @@ interface ConnectAppsDropdownProps {
 const ConnectAppsDropdown = ({ isOpen }: ConnectAppsDropdownProps) => {
   const apps: AppIntegration[] = [
     { name: 'YouTube', icon: 'https://static.wixstatic.com/media/c67dd6_aea51bc85e594033b8a29040d67b1d15~mv2.png', connected: true },
+    { name: 'X/Twitter', icon: 'https://static.wixstatic.com/media/c67dd6_a7b28b585b034f56ad6ab32232e745fc~mv2.webp', comingSoon: true },
     { name: 'Notion', icon: 'https://static.wixstatic.com/media/c67dd6_c0f6b842de844dff9ac8e0e71e7e5a18~mv2.png', comingSoon: true },
     { name: 'Spotify', icon: 'https://static.wixstatic.com/media/c67dd6_ec71f45884124292ab688e1089e48cb4~mv2.png', comingSoon: true },
-    { name: 'CreatorOS', icon: 'https://static.wixstatic.com/media/c67dd6_1244908d1b0545f6ac85b9f17e808a66~mv2.png', comingSoon: true },
     { name: 'Zapier', icon: 'https://static.wixstatic.com/media/c67dd6_4de0049f34934c93ac04c63d0bb84608~mv2.png', comingSoon: true },
     { name: 'Opus Clip', icon: 'https://static.wixstatic.com/media/c67dd6_c8ef1b8e181340c0a540162c50c059a1~mv2.png', comingSoon: true },
     { name: 'Miro', icon: 'https://static.wixstatic.com/media/c67dd6_db7bcff2a108431cab79c8c90c531d62~mv2.png', comingSoon: true },

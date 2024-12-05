@@ -66,6 +66,66 @@ const SocialAccounts = () => {
       isConnected: false,
       color: 'bg-blue-600/10 hover:bg-blue-600/20',
       textColor: 'text-blue-600'
+    },
+    {
+      id: 7,
+      name: 'Meta',
+      icon: 'https://static.wixstatic.com/media/c67dd6_e11a6a0bb99345839dbdc7cf12357c0b~mv2.png',
+      description: 'Connect with Meta platforms',
+      followers: '750K',
+      isConnected: false,
+      color: 'bg-blue-500/10 hover:bg-blue-500/20',
+      textColor: 'text-blue-500'
+    },
+    {
+      id: 8,
+      name: 'Telegram',
+      icon: 'https://static.wixstatic.com/media/c67dd6_ac87e7d2fc8c434f8c087005f5b27964~mv2.png',
+      description: 'Share updates via Telegram',
+      followers: '180K',
+      isConnected: false,
+      color: 'bg-blue-400/10 hover:bg-blue-400/20',
+      textColor: 'text-blue-400'
+    },
+    {
+      id: 9,
+      name: 'Substack',
+      icon: 'https://static.wixstatic.com/media/c67dd6_2b19ac41ffd349f4aa25811bea0bbabc~mv2.png',
+      description: 'Share your newsletter content',
+      followers: '15K',
+      isConnected: false,
+      color: 'bg-orange-500/10 hover:bg-orange-500/20',
+      textColor: 'text-orange-500'
+    },
+    {
+      id: 10,
+      name: 'OnlyFans',
+      icon: 'https://static.wixstatic.com/media/c67dd6_da17ab64a7e542e18aef84cd3fcbc08e~mv2.png',
+      description: 'Share exclusive content',
+      followers: '50K',
+      isConnected: false,
+      color: 'bg-blue-400/10 hover:bg-blue-400/20',
+      textColor: 'text-blue-400'
+    },
+    {
+      id: 11,
+      name: 'Skool',
+      icon: 'https://static.wixstatic.com/media/c67dd6_183e7da825044704859844a354659a3e~mv2.png',
+      description: 'Build your learning community',
+      followers: '25K',
+      isConnected: false,
+      color: 'bg-pink-400/10 hover:bg-pink-400/20',
+      textColor: 'text-pink-400'
+    },
+    {
+      id: 12,
+      name: 'Patreon',
+      icon: 'https://static.wixstatic.com/media/c67dd6_1ea98dca9e6b42e5914438202de7b6bb~mv2.png',
+      description: 'Monetize your content',
+      followers: '35K',
+      isConnected: false,
+      color: 'bg-red-400/10 hover:bg-red-400/20',
+      textColor: 'text-red-400'
     }
   ];
 

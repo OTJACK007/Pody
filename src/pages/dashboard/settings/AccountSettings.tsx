@@ -93,33 +93,45 @@ const AccountSettings = () => {
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !currentUser?.uid) return;
-    
-    // Validate file type
+
+     // Validate file type
     if (!file.type.startsWith('image/')) {
       alert('Please upload an image file');
       return;
     }
-    
-    // Validate file size (5MB max)
+
+     // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
       alert('File size must be less than 5MB');
       return;
     }
 
     setIsLoading(true);
+    setUploadProgress(0);
+
     try {
       const downloadURL = await uploadProfilePicture(currentUser.uid, file);
-      setSettings(prev => ({ ...prev, profilePicture: downloadURL }));
+      
+      // Update local state
+      setSettings(prev => ({
+        ...prev,
+        profilePicture: downloadURL
+      }));
+      
+      // Update Firestore
       await updateUserSettings(currentUser.uid, { profilePicture: downloadURL });
       await refreshSettings();
+      
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       console.error('Error uploading profile picture:', error);
       alert('Failed to upload image. Please try again.');
     } finally {
       setIsLoading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      setUploadProgress(0);
     }
   };
 
