@@ -21,7 +21,7 @@ const AccountSettings = () => {
   const [settings, setSettings] = useState({
     fullName: '',
     email: '',
-    phoneNumber: '',
+    phoneNumber: selectedCountry.dial_code,
     company: '',
     jobTitle: '',
     location: '',
@@ -49,9 +49,10 @@ const AccountSettings = () => {
     if (detectedCountry) {
       setSelectedCountry(detectedCountry);
     }
+    const phoneValue = value || '';
     setSettings(prev => ({ 
       ...prev, 
-      phoneNumber: formatPhoneNumber(value, selectedCountry)
+      phoneNumber: formatPhoneNumber(phoneValue, selectedCountry)
     }));
   };
 
@@ -289,7 +290,7 @@ const AccountSettings = () => {
                   </Dropdown>
                   <Input
                     type="tel"
-                    value={settings.phoneNumber.replace(selectedCountry.dial_code, '')}
+                    value={(settings.phoneNumber || '').replace(selectedCountry.dial_code, '')}
                     onChange={(e) => handlePhoneChange(e.target.value)}
                     startContent={<Phone className="w-4 h-4 text-gray-400" />}
                     placeholder="Phone number"
