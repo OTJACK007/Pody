@@ -133,21 +133,23 @@ function LandingPage() {
       <Header />
       <HeroSection />
       
-      <main className="mt-16 md:mt-24">
-        <div className="px-6 w-full space-y-16">
+      <main className="mt-8 md:mt-12"> 
+        <div className="px-6 w-full space-y-8">
           <FeaturedSection podcasts={mockPodcasts} />
           
-          <div className="sticky top-[60px] bg-[#1A1A1A] py-4 z-40">
+          <div className="sticky top-[60px] bg-[#1A1A1A] py-1 z-40 mt-12">
             <GenreFilter
               activeGenre={activeGenre}
               onGenreChange={setActiveGenre}
             />
           </div>
 
-          <PodcastGrid
+          <div className="mt-2">
+            <PodcastGrid
             title={`${activeGenre} Podcasts`}
             podcasts={trendingPodcasts}
-          />
+            />
+          </div>
         </div>
       </main>
     </div>
