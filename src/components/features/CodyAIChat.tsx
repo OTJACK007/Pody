@@ -1,15 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Avatar, Card, CardBody } from "@nextui-org/react";
 import { Send, Paperclip, AtSign, Image, Sparkles, ExternalLink, TrendingUp, Headphones, Library, Target } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
-
-interface Message {
-  id: string;
-  type: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
+import { createThread, sendMessage } from '../../services/openai';
+import type { Message } from '../../types/openai';
 
 interface CodyAIChatProps {
   isOpen: boolean;
@@ -22,6 +17,7 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [threadId, setThreadId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const suggestions = [
@@ -55,7 +51,18 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async (content: string = inputValue) => {
+  useEffect(() => {
+    const initThread = async () => {
+      const thread = await createThread();
+      setThreadId(thread.id);
+    };
+    
+    if (isOpen && !threadId) {
+      initThread();
+    }
+  }, [isOpen]);
+
+  const handleSend = useCallback(async (content: string = inputValue) => {
     if (!content.trim()) return;
 
     const userMessage: Message = {
@@ -69,17 +76,31 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
     setInputValue('');
     setIsTyping(true);
 
-    setTimeout(() => {
+    try {
+      if (!threadId) throw new Error('No active thread');
+
+      const response = await sendMessage(threadId, content);
+      
       const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: response.id,
         type: 'assistant',
-        content: "I'm analyzing your request. Let me help you with that!",
+        content: response.content,
         timestamp: new Date()
       };
+
       setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Failed to get AI response:', error);
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        type: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date()
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
-  };
+    }
+  }, [threadId, inputValue]);
 
   return (
     <Modal 

@@ -1,17 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Avatar, Card, CardBody, Progress } from "@nextui-org/react";
 import { Send, Paperclip, Image, AtSign, Sparkles, Brain, Wand2, MessageSquare, Star, TrendingUp, Headphones, Library, Target, Plus, Coins } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { createThread, sendMessage } from '../../services/openai';
+import type { Message } from '../../types/openai';
 import CreditOptionsModal from '../../components/features/CreditOptionsModal';
 import TopUpCreditsModal from '../../components/features/TopUpCreditsModal';
 import UpgradePlanModal from './settings/billing/UpgradePlanModal';
-
-interface Message {
-  id: string;
-  type: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
 
 const CodyAI = () => {
   const { theme } = useTheme();
@@ -21,6 +16,7 @@ const CodyAI = () => {
   const [showCreditOptions, setShowCreditOptions] = useState(false);
   const [showTopUpModal, setShowTopUpModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [threadId, setThreadId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const suggestions = [
@@ -77,7 +73,16 @@ const CodyAI = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async (content: string = inputValue) => {
+  useEffect(() => {
+    const initThread = async () => {
+      const thread = await createThread();
+      setThreadId(thread.id);
+    };
+    
+    initThread();
+  }, []);
+
+  const handleSend = useCallback(async (content: string = inputValue) => {
     if (!content.trim()) return;
 
     const userMessage: Message = {
@@ -91,17 +96,31 @@ const CodyAI = () => {
     setInputValue('');
     setIsTyping(true);
 
-    setTimeout(() => {
+    try {
+      if (!threadId) throw new Error('No active thread');
+
+      const response = await sendMessage(threadId, content);
+      
       const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: response.id,
         type: 'assistant',
-        content: "I'm analyzing your request. Let me help you with that!",
+        content: response.content,
         timestamp: new Date()
       };
+
       setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Failed to get AI response:', error);
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        type: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date()
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
-  };
+    }
+  }, [threadId, inputValue]);
 
   return (
     <div className="flex h-[calc(100vh-120px)]">
