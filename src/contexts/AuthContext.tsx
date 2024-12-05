@@ -8,12 +8,13 @@ import {
   onAuthStateChanged
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
+import { createUserSettings } from '../lib/firestore';
 
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -45,12 +46,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signUp = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
+  const signUp = async (email: string, password: string, fullName: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const [firstName, ...lastNameParts] = fullName.trim().split(' ');
+    const lastName = lastNameParts.join(' ');
+    
+    // Create initial user settings
+    await createUserSettings(userCredential.user.uid, {
+      firstName,
+      lastName,
+      email,
+      profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+      phoneNumber: '',
+      company: '',
+      jobTitle: '',
+      location: '',
+      website: ''
+    });
   };
 
   const signInWithGoogle = async () => {
-    await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    
+    // Create user settings if they don't exist
+    const names = user.displayName?.split(' ') || [''];
+    const firstName = names[0];
+    const lastName = names.slice(1).join(' ');
+    
+    await createUserSettings(user.uid, {
+      firstName,
+      lastName,
+      email: user.email || '',
+      profilePicture: user.photoURL || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+      phoneNumber: user.phoneNumber || '',
+      company: '',
+      jobTitle: '',
+      location: '',
+      website: ''
+    });
   };
 
   const logout = async () => {

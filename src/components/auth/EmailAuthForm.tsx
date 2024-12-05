@@ -15,13 +15,31 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
   const { signIn, signUp } = useAuth();
+
+  const validatePassword = (password: string) => {
+    return /\d/.test(password);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (mode === 'signup') {
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+      
+      if (!validatePassword(password)) {
+        setError('Password must contain at least one number');
+        return;
+      }
+    }
+    
     setIsLoading(true);
     
     try {
@@ -29,7 +47,7 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
         await signIn(email, password);
         navigate('/dashboard/livespace');
       } else {
-        await signUp(email, password);
+        await signUp(email, password, fullName);
         navigate('/dashboard/livespace');
       }
     } catch (error: unknown) {
@@ -82,15 +100,15 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
       </div>
 
       {mode === 'signup' && (
-        <div>
+        <div className="mt-4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
             Full Name
           </label>
           <input
             type="text"
             id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
             className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-white"
             placeholder="John Doe"
             required
@@ -126,6 +144,22 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
           placeholder="••••••••"
           required
         />
+        {mode === 'signup' && (
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-white"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+        )}
       </div>
       
       {error && (
