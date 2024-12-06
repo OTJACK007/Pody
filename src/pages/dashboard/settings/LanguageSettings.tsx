@@ -1,66 +1,86 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Globe, Search } from 'lucide-react';
 import { Card, CardBody, Input, Button, RadioGroup, Radio } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useSettings } from '../../../contexts/SettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
+import type { LanguageSettings as LanguageSettingsType } from '../../../lib/firestore/collections/settings';
 
 const LanguageSettings = () => {
   const { theme } = useTheme();
+  const { language, updateLanguage } = useSettings();
+  const [settings, setSettings] = useState<LanguageSettingsType>({
+    language: 'en',
+    region: 'US',
+    timeZone: 'auto',
+    dateFormat: 'MM/DD/YYYY'
+  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const languages = [
     { 
       code: 'en', 
       name: 'English', 
       region: 'United States',
-      flag: 'https://static.wixstatic.com/media/c67dd6_a4882c1010344b30922c23e626baf714~mv2.png'
+      flag: 'https://static.wixstatic.com/media/c67dd6_a4882c1010344b30922c23e626baf714~mv2.png',
+      available: true
     },
     { 
       code: 'uk', 
       name: 'English', 
       region: 'United Kingdom',
-      flag: 'https://static.wixstatic.com/media/c67dd6_2a4617a1f26249028eeb357ddcfbf2d0~mv2.png'
+      flag: 'https://static.wixstatic.com/media/c67dd6_2a4617a1f26249028eeb357ddcfbf2d0~mv2.png',
+      available: false
     },
     { 
       code: 'fr', 
       name: 'French', 
       region: 'France',
-      flag: 'https://static.wixstatic.com/media/c67dd6_6d61dc59e47b47d89b4edfdf83cdb608~mv2.png'
+      flag: 'https://static.wixstatic.com/media/c67dd6_6d61dc59e47b47d89b4edfdf83cdb608~mv2.png',
+      available: false
     },
     { 
       code: 'es', 
       name: 'Spanish', 
       region: 'Spain',
-      flag: 'https://static.wixstatic.com/media/c67dd6_f705d2b950704c50990390cd9e3dd732~mv2.png'
+      flag: 'https://static.wixstatic.com/media/c67dd6_f705d2b950704c50990390cd9e3dd732~mv2.png',
+      available: false
     },
     { 
       code: 'de', 
       name: 'German', 
       region: 'Germany',
-      flag: 'https://static.wixstatic.com/media/c67dd6_c0cddb77907a4e6883e91c95f197d3fa~mv2.png'
+      flag: 'https://static.wixstatic.com/media/c67dd6_c0cddb77907a4e6883e91c95f197d3fa~mv2.png',
+      available: false
     },
     { 
       code: 'ru', 
       name: 'Russian', 
       region: 'Russia',
-      flag: 'https://static.wixstatic.com/media/c67dd6_62e9768157ae4abd8543922462ac6b1e~mv2.png'
+      flag: 'https://static.wixstatic.com/media/c67dd6_62e9768157ae4abd8543922462ac6b1e~mv2.png',
+      available: false
     },
     { 
       code: 'ja', 
       name: 'Japanese', 
       region: 'Japan',
-      flag: 'https://static.wixstatic.com/media/c67dd6_f7079d18b87042f8ad70a98d17b27ff3~mv2.png'
+      flag: 'https://static.wixstatic.com/media/c67dd6_f7079d18b87042f8ad70a98d17b27ff3~mv2.png',
+      available: false
     },
     { 
       code: 'zh', 
       name: 'Chinese', 
       region: 'China',
-      flag: 'https://static.wixstatic.com/media/c67dd6_40f8140eaf8441cd9d3aa19107ed1be4~mv2.png'
+      flag: 'https://static.wixstatic.com/media/c67dd6_40f8140eaf8441cd9d3aa19107ed1be4~mv2.png',
+      available: false
     },
     { 
       code: 'in', 
       name: 'Hindi', 
       region: 'India',
-      flag: 'https://static.wixstatic.com/media/c67dd6_36192cdfdf5f4f0ca31b105cc21011c0~mv2.png'
+      flag: 'https://static.wixstatic.com/media/c67dd6_36192cdfdf5f4f0ca31b105cc21011c0~mv2.png',
+      available: false
     }
   ];
 
@@ -78,6 +98,36 @@ const LanguageSettings = () => {
     { id: 'dmy', format: 'DD/MM/YYYY', example: '15/03/2024' },
     { id: 'ymd', format: 'YYYY-MM-DD', example: '2024-03-15' }
   ];
+
+  useEffect(() => {
+    if (language) {
+      setSettings(language);
+    }
+  }, [language]);
+
+  const handleSave = async () => {
+    try {
+      setIsLoading(true);
+      await updateLanguage(settings);
+    } catch (error) {
+      console.error('Error saving language settings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLanguageSelect = (code: string, region: string) => {
+    setSettings(prev => ({
+      ...prev,
+      language: code,
+      region: region
+    }));
+  };
+
+  const filteredLanguages = languages.filter(lang =>
+    lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    lang.region.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="max-w-4xl">
@@ -101,6 +151,8 @@ const LanguageSettings = () => {
             <div className="space-y-4">
               <Input
                 placeholder="Search languages..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 startContent={<Search className="w-4 h-4 text-gray-400" />}
                 classNames={{
                   input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -108,14 +160,20 @@ const LanguageSettings = () => {
                 }}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {languages.map((lang) => (
+                {filteredLanguages.map((lang) => (
                   <button
                     key={lang.code}
                     className={`flex items-center gap-3 p-3 rounded-lg ${
                       theme === 'dark'
                         ? 'bg-gray-700/30 hover:bg-gray-700/50'
                         : 'bg-gray-100 hover:bg-gray-200'
-                    } transition-colors text-left group`}
+                    } transition-colors text-left group relative ${
+                      settings.language === lang.code && settings.region === lang.region.toUpperCase()
+                        ? 'ring-2 ring-primary'
+                        : ''
+                    } ${!lang.available ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    onClick={() => lang.available && handleLanguageSelect(lang.code, lang.region.toUpperCase())}
+                    disabled={!lang.available}
                   >
                     <img 
                       src={lang.flag} 
@@ -130,6 +188,11 @@ const LanguageSettings = () => {
                         {lang.region}
                       </p>
                     </div>
+                    {!lang.available && (
+                      <span className="absolute top-2 right-2 text-xs font-medium text-secondary">
+                        Coming Soon
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -208,7 +271,12 @@ const LanguageSettings = () => {
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" size="lg">
+          <Button 
+            className="bg-primary text-white font-medium hover:bg-primary/90"
+            size="lg"
+            onClick={handleSave}
+            isLoading={isLoading}
+          >
             Save Changes
           </Button>
         </div>

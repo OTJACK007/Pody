@@ -1,62 +1,102 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CreditCard, Clock, Receipt, Plus } from 'lucide-react';
 import { Card, CardBody, Button } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useSettings } from '../../../contexts/SettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 import AddPaymentModal from './billing/AddPaymentModal';
 import UpgradePlanModal from './billing/UpgradePlanModal';
+import type { BillingSettings as BillingSettingsType } from '../../../lib/firestore/collections/settings';
 
 const BillingSettings = () => {
   const [showAddCardModal, setShowAddCardModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
+  const { billing, updateBilling } = useSettings();
+  const [settings, setSettings] = useState<BillingSettingsType>({
+    subscription: {
+      plan: 'basic',
+      status: 'active',
+      nextBillingDate: new Date(),
+      amount: 5,
+      currency: 'USD'
+    },
+    paymentMethods: [],
+    billingHistory: []
+  });
+
+  useEffect(() => {
+    if (billing) {
+      setSettings(billing);
+    }
+  }, [billing]);
 
   const handleAddPayment = async (data: any) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoading(false);
+    try {
+      const newPaymentMethod = {
+        id: Date.now().toString(),
+        type: data.method,
+        isDefault: settings.paymentMethods.length === 0,
+        details: {
+          last4: data.data?.cardNumber?.slice(-4),
+          expiry: data.data?.expiry,
+          email: data.data?.email,
+          name: data.data?.cardName
+        },
+        provider: {
+          name: data.method === 'card' ? 'Stripe' : data.method === 'paypal' ? 'PayPal' : 'MoonPay',
+          icon: data.method === 'card' 
+            ? 'https://static.wixstatic.com/media/c67dd6_7db17138923b4bcf92d85ed71f9f85ed~mv2.png'
+            : data.method === 'paypal'
+              ? 'https://static.wixstatic.com/media/c67dd6_ba6512237a194a9a9297eeeb9219122e~mv2.png'
+              : 'https://static.wixstatic.com/media/c67dd6_8dfcffeaa9b34dab888e64ceee0531f0~mv2.png'
+        }
+      };
+
+      const updatedSettings = {
+        ...settings,
+        paymentMethods: [...settings.paymentMethods, newPaymentMethod]
+      };
+
+      await updateBilling(updatedSettings);
+      setSettings(updatedSettings);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const paymentMethods = [
-    {
-      id: 1,
-      type: 'card',
-      last4: '4242',
-      expiry: '12/24',
-      icon: 'https://static.wixstatic.com/media/c67dd6_7db17138923b4bcf92d85ed71f9f85ed~mv2.png'
-    },
-    {
-      id: 2,
-      type: 'paypal',
-      email: 'john@example.com',
-      icon: 'https://static.wixstatic.com/media/c67dd6_ba6512237a194a9a9297eeeb9219122e~mv2.png'
-    },
-    {
-      id: 3,
-      type: 'crypto',
-      name: 'MoonPay',
-      icon: 'https://static.wixstatic.com/media/c67dd6_8dfcffeaa9b34dab888e64ceee0531f0~mv2.png'
-    }
-  ];
+  const handleRemovePaymentMethod = async (id: string) => {
+    try {
+      const updatedSettings = {
+        ...settings,
+        paymentMethods: settings.paymentMethods.filter(method => method.id !== id)
+      };
 
-  const billingHistory = [
-    {
-      id: 1,
-      date: 'Mar 1, 2024',
-      amount: '$5.00',
-      status: 'Paid',
-      description: 'Monthly Subscription'
-    },
-    {
-      id: 2,
-      date: 'Feb 1, 2024',
-      amount: '$5.00',
-      status: 'Paid',
-      description: 'Monthly Subscription'
+      await updateBilling(updatedSettings);
+      setSettings(updatedSettings);
+    } catch (error) {
+      console.error('Error removing payment method:', error);
     }
-  ];
+  };
+
+  const handleCancelSubscription = async () => {
+    try {
+      const updatedSettings = {
+        ...settings,
+        subscription: {
+          ...settings.subscription,
+          status: 'cancelled' as const
+        }
+      };
+
+      await updateBilling(updatedSettings);
+      setSettings(updatedSettings);
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+    }
+  };
 
   return (
     <div className="max-w-4xl">
@@ -102,13 +142,15 @@ const BillingSettings = () => {
                   </p>
                   <p className={`text-sm ${
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                  }`}>April 1, 2024</p>
+                  }`}>{new Date(settings.subscription.nextBillingDate).toLocaleDateString()}</p>
                 </div>
               </div>
               <Button
                 color="danger"
                 variant="flat"
                 size="sm"
+                onClick={handleCancelSubscription}
+                isDisabled={settings.subscription.status === 'cancelled'}
               >
                 Cancel Subscription
               </Button>
@@ -154,7 +196,7 @@ const BillingSettings = () => {
             </div>
 
             <div className="space-y-4">
-              {paymentMethods.map((method) => (
+              {settings.paymentMethods.map((method) => (
                 <div
                   key={method.id}
                   className={`flex items-center justify-between p-4 rounded-lg ${
@@ -166,7 +208,7 @@ const BillingSettings = () => {
                       theme === 'dark' ? 'bg-gray-600/50' : 'bg-gray-200'
                     }`}>
                       <img 
-                        src={method.icon}
+                        src={method.provider.icon}
                         alt={method.type}
                         className="w-6 h-6 object-contain"
                       />
@@ -175,11 +217,11 @@ const BillingSettings = () => {
                       {method.type === 'card' && (
                         <>
                           <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                            •••• {method.last4}
+                            •••• {method.details.last4}
                           </p>
                           <p className={`text-sm ${
                             theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                          }`}>Expires {method.expiry}</p>
+                          }`}>Expires {method.details.expiry}</p>
                         </>
                       )}
                       {method.type === 'paypal' && (
@@ -189,7 +231,7 @@ const BillingSettings = () => {
                           </p>
                           <p className={`text-sm ${
                             theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                          }`}>{method.email}</p>
+                          }`}>{method.details.email}</p>
                         </>
                       )}
                       {method.type === 'crypto' && (
@@ -208,6 +250,7 @@ const BillingSettings = () => {
                     color="danger"
                     variant="flat"
                     size="sm"
+                    onClick={() => handleRemovePaymentMethod(method.id)}
                   >
                     Remove
                   </Button>
@@ -246,7 +289,7 @@ const BillingSettings = () => {
             </div>
 
             <div className="space-y-4">
-              {billingHistory.map((item) => (
+              {settings.billingHistory.map((item) => (
                 <div
                   key={item.id}
                   className={`flex items-center justify-between p-4 rounded-lg ${
@@ -259,11 +302,11 @@ const BillingSettings = () => {
                     </p>
                     <p className={`text-sm ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                    }`}>{item.date}</p>
+                    }`}>{new Date(item.date).toLocaleDateString()}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                      {item.amount}
+                      ${item.amount.toFixed(2)} {item.currency}
                     </span>
                     <Button
                       size="sm"
@@ -272,6 +315,8 @@ const BillingSettings = () => {
                           ? 'bg-gray-600 text-white hover:bg-gray-500'
                           : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
                       }`}
+                      onClick={() => window.open(item.invoice_url, '_blank')}
+                      isDisabled={!item.invoice_url}
                     >
                       Download
                     </Button>

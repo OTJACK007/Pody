@@ -1,13 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, Lock, Smartphone, QrCode, Key, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Card, CardBody, Input, Button, Switch, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useSettings } from '../../../contexts/SettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
+import type { PrivacySettings as PrivacySettingsType } from '../../../lib/firestore/collections/settings';
 
 const PrivacySettings = () => {
   const [showQRModal, setShowQRModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const { privacy, updatePrivacy } = useSettings();
+  const [settings, setSettings] = useState<PrivacySettingsType>({
+    password_authentication: {
+      change_password: true,
+      phone_number_authentication: {
+        enabled: false,
+        phone_number: '',
+        verified: false
+      },
+      authenticator_app: {
+        enabled: false,
+        qr_code_url: '',
+        last_used: new Date()
+      }
+    },
+    privacy_settings: {
+      show_profile: true,
+      allow_listening_activity: false,
+      share_library: true,
+      allow_friend_requests: true
+    },
+    security_log: []
+  });
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,6 +43,12 @@ const PrivacySettings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<'phone' | 'verify'>('phone');
   const { theme } = useTheme();
+
+  useEffect(() => {
+    if (privacy) {
+      setSettings(privacy);
+    }
+  }, [privacy]);
 
   const calculatePasswordStrength = (password: string) => {
     let strength = 0;
@@ -39,32 +70,91 @@ const PrivacySettings = () => {
 
   const handlePasswordChange = async () => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoading(false);
-    setShowPasswordModal(false);
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+    try {
+      await updatePrivacy({
+        ...settings,
+        password_authentication: {
+          ...settings.password_authentication,
+          change_password: true
+        }
+      });
+      
+      setIsLoading(false);
+      setShowPasswordModal(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      console.error('Error changing password:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePhoneSubmit = async () => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoading(false);
-    setStep('verify');
+    try {
+      await updatePrivacy({
+        ...settings,
+        password_authentication: {
+          ...settings.password_authentication,
+          phone_number_authentication: {
+            enabled: true,
+            phone_number: phoneNumber,
+            verified: false
+          }
+        }
+      });
+      
+      setIsLoading(false);
+      setStep('verify');
+    } catch (error) {
+      console.error('Error setting up phone authentication:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerifyCode = async () => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoading(false);
-    setShowPhoneModal(false);
-    setStep('phone');
-    setPhoneNumber('');
-    setVerificationCode('');
+    try {
+      await updatePrivacy({
+        ...settings,
+        password_authentication: {
+          ...settings.password_authentication,
+          phone_number_authentication: {
+            ...settings.password_authentication.phone_number_authentication,
+            verified: true
+          }
+        }
+      });
+      
+      setIsLoading(false);
+      setShowPhoneModal(false);
+      setStep('phone');
+      setPhoneNumber('');
+      setVerificationCode('');
+    } catch (error) {
+      console.error('Error verifying phone:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePrivacyToggle = async (key: keyof typeof settings.privacy_settings, value: boolean) => {
+    try {
+      const updatedSettings = {
+        ...settings,
+        privacy_settings: {
+          ...settings.privacy_settings,
+          [key]: value
+        }
+      };
+      await updatePrivacy(updatedSettings);
+      setSettings(updatedSettings);
+    } catch (error) {
+      console.error('Error updating privacy setting:', error);
+    }
   };
 
   return (
@@ -185,25 +275,41 @@ const PrivacySettings = () => {
                 <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
                   Show my profile to other users
                 </span>
-                <Switch defaultSelected color="success" />
+                <Switch
+                  isSelected={settings.privacy_settings.show_profile}
+                  onValueChange={(value) => handlePrivacyToggle('show_profile', value)}
+                  color="success"
+                />
               </div>
               <div className="flex items-center justify-between">
                 <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
                   Allow others to see my listening activity
                 </span>
-                <Switch defaultSelected color="success" />
+                <Switch
+                  isSelected={settings.privacy_settings.allow_listening_activity}
+                  onValueChange={(value) => handlePrivacyToggle('allow_listening_activity', value)}
+                  color="success"
+                />
               </div>
               <div className="flex items-center justify-between">
                 <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
                   Share my library with followers
                 </span>
-                <Switch color="success" />
+                <Switch
+                  isSelected={settings.privacy_settings.share_library}
+                  onValueChange={(value) => handlePrivacyToggle('share_library', value)}
+                  color="success"
+                />
               </div>
               <div className="flex items-center justify-between">
                 <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
                   Allow friend requests
                 </span>
-                <Switch defaultSelected color="success" />
+                <Switch
+                  isSelected={settings.privacy_settings.allow_friend_requests}
+                  onValueChange={(value) => handlePrivacyToggle('allow_friend_requests', value)}
+                  color="success"
+                />
               </div>
             </div>
           </CardBody>
@@ -221,32 +327,24 @@ const PrivacySettings = () => {
             }`}>Security Log</h3>
             
             <div className="space-y-4">
-              <div className={`flex items-center justify-between p-3 rounded-lg ${
-                theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-100'
-              }`}>
-                <div>
-                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                    Password changed
-                  </p>
-                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                    2 days ago • New York, USA
-                  </p>
+              {settings.security_log.map((log, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center justify-between p-3 rounded-lg ${
+                    theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-100'
+                  }`}
+                >
+                  <div>
+                    <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                      {log.event_type}
+                    </p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      {new Date(log.timestamp).toLocaleDateString()} • {log.location}
+                    </p>
+                  </div>
+                  <AlertCircle className="w-5 h-5 text-primary" />
                 </div>
-                <AlertCircle className="w-5 h-5 text-primary" />
-              </div>
-              <div className={`flex items-center justify-between p-3 rounded-lg ${
-                theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-100'
-              }`}>
-                <div>
-                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                    New device logged in
-                  </p>
-                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                    5 days ago • London, UK
-                  </p>
-                </div>
-                <AlertCircle className="w-5 h-5 text-primary" />
-              </div>
+              ))}
             </div>
           </CardBody>
         </Card>

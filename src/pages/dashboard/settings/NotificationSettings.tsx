@@ -1,11 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, Mail, Globe, MessageSquare, Star, Gift, Radio, Smartphone, Volume2 } from 'lucide-react';
 import { Card, CardBody, Switch, Tabs, Tab, Divider, Button, Select, SelectItem } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useSettings } from '../../../contexts/SettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
+import type { NotificationSettings as NotificationSettingsType } from '../../../lib/firestore/collections/settings';
 
 const NotificationSettings = () => {
   const { theme } = useTheme();
+  const { notifications, updateNotifications } = useSettings();
+  const [isLoading, setIsLoading] = useState(false);
+  const [settings, setSettings] = useState<NotificationSettingsType>({
+    browser: true,
+    categories: {},
+    content: {
+      'new-episodes': true,
+      recommendations: true,
+      trending: true
+    },
+    social: {
+      follows: true,
+      mentions: true,
+      replies: true
+    },
+    system: {
+      maintenance: false,
+      security: true,
+      updates: true,
+      email: true,
+      emailFrequency: 'immediate',
+      mobile: false,
+      quietHours: {
+        enabled: false,
+        end: '07:00',
+        start: '22:00',
+        sound: true
+      }
+    },
+    quietHours: {
+      enabled: false,
+      start: '22:00',
+      end: '07:00',
+      sound: true
+    }
+  });
+
+  useEffect(() => {
+    if (notifications) {
+      setSettings(notifications);
+    }
+  }, [notifications]);
 
   const emailFrequencies = [
     { value: 'immediate', label: 'Immediately' },
@@ -44,6 +88,44 @@ const NotificationSettings = () => {
     }
   ];
 
+  const handleSave = async () => {
+    try {
+      setIsLoading(true);
+      await updateNotifications(settings);
+    } catch (error) {
+      console.error('Error saving notification settings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggle = (key: string, value: boolean) => {
+    setSettings(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleEmailFrequencyChange = (value: string) => {
+    setSettings(prev => ({
+      ...prev,
+      system: {
+        ...prev.system,
+        emailFrequency: value
+      }
+    }));
+  };
+
+  const handleQuietHoursChange = (key: string, value: string | boolean) => {
+    setSettings(prev => ({
+      ...prev,
+      quietHours: {
+        ...prev.quietHours,
+        [key]: value
+      }
+    }));
+  };
+
   return (
     <div className="max-w-4xl">
       <SettingsHeader
@@ -79,7 +161,8 @@ const NotificationSettings = () => {
                   </div>
                 </div>
                 <Select
-                  defaultSelectedKeys={['immediate']}
+                  selectedKeys={[settings?.system?.emailFrequency || 'immediate']}
+                  onChange={(e) => handleEmailFrequencyChange(e.target.value)}
                   className="max-w-xs"
                   size="sm"
                 >
@@ -107,7 +190,11 @@ const NotificationSettings = () => {
                     </p>
                   </div>
                 </div>
-                <Switch defaultSelected color="success" />
+                <Switch
+                  isSelected={settings?.browser ?? true}
+                  onValueChange={(value) => setSettings(prev => ({ ...prev, browser: value }))}
+                  color="success"
+                />
               </div>
 
               <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
@@ -126,7 +213,14 @@ const NotificationSettings = () => {
                     </p>
                   </div>
                 </div>
-                <Switch defaultSelected color="success" />
+                <Switch
+                  isSelected={settings?.system?.mobile ?? false}
+                  onValueChange={(value) => setSettings(prev => ({
+                    ...prev,
+                    system: { ...prev.system, mobile: value }
+                  }))}
+                  color="success"
+                />
               </div>
 
               <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
@@ -145,7 +239,17 @@ const NotificationSettings = () => {
                     </p>
                   </div>
                 </div>
-                <Switch defaultSelected color="success" />
+                <Switch
+                  isSelected={settings?.system?.quietHours?.sound ?? true}
+                  onValueChange={(value) => setSettings(prev => ({
+                    ...prev,
+                    system: {
+                      ...prev.system,
+                      quietHours: { ...prev.system.quietHours, sound: value }
+                    }
+                  }))}
+                  color="success"
+                />
               </div>
             </div>
           </CardBody>
@@ -174,7 +278,14 @@ const NotificationSettings = () => {
                           {item.description}
                         </p>
                       </div>
-                      <Switch defaultSelected color="success" />
+                      <Switch
+                        isSelected={settings?.content?.[item.id as keyof typeof settings.content] ?? true}
+                        onValueChange={(value) => setSettings(prev => ({
+                          ...prev,
+                          content: { ...prev.content, [item.id]: value }
+                        }))}
+                        color="success"
+                      />
                     </div>
                     {index < section.items.length - 1 && (
                       <Divider className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} />
@@ -202,7 +313,11 @@ const NotificationSettings = () => {
                   Pause notifications during specific times
                 </p>
               </div>
-              <Switch defaultSelected color="success" />
+              <Switch
+                isSelected={settings?.system?.quietHours?.enabled ?? false}
+                onValueChange={(value) => handleQuietHoursChange('enabled', value)}
+                color="success"
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -211,7 +326,8 @@ const NotificationSettings = () => {
                 }`}>Start Time</label>
                 <input
                   type="time"
-                  defaultValue="22:00"
+                  value={settings?.system?.quietHours?.start || '22:00'}
+                  onChange={(e) => handleQuietHoursChange('start', e.target.value)}
                   className={`w-full px-4 py-2 rounded-lg focus:ring-1 focus:ring-primary outline-none ${
                     theme === 'dark'
                       ? 'bg-gray-700/50 border-gray-600 text-white'
@@ -225,7 +341,8 @@ const NotificationSettings = () => {
                 }`}>End Time</label>
                 <input
                   type="time"
-                  defaultValue="07:00"
+                  value={settings?.system?.quietHours?.end || '07:00'}
+                  onChange={(e) => handleQuietHoursChange('end', e.target.value)}
                   className={`w-full px-4 py-2 rounded-lg focus:ring-1 focus:ring-primary outline-none ${
                     theme === 'dark'
                       ? 'bg-gray-700/50 border-gray-600 text-white'
@@ -238,10 +355,18 @@ const NotificationSettings = () => {
         </Card>
 
         <div className="flex justify-end gap-3">
-          <Button color="danger" variant="flat">
+          <Button 
+            color="danger" 
+            variant="flat"
+            onClick={() => setSettings(notifications || settings)}
+          >
             Reset to Default
           </Button>
-          <Button color="primary">
+          <Button 
+            color="primary"
+            onClick={handleSave}
+            isLoading={isLoading}
+          >
             Save Changes
           </Button>
         </div>

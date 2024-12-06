@@ -2,15 +2,53 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow users to read and write their own settings
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function hasValidFields(requiredFields) {
+      return request.resource.data.keys().hasAll(requiredFields);
+    }
+    
+    // User Settings
     match /userSettings/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isAuthenticated() && isOwner(userId);
       
-      // Allow creation of new user settings
-      allow create: if request.auth != null && 
-                   request.auth.uid == userId &&
-                   request.resource.data.keys().hasAll(['firstName', 'lastName', 'email']) &&
-                   request.resource.data.email is string;
+      allow create: if isAuthenticated() && 
+                   isOwner(userId) &&
+                   hasValidFields(['firstName', 'lastName', 'email']);
+      
+      allow update: if isAuthenticated() && isOwner(userId);
+      
+      // Validate specific settings updates
+      match /appearance {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     request.resource.data.keys().hasAll(['theme']);
+      }
+      
+      match /notifications {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     request.resource.data.keys().hasAll(['email', 'browser', 'mobile']);
+      }
+      
+      match /privacy {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     request.resource.data.keys().hasAll(['showProfile', 'showListeningActivity']);
+      }
+      
+      match /language {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     request.resource.data.keys().hasAll(['language', 'region']);
+      }
     }
   }
 }
