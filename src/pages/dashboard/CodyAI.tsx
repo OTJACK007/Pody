@@ -153,7 +153,7 @@ const CodyAI = () => {
             }`}>Usage Stats</h3>
             <div className="space-y-4">
               <div>
-                <div className="flex justify-between mb-1 text-sm">
+                <div className="flex justify-between text-sm mb-1">
                   <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
                     Monthly Credits
                   </span>
@@ -175,7 +175,7 @@ const CodyAI = () => {
                 </Button>
               </div>
               <div>
-                <div className="flex justify-between mb-1 text-sm">
+                <div className="flex justify-between text-sm mb-1">
                   <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
                     Response Quality
                   </span>
@@ -196,7 +196,7 @@ const CodyAI = () => {
                   : 'bg-white border-gray-200'
               } border`}>
                 <CardBody className="p-4">
-                  <div className="flex flex-col items-center gap-2 text-center">
+                  <div className="flex flex-col items-center text-center gap-2">
                     {feature.icon}
                     <h3 className={`text-sm font-medium ${
                       theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -213,7 +213,7 @@ const CodyAI = () => {
       </div>
 
       {/* Chat Area */}
-      <div className="flex flex-col flex-grow">
+      <div className="flex-grow flex flex-col">
         {/* Chat Messages */}
         <div className={`flex-grow overflow-y-auto p-6 ${
           theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
@@ -290,8 +290,8 @@ const CodyAI = () => {
                 />
                 <div className="flex gap-1">
                   <span className="w-2 h-2 rounded-full bg-primary animate-bounce"></span>
-                  <span className="w-2 h-2 delay-100 rounded-full bg-primary animate-bounce"></span>
-                  <span className="w-2 h-2 delay-200 rounded-full bg-primary animate-bounce"></span>
+                  <span className="w-2 h-2 rounded-full bg-primary animate-bounce delay-100"></span>
+                  <span className="w-2 h-2 rounded-full bg-primary animate-bounce delay-200"></span>
                 </div>
               </div>
             )}
@@ -303,7 +303,7 @@ const CodyAI = () => {
         <div className={`p-4 border-t ${
           theme === 'dark' ? 'border-gray-800' : 'border-gray-200'
         }`}>
-          <div className="flex items-center max-w-4xl gap-2 mx-auto">
+          <div className="max-w-4xl mx-auto flex items-center gap-2">
             <div className="flex gap-2">
               <Button
                 isIconOnly
@@ -341,7 +341,7 @@ const CodyAI = () => {
             <Button
               isIconOnly
               color="success"
-              className="text-black bg-secondary"
+              className="bg-secondary text-black"
               onClick={() => handleSend()}
             >
               <Send className="w-5 h-5" />
