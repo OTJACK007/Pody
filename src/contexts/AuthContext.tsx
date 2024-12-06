@@ -3,12 +3,15 @@ import {
   User,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
-import { createUserSettings } from '../lib/firestore';
+import { createUserSettings, createDefaultSocialAccounts, getUserSettings } from '../lib/firestore';
+import { defaultSettings } from '../lib/firestore/collections/settings';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -32,6 +35,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -42,6 +46,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          const user = result.user;
+          const existingSettings = await getUserSettings(user.uid);
+          
+          if (!existingSettings) {
+            const names = user.displayName?.split(' ') || [''];
+            const firstName = names[0];
+            const lastName = names.slice(1).join(' ');
+            
+            const settings = {
+              ...defaultSettings,
+              firstName,
+              lastName,
+              email: user.email || '',
+              profilePicture: user.photoURL || 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png',
+              phoneNumber: user.phoneNumber || ''
+            };
+
+            await createUserSettings(user.uid, settings);
+            await createDefaultSocialAccounts(user.uid);
+          }
+          
+          navigate('/dashboard/livespace');
+        }
+      } catch (error) {
+        console.error('Error handling redirect result:', error);
+      }
+    };
+
+    handleRedirectResult();
+  }, [navigate]);
   const signIn = async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password);
   };
@@ -51,40 +90,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [firstName, ...lastNameParts] = fullName.trim().split(' ');
     const lastName = lastNameParts.join(' ');
     
-    // Create initial user settings
-    await createUserSettings(userCredential.user.uid, {
+    // Create default settings for new user
+    const settings = {
+      ...defaultSettings,
       firstName,
       lastName,
       email,
-      profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
-      phoneNumber: '',
-      company: '',
-      jobTitle: '',
-      location: '',
-      website: ''
-    });
+      profilePicture: 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png',
+    };
+
+    await createUserSettings(userCredential.user.uid, settings);
+    await createDefaultSocialAccounts(userCredential.user.uid);
   };
 
   const signInWithGoogle = async () => {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-    
-    // Create user settings if they don't exist
-    const names = user.displayName?.split(' ') || [''];
-    const firstName = names[0];
-    const lastName = names.slice(1).join(' ');
-    
-    await createUserSettings(user.uid, {
-      firstName,
-      lastName,
-      email: user.email || '',
-      profilePicture: user.photoURL || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
-      phoneNumber: user.phoneNumber || '',
-      company: '',
-      jobTitle: '',
-      location: '',
-      website: ''
-    });
+    try {
+      // Navigate after successful sign-in
+      navigate('/dashboard/livespace');
+      
+      await signInWithRedirect(auth, googleProvider);
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+      throw error;
+    }
   };
 
   const logout = async () => {

@@ -1,0 +1,126 @@
+rules_version = '2';
+
+// Firestore Rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function hasValidFields(requiredFields) {
+      return request.resource.data.keys().hasAll(requiredFields);
+    }
+
+    function isValidEmail(email) {
+      return email.matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
+    }
+
+    // User Settings
+    match /userSettings/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      allow create: if isAuthenticated() && 
+                   isOwner(userId) &&
+                   hasValidFields(['firstName', 'lastName', 'email']) &&
+                   isValidEmail(request.resource.data.email);
+      
+      allow update: if isAuthenticated() && isOwner(userId);
+      
+      // Validate specific settings updates
+      match /appearance {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     request.resource.data.keys().hasAll(['theme', 'colorScheme']);
+      }
+      
+      match /notifications {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     request.resource.data.keys().hasAll(['browser', 'content', 'social', 'system']);
+      }
+      
+      match /privacy {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     request.resource.data.keys().hasAll(['password_authentication', 'privacy_settings']);
+      }
+      
+      match /language {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     request.resource.data.keys().hasAll(['language', 'region', 'timeZone', 'dateFormat']);
+      }
+      
+      match /billing {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     request.resource.data.keys().hasAll(['subscription', 'paymentMethods', 'billingHistory']);
+      }
+    }
+
+    // Social Accounts
+    match /userSocialAccounts/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      allow create: if isAuthenticated() && 
+                   isOwner(userId) &&
+                   request.resource.data.keys().hasAll(['accounts', 'updatedAt']);
+      
+      allow update: if isAuthenticated() && 
+                   isOwner(userId) &&
+                   request.resource.data.keys().hasAll(['accounts', 'updatedAt']);
+    }
+
+    // Security Logs
+    match /securityLogs/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if isAuthenticated() && isOwner(userId);
+    }
+  }
+}
+
+// Storage Rules
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Profile pictures
+    match /profilePictures/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                  request.auth.uid == userId &&
+                  request.resource.size < 5 * 1024 * 1024 && // 5MB max
+                  request.resource.contentType.matches('image/.*');
+    }
+
+    // Social media assets
+    match /socialMedia/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                  request.auth.uid == userId &&
+                  request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // Billing documents
+    match /billing/{userId}/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; // Only backend can write billing documents
+    }
+  }
+}
+
+// Authentication Rules
+service firebase.auth {
+  match /users/{userId} {
+    allow read: if request.auth != null && request.auth.uid == userId;
+    allow write: if request.auth != null && request.auth.uid == userId;
+  }
+  
+  match /{document=**} {
+    allow read, write: if false;
+  }
+}

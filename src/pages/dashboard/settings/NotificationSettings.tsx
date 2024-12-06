@@ -102,7 +102,10 @@ const NotificationSettings = () => {
   const handleToggle = (key: string, value: boolean) => {
     setSettings(prev => ({
       ...prev,
-      [key]: value
+      content: {
+        ...prev.content,
+        [key]: value
+      }
     }));
   };
 

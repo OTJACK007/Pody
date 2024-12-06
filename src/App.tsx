@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import LandingPage from './pages/LandingPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
@@ -33,12 +33,11 @@ import NewFeatures from './pages/dashboard/NewFeatures';
 function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<Navigate to="/dashboard/livespace" replace />} />
-            <Route path="livespace" element={<LiveSpace />} />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<Navigate to="/dashboard/livespace" replace />} />
+          <Route path="livespace" element={<LiveSpace />} />
             <Route path="creator-space" element={<CreatorSpace />} />
             <Route path="creator-space/manage-channel" element={<ManageChannel />} />
             <Route path="livespace/channel" element={<Channel />} />
@@ -66,7 +65,6 @@ function App() {
             <Route path="newfeatures" element={<NewFeatures />} />
           </Route>
         </Routes>
-      </BrowserRouter>
     </ThemeProvider>
   );
 }

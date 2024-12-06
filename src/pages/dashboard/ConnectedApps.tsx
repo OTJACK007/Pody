@@ -116,24 +116,6 @@ const ConnectedApps = () => {
       isConnected: false,
       color: 'bg-red-400/10',
       textColor: 'text-red-400'
-    },
-    {
-      id: 'meta',
-      name: 'Meta',
-      icon: 'https://static.wixstatic.com/media/c67dd6_e11a6a0bb99345839dbdc7cf12357c0b~mv2.png',
-      description: 'Connect with Meta platforms',
-      isConnected: false,
-      color: 'bg-blue-500/10',
-      textColor: 'text-blue-500'
-    },
-    {
-      id: 'patreon',
-      name: 'Patreon',
-      icon: 'https://static.wixstatic.com/media/c67dd6_1ea98dca9e6b42e5914438202de7b6bb~mv2.png',
-      description: 'Monetize your content',
-      isConnected: false,
-      color: 'bg-red-400/10',
-      textColor: 'text-red-400'
     }
   ];
 

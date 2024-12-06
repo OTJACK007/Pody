@@ -122,7 +122,7 @@ export interface UserSettings {
   updatedAt: Date;
 }
 
-const defaultSettings: Partial<UserSettings> = {
+export const defaultSettings: Partial<UserSettings> = {
   appearance: {
     theme: 'dark',
     colorScheme: '#ff3366'

@@ -1,6 +1,8 @@
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { serverTimestamp } from 'firebase/firestore';
+import { defaultSettings } from './firestore/collections/settings';
+import { createDefaultSocialAccounts } from './firestore/collections/socialAccounts';
 
 export interface UserSettings {
   firstName: string;
@@ -51,3 +53,5 @@ export const updateUserSettings = async (userId: string, settings: Partial<UserS
     throw error;
   }
 };
+
+export { defaultSettings, createDefaultSocialAccounts };

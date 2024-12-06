@@ -6,10 +6,12 @@ import {
   updateNotificationSettings,
   updatePrivacySettings,
   updateLanguageSettings,
+  updateBillingSettings,
   type AppearanceSettings,
   type NotificationSettings,
   type PrivacySettings,
-  type LanguageSettings
+  type LanguageSettings,
+  type BillingSettings
 } from '../lib/firestore/collections/settings';
 
 interface SettingsContextType {
