@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Brain, Plus, CheckCircle2, Eye, MessageSquare, Share2, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { Button, Card, CardBody, Avatar, Badge } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
@@ -10,6 +10,8 @@ import KeyInsights from './components/KeyInsights';
 const ShortVideo = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const sourceVideoId = location.state?.sourceVideoId;
   const { theme } = useTheme();
   const [showCodyChat, setShowCodyChat] = useState(false);
 
@@ -40,14 +42,60 @@ const ShortVideo = () => {
       {/* Header */}
       <div className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-md z-50 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Button
-            isIconOnly
-            variant="light"
-            onClick={() => navigate('/dashboard/livespace')}
-            className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button
+              isIconOnly
+              variant="light"
+              onClick={() => sourceVideoId ? navigate(`/dashboard/feedvideo/${sourceVideoId}`) : navigate('/dashboard/livespace')}
+              className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </Button>
+            <div>
+              <h1 className={`text-xl font-bold ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>{shortData.title}</h1>
+              <div className="flex items-center gap-2">
+                <Avatar
+                  src={shortData.channel.avatar}
+                  size="sm"
+                  className="ring-2 ring-white/20"
+                />
+                <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  {shortData.channel.name}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              startContent={<Plus className="w-4 h-4" />}
+              className="bg-secondary text-black font-medium hover:bg-secondary/90"
+            >
+              Add to PodRoom
+            </Button>
+            <Button
+              startContent={<img 
+                src="https://static.wixstatic.com/media/c67dd6_c0f6b842de844dff9ac8e0e71e7e5a18~mv2.png"
+                alt="Notion"
+                className="w-4 h-4"
+              />}
+              className={`${
+                theme === 'dark'
+                  ? 'bg-gray-700 text-white hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+              }`}
+            >
+              Link to Notion
+            </Button>
+            <Button
+              startContent={<Brain className="w-4 h-4" />}
+              className="bg-primary text-white hover:bg-primary/90"
+              onClick={() => setShowCodyChat(true)}
+            >
+              Ask Cody AI
+            </Button>
+          </div>
         </div>
       </div>
 

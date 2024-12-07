@@ -5,6 +5,7 @@ import { Button, Card, CardBody, Tabs, Tab, Chip, Progress, Avatar, Popover, Pop
 import { useTheme } from '../../../contexts/ThemeContext';
 import VideoPlayer from './components/VideoPlayer';
 import KeyMoments from './components/KeyMoments';
+import ShortsCarousel from './components/ShortsCarousel';
 import InsightsList from './components/InsightsList';
 import TopicInsights from './components/TopicInsights';
 import CodyAIChat from '../../../components/features/CodyAIChat';
@@ -219,6 +220,7 @@ const FeedVideo = () => {
               <Tab key="key-moments" title="Key Moments" />
               <Tab key="insights" title="Insights" />
               <Tab key="topics" title="Topics" />
+              <Tab key="shorts" title="Shorts" />
             </Tabs>
 
             <div className="mt-6">
@@ -235,6 +237,37 @@ const FeedVideo = () => {
               )}
               {selectedView === 'topics' && (
                 <TopicInsights topics={podcastData.topics} moments={podcastData.keyMoments} />
+              )}
+              {selectedView === 'shorts' && (
+                <ShortsCarousel shorts={[
+                  {
+                    id: 'short-1',
+                    title: 'AI Ethics Overview',
+                    timestamp: '05:30',
+                    views: '12.5K',
+                    thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
+                    videoUrl: 'https://video.wixstatic.com/video/c67dd6_8c436b9b6e42468a9e2b68ea49868528/1080p/mp4/file.mp4',
+                    sourceVideoId: podcastData.id
+                  },
+                  {
+                    id: 'short-2',
+                    title: 'Future ML Trends',
+                    timestamp: '15:45',
+                    views: '8.2K',
+                    thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800',
+                    videoUrl: 'https://video.wixstatic.com/video/c67dd6_8c436b9b6e42468a9e2b68ea49868528/1080p/mp4/file.mp4',
+                    sourceVideoId: podcastData.id
+                  },
+                  {
+                    id: 'short-3',
+                    title: 'AI in Healthcare',
+                    timestamp: '25:20',
+                    views: '15.7K',
+                    thumbnail: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800',
+                    videoUrl: 'https://video.wixstatic.com/video/c67dd6_8c436b9b6e42468a9e2b68ea49868528/1080p/mp4/file.mp4',
+                    sourceVideoId: podcastData.id
+                  }
+                ]} />
               )}
             </div>
           </div>
