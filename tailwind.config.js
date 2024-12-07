@@ -18,6 +18,7 @@ export default {
       animation: {
         'slow-zoom': 'slow-zoom 20s ease-in-out infinite',
         'title-slide': 'title-slide 10s ease-in-out infinite',
+        'gradient': 'gradient 3s linear infinite',
       },
       keyframes: {
         'slow-zoom': {
@@ -27,6 +28,10 @@ export default {
         'title-slide': {
           '0%, 100%': { transform: 'translateY(0)', opacity: 1 },
           '50%': { transform: 'translateY(-20px)', opacity: 0 },
+        },
+        'gradient': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' }
         },
       },
     },

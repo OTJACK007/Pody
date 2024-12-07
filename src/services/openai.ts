@@ -17,7 +17,7 @@ export const sendMessage = async (threadId: string, content: string) => {
   });
 
   const run = await openai.beta.threads.runs.create(threadId, {
-    assistant_id: import.meta.env.VITE_OPENAI_ASSISTANT_ID
+    assistant_id: 'asst_2s4HmNJNOleA8gWNv7iKZ396'
   });
 
   let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
