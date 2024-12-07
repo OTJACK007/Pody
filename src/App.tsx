@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import ShortVideo from './pages/dashboard/shortvideo/ShortVideo';
 import { ThemeProvider } from './contexts/ThemeContext';
 import LandingPage from './pages/LandingPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
@@ -42,6 +43,7 @@ function App() {
             <Route path="creator-space/manage-channel" element={<ManageChannel />} />
             <Route path="livespace/channel" element={<Channel />} />
             <Route path="feedvideo/:id" element={<FeedVideo />} />
+            <Route path="shortvideo/:id" element={<ShortVideo />} />
             <Route path="guestvideos/:id" element={<GuestVideos />} />
             <Route path="podroom" element={<PodRoom />} />
             <Route path="podroom/podcastvideo" element={<PodcastVideo />} />

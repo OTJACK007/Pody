@@ -68,7 +68,7 @@ const FeedVideo = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen -mt-[60px]">
       {/* Header */}
       <div className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-md z-50 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -130,7 +130,7 @@ const FeedVideo = () => {
         </div>
       </div>
 
-      <div className="pt-24 pb-12 max-w-7xl mx-auto px-6">
+      <div className="pt-[84px] pb-12 max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="col-span-2 space-y-6">
@@ -240,12 +240,12 @@ const FeedVideo = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-6 sticky top-[84px]">
             <Card className={`${
               theme === 'dark' 
                 ? 'bg-gray-800/50 border-gray-700/50' 
                 : 'bg-white border-gray-200'
-            } border sticky top-24`}>
+            } border`}>
               <CardBody className="p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <Sparkles className="w-6 h-6 text-primary" />

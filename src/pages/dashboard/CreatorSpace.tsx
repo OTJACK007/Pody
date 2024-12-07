@@ -23,34 +23,40 @@ const CreatorSpace = () => {
 
   const creatorTools = [
     {
-      title: 'Generate YouTube Thumbnail',
-      description: 'Create eye-catching thumbnails with AI',
-      icon: <Youtube className="w-6 h-6 text-red-500" />,
+      title: 'Thumbnail Factory',
+      description: 'Create stunning thumbnails in seconds',
+      icon: <img src="https://static.wixstatic.com/media/c67dd6_dc1b943932434625bf0fecc47a839bcb~mv2.png" alt="Thumbnail Factory" className="w-6 h-6" />,
       color: 'bg-red-500/10'
     },
     {
-      title: 'Add Subtitles',
+      title: 'Pody AI',
       description: 'Auto-generate and edit video subtitles',
-      icon: <Subtitles className="w-6 h-6 text-blue-500" />,
+      icon: <img src="https://static.wixstatic.com/media/c67dd6_b0f1e912c94d4cebbb12ba52362e1755~mv2.gif" alt="Pody" className="w-6 h-6" />,
       color: 'bg-blue-500/10'
     },
     {
-      title: 'Generate Shorts',
+      title: 'ShortStorm',
       description: 'Convert videos into engaging shorts',
-      icon: <VideoIcon className="w-6 h-6 text-purple-500" />,
+      icon: <img src="https://static.wixstatic.com/media/c67dd6_4bfeb28dfbb84aa8b0685bb79c7ab934~mv2.png" alt="ShortStorm" className="w-6 h-6" />,
       color: 'bg-purple-500/10'
     },
     {
-      title: 'Launch Ad in Pody',
+      title: 'Pody Ad',
       description: 'Promote your content on our platform',
-      icon: <Megaphone className="w-6 h-6 text-primary" />,
+      icon: <img src="https://static.wixstatic.com/media/c67dd6_b0f1e912c94d4cebbb12ba52362e1755~mv2.gif" alt="Pody" className="w-6 h-6" />,
       color: 'bg-primary/10'
     },
     {
-      title: 'Content Booster',
+      title: 'Shogun 360',
       description: '360° Marketing Content Generator',
-      icon: <Rocket className="w-6 h-6 text-secondary" />,
+      icon: <img src="https://static.wixstatic.com/media/c67dd6_13666aed622048b3b2f3a929081c486f~mv2.png" alt="Shogun 360" className="w-6 h-6" />,
       color: 'bg-secondary/10'
+    },
+    {
+      title: 'Shogun 360',
+      description: 'Generate Marketing Videos',
+      icon: <img src="https://static.wixstatic.com/media/c67dd6_13666aed622048b3b2f3a929081c486f~mv2.png" alt="Shogun 360" className="w-6 h-6" />,
+      color: 'bg-blue-500/10'
     }
   ];
 

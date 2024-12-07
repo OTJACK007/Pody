@@ -43,10 +43,10 @@ const AIAnalysis = ({ podcast, onAskQuestion }: AIAnalysisProps) => {
       theme === 'dark' 
         ? 'bg-gray-800/50 border-gray-700/50' 
         : 'bg-white border-gray-200'
-    } border sticky top-24`}>
+    } border`}>
       <CardBody className="p-6">
         <div className="flex items-center gap-3 mb-6">
-          <Brain className="w-6 h-6 text-primary" />
+          <Brain className="w-6 h-6 text-[#ff3366]" />
           <h2 className={`text-xl font-bold ${
             theme === 'dark' ? 'text-white' : 'text-gray-900'
           }`}>AI Analysis</h2>
