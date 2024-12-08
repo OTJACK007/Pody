@@ -14,7 +14,7 @@ const ConnectedApps = () => {
       name: 'YouTube',
       icon: 'https://static.wixstatic.com/media/c67dd6_aea51bc85e594033b8a29040d67b1d15~mv2.png',
       description: 'Share your podcast content',
-      isConnected: true,
+      isConnected: false,
       color: 'bg-red-500/10',
       textColor: 'text-red-500'
     },
@@ -50,7 +50,7 @@ const ConnectedApps = () => {
       name: 'Spotify',
       icon: 'https://static.wixstatic.com/media/c67dd6_ec71f45884124292ab688e1089e48cb4~mv2.png',
       description: 'Sync your podcast playlists',
-      isConnected: true,
+      isConnected: false,
       color: 'bg-green-500/10',
       textColor: 'text-green-500'
     },
@@ -86,7 +86,7 @@ const ConnectedApps = () => {
       name: 'Google Tasks',
       icon: 'https://static.wixstatic.com/media/c67dd6_a9320374565d487ab96fa91c5c0ad8fd~mv2.avif',
       description: 'Manage your tasks and reminders',
-      isConnected: true,
+      isConnected: false,
       color: 'bg-blue-600/10',
       textColor: 'text-blue-600'
     },

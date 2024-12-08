@@ -17,7 +17,18 @@ import MyGoals from './pages/dashboard/myGoals/MyGoals';
 import TasksCalendar from './pages/dashboard/TasksCalendar';
 import Analytics from './pages/dashboard/Analytics';
 import ConnectedApps from './pages/dashboard/ConnectedApps';
-import AppConfig from './pages/dashboard/connectedApps/AppConfig';
+import YoutubeConfig from './pages/dashboard/connectedApps/pages/YoutubeConfig';
+import TwitterConfig from './pages/dashboard/connectedApps/pages/TwitterConfig';
+import MetaConfig from './pages/dashboard/connectedApps/pages/MetaConfig';
+import NotionConfig from './pages/dashboard/connectedApps/pages/NotionConfig';
+import SpotifyConfig from './pages/dashboard/connectedApps/pages/SpotifyConfig';
+import ZapierConfig from './pages/dashboard/connectedApps/pages/ZapierConfig';
+import OpusClipConfig from './pages/dashboard/connectedApps/pages/OpusClipConfig';
+import MiroConfig from './pages/dashboard/connectedApps/pages/MiroConfig';
+import GoogleTasksConfig from './pages/dashboard/connectedApps/pages/GoogleTasksConfig';
+import SkoolConfig from './pages/dashboard/connectedApps/pages/SkoolConfig';
+import BonzaiConfig from './pages/dashboard/connectedApps/pages/BonzaiConfig';
+import PatreonConfig from './pages/dashboard/connectedApps/pages/PatreonConfig';
 import SocialAccounts from './pages/dashboard/SocialAccounts';
 import Subscribe from './pages/dashboard/Subscribe';
 import Settings from './pages/dashboard/Settings';
@@ -56,7 +67,18 @@ function App() {
             <Route path="tasks" element={<TasksCalendar />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="connected-apps" element={<ConnectedApps />} />
-            <Route path="connected-apps/configure/:appId" element={<AppConfig />} />
+            <Route path="connected-apps/configure/youtube" element={<YoutubeConfig />} />
+            <Route path="connected-apps/configure/x-twitter" element={<TwitterConfig />} />
+            <Route path="connected-apps/configure/meta" element={<MetaConfig />} />
+            <Route path="connected-apps/configure/notion" element={<NotionConfig />} />
+            <Route path="connected-apps/configure/spotify" element={<SpotifyConfig />} />
+            <Route path="connected-apps/configure/zapier" element={<ZapierConfig />} />
+            <Route path="connected-apps/configure/opus-clip" element={<OpusClipConfig />} />
+            <Route path="connected-apps/configure/miro" element={<MiroConfig />} />
+            <Route path="connected-apps/configure/google-tasks" element={<GoogleTasksConfig />} />
+            <Route path="connected-apps/configure/skool" element={<SkoolConfig />} />
+            <Route path="connected-apps/configure/bonzai" element={<BonzaiConfig />} />
+            <Route path="connected-apps/configure/patreon" element={<PatreonConfig />} />
             <Route path="social" element={<SocialAccounts />} />
             <Route path="subscribe" element={<Subscribe />} />
             <Route path="settings" element={<Settings />} />
