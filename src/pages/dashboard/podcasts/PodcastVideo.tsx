@@ -82,13 +82,13 @@ const PodcastVideo = () => {
               isIconOnly
               variant="light"
               onClick={() => navigate('/dashboard/podroom')}
-              className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
+              className="text-white hover:text-white/80"
             >
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div>
               <h1 className={`text-xl font-bold ${
-                theme === 'dark' ? 'text-white' : 'text-gray-900'
+                'text-white'
               }`}>{podcastData.title}</h1>
               <div className="flex items-center gap-2">
                 <Avatar
@@ -96,7 +96,7 @@ const PodcastVideo = () => {
                   size="sm"
                   className="ring-2 ring-white/20"
                 />
-                <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                <span className="text-white">
                   {podcastData.channel.name}
                 </span>
               </div>

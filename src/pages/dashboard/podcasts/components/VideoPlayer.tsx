@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { Slider } from "@nextui-org/react";
 import { useTheme } from '../../../../contexts/ThemeContext';
@@ -10,9 +10,62 @@ interface VideoPlayerProps {
 const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(100);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { theme } = useTheme();
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = volume / 100;
+    }
+  }, [volume]);
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const handlePlayPause = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleMuteToggle = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const handleProgressChange = (value: number) => {
+    if (videoRef.current) {
+      const newTime = (value / 100) * duration;
+      videoRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const handleVolumeChange = (value: number) => {
+    if (videoRef.current) {
+      videoRef.current.volume = value / 100;
+      setVolume(value);
+    }
+  };
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -23,7 +76,13 @@ const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
   return (
     <div className="relative group">
       <video
+        ref={videoRef}
         src={videoUrl}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => setIsPlaying(false)}
         className="w-full aspect-video object-cover"
         onClick={() => setIsPlaying(!isPlaying)}
       />
@@ -34,8 +93,8 @@ const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
           {/* Progress Bar */}
           <Slider
             size="sm"
-            value={progress}
-            onChange={(value) => setProgress(Array.isArray(value) ? value[0] : value)}
+            value={(currentTime / duration) * 100 || 0}
+            onChange={handleProgressChange}
             className="mb-4"
             classNames={{
               track: "bg-white/30",
@@ -47,7 +106,7 @@ const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={handlePlayPause}
                 className="p-2 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
               >
                 {isPlaying ? (
@@ -59,7 +118,7 @@ const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setIsMuted(!isMuted)}
+                  onClick={handleMuteToggle}
                   className="p-2 rounded-full hover:bg-white/10 transition-colors"
                 >
                   {isMuted ? (
@@ -71,7 +130,7 @@ const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
                 <Slider
                   size="sm"
                   value={volume}
-                  onChange={(value) => setVolume(Array.isArray(value) ? value[0] : value)}
+                  onChange={handleVolumeChange}
                   className="w-24"
                   classNames={{
                     track: "bg-white/30",
@@ -82,7 +141,7 @@ const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
               </div>
 
               <span className="text-sm text-white">
-                {formatTime(progress)} / {formatTime(180)}
+                {formatTime(currentTime)} / {formatTime(duration)}
               </span>
             </div>
 
