@@ -6,9 +6,71 @@ service cloud.firestore {
     function isAuthenticated() {
       return request.auth != null;
     }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function hasValidFields(requiredFields) {
+      return request.resource.data.keys().hasAll(requiredFields);
+    }
+
+    function isValidEmail(email) {
+      return email.matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
+    }
 
     // Features Collection
     match /features/{featureId} {
+      allow read, write: if true;
+    }
+    
+    // Creator Space Collections
+    match /creatorContent/{contentId} {
+      allow read, write: if true;
+    }
+    
+    match /creatorChannels/{channelId} {
+      allow read, write: if true;
+    }
+    
+    match /creatorAnalytics/{analyticsId} {
+      allow read, write: if true;
+    }
+    
+    match /creatorSubscriptions/{subscriptionId} {
+      allow read, write: if true;
+    }
+    
+    match /creatorMonetization/{monetizationId} {
+      allow read, write: if true;
+    }
+    
+    match /creatorSettings/{settingsId} {
+      allow read, write: if true;
+    }
+    
+    // Pod Room Collections
+    match /podcastLibrary/{podcastId} {
+      allow read, write: if true;
+    }
+    
+    match /podcastEpisodes/{episodeId} {
+      allow read, write: if true;
+    }
+    
+    match /podcastShorts/{shortId} {
+      allow read, write: if true;
+    }
+    
+    match /podcastInsights/{insightId} {
+      allow read, write: if true;
+    }
+    
+    match /podcastNotes/{noteId} {
+      allow read, write: if true;
+    }
+    
+    match /podcastFavorites/{favoriteId} {
       allow read, write: if true;
     }
     
@@ -121,17 +183,33 @@ service cloud.firestore {
 
     // User Settings
     match /userSettings/{userId} {
-      allow read, write: if true;
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      allow create: if isAuthenticated() && 
+                   isOwner(userId) &&
+                   hasValidFields(['firstName', 'lastName', 'email']) &&
+                   isValidEmail(request.resource.data.email);
+      
+      allow update: if isAuthenticated() && isOwner(userId);
     }
 
     // Social Accounts
     match /userSocialAccounts/{userId} {
-      allow read, write: if true;
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      allow create: if isAuthenticated() && 
+                   isOwner(userId) &&
+                   hasValidFields(['accounts', 'updatedAt']);
+      
+      allow update: if isAuthenticated() && 
+                   isOwner(userId) &&
+                   hasValidFields(['accounts', 'updatedAt']);
     }
 
     // Security Logs
     match /securityLogs/{userId} {
-      allow read, write: if true;
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if isAuthenticated() && isOwner(userId);
     }
   }
 }
