@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Target, Plus } from 'lucide-react';
 import { Button, Tabs, Tab, Chip } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
-import GoalsList from './components/GoalsList';
+import ActiveGoalsList from './components/ActiveGoalsList';
+import CompletedGoalsList from './components/CompletedGoalsList';
+import UpcomingGoalsList from './components/UpcomingGoalsList';
 import GoalInsights from './components/GoalInsights';
 import GoalProgress from './components/GoalProgress';
 import GoalModal from './components/GoalModal';
@@ -63,7 +65,9 @@ const MyGoals = () => {
           </Tabs>
 
           <div className="mt-6">
-            <GoalsList status={selectedView} />
+            {selectedView === 'active' && <ActiveGoalsList status={selectedView} />}
+            {selectedView === 'completed' && <CompletedGoalsList status={selectedView} />}
+            {selectedView === 'upcoming' && <UpcomingGoalsList status={selectedView} />}
           </div>
         </div>
 

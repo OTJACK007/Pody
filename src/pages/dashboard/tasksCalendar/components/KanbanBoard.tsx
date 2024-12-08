@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Avatar, Badge } from "@nextui-org/react";
 import { Calendar, Clock, Flag } from 'lucide-react';
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, useSensor, useSensors, PointerSensor, DragOverEvent } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import KanbanColumn from './KanbanColumn';
@@ -91,6 +91,12 @@ const KanbanBoard = () => {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
+  const findColumnByTaskId = (taskId: number) => {
+    return Object.entries(tasks).find(([_, columnTasks]) => 
+      columnTasks.some(task => task.id === taskId)
+    )?.[0] || null;
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -112,6 +118,48 @@ const KanbanBoard = () => {
         break;
       }
     }
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    if (activeId === overId) return;
+
+    const isActiveATask = typeof activeId === 'number';
+    const isOverATask = typeof overId === 'number';
+
+    if (!isActiveATask) return;
+
+    // Handle dropping a task over another task
+    if (isOverATask) {
+      const activeColumn = findColumnByTaskId(activeId as number);
+      const overColumn = findColumnByTaskId(overId as number);
+      
+      if (!activeColumn || !overColumn || activeColumn !== overColumn) return;
+
+      // Tasks are in the same column, handle reordering
+      handleReorder(activeColumn, activeId as number, overId as number);
+    }
+  };
+
+  const handleReorder = (columnId: string, activeId: number, overId: number) => {
+    setTasks(prev => {
+      const columnTasks = [...prev[columnId]];
+      const activeIndex = columnTasks.findIndex(task => task.id === activeId);
+      const overIndex = columnTasks.findIndex(task => task.id === overId);
+
+      // Reorder tasks within the column
+      const reorderedTasks = arrayMove(columnTasks, activeIndex, overIndex);
+
+      return {
+        ...prev,
+        [columnId]: reorderedTasks
+      };
+    });
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -153,6 +201,7 @@ const KanbanBoard = () => {
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
     >
       <div className="flex gap-6 overflow-x-auto pb-6">
         {columns.map((column) => (

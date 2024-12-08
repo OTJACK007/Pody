@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDroppable } from '@dnd-kit/core';
+import { useDroppable, DragOverlay } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import KanbanItem from './KanbanItem';
@@ -24,7 +24,7 @@ interface KanbanColumnProps {
 }
 
 const KanbanColumn = ({ id, title, color, tasks }: KanbanColumnProps) => {
-  const { setNodeRef } = useDroppable({ id });
+  const { setNodeRef, isOver } = useDroppable({ id });
   const { theme } = useTheme();
 
   return (

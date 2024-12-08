@@ -1,62 +1,53 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Progress, Button, Avatar, Badge } from "@nextui-org/react";
 import { Link2, BarChart2, PlayCircle, ChevronRight, Plus, Clock } from 'lucide-react';
-import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import GoalDetailsModal from './GoalDetailsModal';
 import LinkPodcastModal from './LinkPodcastModal';
 
-const goals = [
+const upcomingGoals = [
   {
     id: 1,
-    title: 'Master Public Speaking',
-    description: 'Improve presentation and communication skills',
-    category: 'Personal Growth',
-    progress: 75,
-    dueDate: '2024-04-15',
+    title: 'Start YouTube Channel',
+    description: 'Create and launch educational tech content',
+    category: 'Content Creation',
+    progress: 15,
+    dueDate: '2024-05-30',
     linkedContent: [
       {
         id: 1,
-        title: 'The Art of Public Speaking',
-        type: 'podcast',
-        image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400'
+        title: 'YouTube Success Guide',
+        type: 'course',
+        image: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=400'
       },
       {
         id: 2,
-        title: 'Mastering Stage Presence',
+        title: 'Content Creation Mastery',
         type: 'video',
-        image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400'
+        image: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400'
       }
     ]
   },
   {
     id: 2,
-    title: 'Financial Independence',
-    description: 'Build multiple income streams and investments',
-    category: 'Finance',
-    progress: 45,
-    dueDate: '2024-06-30',
+    title: 'Learn Machine Learning',
+    description: 'Complete ML certification and build projects',
+    category: 'Education',
+    progress: 5,
+    dueDate: '2024-07-15',
     linkedContent: [
       {
         id: 3,
-        title: 'Wealth Building Strategies',
-        type: 'podcast',
-        image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400'
-      }
-    ]
-  },
-  {
-    id: 3,
-    title: 'Launch Online Course',
-    description: 'Create and launch digital product',
-    category: 'Business',
-    progress: 30,
-    dueDate: '2024-05-20',
-    linkedContent: [
+        title: 'ML Fundamentals',
+        type: 'course',
+        image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400'
+      },
       {
         id: 4,
-        title: 'Digital Product Creation',
+        title: 'AI Project Planning',
         type: 'podcast',
-        image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400'
+        image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400'
       }
     ]
   }
@@ -66,9 +57,11 @@ interface GoalsListProps {
   status: string;
 }
 
-const GoalsList = ({ status }: GoalsListProps) => {
+const UpcomingGoalsList = ({ status }: GoalsListProps) => {
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState(null);
   const { theme } = useTheme();
   
   const carouselOptions = {
@@ -77,17 +70,22 @@ const GoalsList = ({ status }: GoalsListProps) => {
     dragFree: true
   };
 
-  const carouselRefs = goals.map(() => useEmblaCarousel(carouselOptions));
+  const carouselRefs = upcomingGoals.map(() => useEmblaCarousel(carouselOptions));
 
   const handleLinkPodcast = (goalId: number) => {
     setSelectedGoalId(goalId);
     setShowLinkModal(true);
   };
 
+  const handleGoalDetails = (goal) => {
+    setSelectedGoal(goal);
+    setShowDetailsModal(true);
+  };
+
   return (
     <>
       <div className="space-y-4">
-        {goals.map((goal, index) => (
+        {upcomingGoals.map((goal, index) => (
           <Card key={goal.id} className={`${
             theme === 'dark' 
               ? 'bg-gray-800/50 border-gray-700/50' 
@@ -100,6 +98,7 @@ const GoalsList = ({ status }: GoalsListProps) => {
                     <h3 className={`text-xl font-semibold ${
                       theme === 'dark' ? 'text-white' : 'text-gray-900'
                     }`}>{goal.title}</h3>
+                    <Badge color="warning" variant="flat">Upcoming</Badge>
                     <Badge color="primary" variant="flat">
                       {goal.category}
                     </Badge>
@@ -120,7 +119,7 @@ const GoalsList = ({ status }: GoalsListProps) => {
                       </div>
                       <Progress 
                         value={goal.progress} 
-                        color="success"
+                        color="warning"
                         className="max-w-full"
                       />
                     </div>
@@ -155,7 +154,7 @@ const GoalsList = ({ status }: GoalsListProps) => {
                       ? 'bg-gray-700 hover:bg-gray-600'
                       : 'bg-gray-100 hover:bg-gray-200'
                   }`}
-                  onClick={() => console.log('View goal details')}
+                  onClick={() => handleGoalDetails(goal)}
                 >
                   <ChevronRight className={theme === 'dark' ? 'text-white' : 'text-gray-900'} />
                 </div>
@@ -214,8 +213,17 @@ const GoalsList = ({ status }: GoalsListProps) => {
           goalId={selectedGoalId}
         />
       )}
+
+      {selectedGoal && (
+        <GoalDetailsModal
+          isOpen={showDetailsModal}
+          onClose={() => setShowDetailsModal(false)}
+          goal={selectedGoal}
+          isUpcoming={true}
+        />
+      )}
     </>
   );
 };
 
-export default GoalsList;
+export default UpcomingGoalsList;

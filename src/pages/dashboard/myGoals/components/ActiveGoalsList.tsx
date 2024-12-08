@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Progress, Button, Avatar, Badge } from "@nextui-org/react";
 import { Link2, BarChart2, PlayCircle, ChevronRight, Plus, Clock } from 'lucide-react';
-import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import GoalDetailsModal from './GoalDetailsModal';
 import LinkPodcastModal from './LinkPodcastModal';
 
-const goals = [
+const activeGoals = [
   {
     id: 1,
     title: 'Master Public Speaking',
@@ -66,9 +67,11 @@ interface GoalsListProps {
   status: string;
 }
 
-const GoalsList = ({ status }: GoalsListProps) => {
+const ActiveGoalsList = ({ status }: GoalsListProps) => {
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState(null);
   const { theme } = useTheme();
   
   const carouselOptions = {
@@ -77,17 +80,22 @@ const GoalsList = ({ status }: GoalsListProps) => {
     dragFree: true
   };
 
-  const carouselRefs = goals.map(() => useEmblaCarousel(carouselOptions));
+  const carouselRefs = activeGoals.map(() => useEmblaCarousel(carouselOptions));
 
   const handleLinkPodcast = (goalId: number) => {
     setSelectedGoalId(goalId);
     setShowLinkModal(true);
   };
 
+  const handleGoalDetails = (goal) => {
+    setSelectedGoal(goal);
+    setShowDetailsModal(true);
+  };
+
   return (
     <>
       <div className="space-y-4">
-        {goals.map((goal, index) => (
+        {activeGoals.map((goal, index) => (
           <Card key={goal.id} className={`${
             theme === 'dark' 
               ? 'bg-gray-800/50 border-gray-700/50' 
@@ -155,7 +163,7 @@ const GoalsList = ({ status }: GoalsListProps) => {
                       ? 'bg-gray-700 hover:bg-gray-600'
                       : 'bg-gray-100 hover:bg-gray-200'
                   }`}
-                  onClick={() => console.log('View goal details')}
+                  onClick={() => handleGoalDetails(goal)}
                 >
                   <ChevronRight className={theme === 'dark' ? 'text-white' : 'text-gray-900'} />
                 </div>
@@ -214,8 +222,16 @@ const GoalsList = ({ status }: GoalsListProps) => {
           goalId={selectedGoalId}
         />
       )}
+
+      {selectedGoal && (
+        <GoalDetailsModal
+          isOpen={showDetailsModal}
+          onClose={() => setShowDetailsModal(false)}
+          goal={selectedGoal}
+        />
+      )}
     </>
   );
 };
 
-export default GoalsList;
+export default ActiveGoalsList;

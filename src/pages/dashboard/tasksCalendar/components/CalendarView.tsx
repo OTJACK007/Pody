@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button, Card, CardBody, Badge } from "@nextui-org/react";
 import { useTheme } from '../../../../contexts/ThemeContext';
+import DayTasksModal from './DayTasksModal';
 
 const CalendarView = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { theme } = useTheme();
 
   const daysInMonth = new Date(
@@ -23,13 +25,59 @@ const CalendarView = () => {
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const mockTasks = {
-    5: [{ title: 'Review Podcast', color: 'primary' }],
-    12: [{ title: 'Team Meeting', color: 'secondary' }],
-    15: [
-      { title: 'Content Planning', color: 'success' },
-      { title: 'Record Episode', color: 'warning' }
+    5: [
+      {
+        id: '1',
+        title: 'Review Podcast',
+        description: 'Review and take notes on latest tech podcast episode',
+        dueTime: '10:00 AM',
+        priority: 'high',
+        category: 'Content',
+        status: 'pending'
+      }
     ],
-    20: [{ title: 'Edit Video', color: 'danger' }]
+    12: [
+      {
+        id: '2',
+        title: 'Team Meeting',
+        description: 'Weekly team sync to discuss progress',
+        dueTime: '2:00 PM',
+        priority: 'medium',
+        category: 'Meeting',
+        status: 'pending'
+      }
+    ],
+    15: [
+      {
+        id: '3',
+        title: 'Content Planning',
+        description: 'Plan next month\'s content calendar',
+        dueTime: '11:00 AM',
+        priority: 'high',
+        category: 'Planning',
+        status: 'completed'
+      },
+      {
+        id: '4',
+        title: 'Record Episode',
+        description: 'Record new podcast episode',
+        dueTime: '3:00 PM',
+        priority: 'medium',
+        category: 'Production',
+        status: 'pending'
+      }
+    ],
+    20: [
+      {
+        id: '5',
+        title: 'Edit Video',
+        description: 'Edit and prepare video content',
+        dueTime: '4:00 PM',
+        priority: 'high',
+        category: 'Production',
+        status: 'pending'
+      }
+    ]
   };
 
   const prevMonth = () => {
@@ -40,7 +88,17 @@ const CalendarView = () => {
     setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)));
   };
 
+  const handleDayClick = useCallback((day: number) => {
+    const selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    setSelectedDate(selectedDate);
+  }, [currentDate]);
+
+  const getTasksForDate = (day: number) => {
+    return mockTasks[day] || [];
+  };
+
   return (
+    <>
     <Card className={`${
       theme === 'dark' 
         ? 'bg-gray-800/50 border-gray-700/50' 
@@ -99,19 +157,20 @@ const CalendarView = () => {
                 theme === 'dark'
                   ? 'border-gray-700/50 hover:bg-gray-700/30'
                   : 'border-gray-200 hover:bg-gray-100'
-              } transition-colors cursor-pointer relative ${
+              } transition-colors cursor-pointer relative hover:border-primary ${
                 mockTasks[day] 
                   ? theme === 'dark' ? 'bg-gray-700/20' : 'bg-gray-50' 
                   : ''
-              }`}
+              }`} 
+              onClick={() => handleDayClick(day)}
             >
               <span className={`text-sm ${
                 theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
               }`}>{day}</span>
-              {mockTasks[day]?.map((task, index) => (
+              {getTasksForDate(day).map((task, index) => (
                 <Badge
                   key={index}
-                  color={task.color}
+                  color={task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'success'}
                   content=""
                   className="absolute bottom-2 left-2"
                   size="sm"
@@ -122,6 +181,16 @@ const CalendarView = () => {
         </div>
       </CardBody>
     </Card>
+    
+    {selectedDate && (
+      <DayTasksModal
+        isOpen={!!selectedDate}
+        onClose={() => setSelectedDate(null)}
+        date={selectedDate}
+        tasks={getTasksForDate(selectedDate.getDate())}
+      />
+    )}
+    </>
   );
 };
 

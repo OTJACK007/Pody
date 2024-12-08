@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardBody, Checkbox, Badge, Button } from "@nextui-org/react";
 import { Clock, Calendar, Flag, MoreVertical } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
 const TaskList = () => {
   const { theme } = useTheme();
-
-  const tasks = [
+  const [tasks, setTasks] = useState([
     {
       id: 1,
       title: 'Review Podcast Episode',
@@ -23,7 +22,7 @@ const TaskList = () => {
       dueDate: '2024-03-21',
       priority: 'medium',
       category: 'Meeting',
-      status: 'completed'
+      status: 'pending'
     },
     {
       id: 3,
@@ -34,7 +33,25 @@ const TaskList = () => {
       category: 'Production',
       status: 'pending'
     }
-  ];
+  ]);
+
+  const handleTaskStatusChange = (taskId: number, isCompleted: boolean) => {
+    setTasks(prevTasks => {
+      const updatedTasks = prevTasks.map(task => {
+        if (task.id === taskId) {
+          return { ...task, status: isCompleted ? 'completed' : 'pending' };
+        }
+        return task;
+      });
+      
+      // Sort tasks: pending first, completed last
+      return updatedTasks.sort((a, b) => {
+        if (a.status === 'completed' && b.status !== 'completed') return 1;
+        if (a.status !== 'completed' && b.status === 'completed') return -1;
+        return 0;
+      });
+    });
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -59,7 +76,8 @@ const TaskList = () => {
           <CardBody className="p-4">
             <div className="flex items-start gap-4">
               <Checkbox 
-                defaultSelected={task.status === 'completed'}
+                isSelected={task.status === 'completed'}
+                onValueChange={(isSelected) => handleTaskStatusChange(task.id, isSelected)}
                 classNames={{
                   wrapper: theme === 'dark' ? "before:border-gray-600" : "before:border-gray-300"
                 }}

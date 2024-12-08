@@ -1,62 +1,54 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Progress, Button, Avatar, Badge } from "@nextui-org/react";
 import { Link2, BarChart2, PlayCircle, ChevronRight, Plus, Clock } from 'lucide-react';
-import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import LinkPodcastModal from './LinkPodcastModal';
 
-const goals = [
+const completedGoals = [
   {
     id: 1,
-    title: 'Master Public Speaking',
-    description: 'Improve presentation and communication skills',
+    title: 'Learn Public Speaking',
+    description: 'Completed public speaking course and gave first presentation',
     category: 'Personal Growth',
-    progress: 75,
-    dueDate: '2024-04-15',
+    progress: 100,
+    dueDate: '2024-03-15',
+    completedDate: '2024-03-10',
     linkedContent: [
       {
         id: 1,
-        title: 'The Art of Public Speaking',
-        type: 'podcast',
+        title: 'Public Speaking Mastery',
+        type: 'course',
         image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400'
       },
       {
         id: 2,
-        title: 'Mastering Stage Presence',
+        title: 'Presentation Skills',
         type: 'video',
-        image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400'
+        image: 'https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?w=400'
       }
     ]
   },
   {
     id: 2,
-    title: 'Financial Independence',
-    description: 'Build multiple income streams and investments',
+    title: 'Build Investment Portfolio',
+    description: 'Created diversified investment portfolio with stocks and ETFs',
     category: 'Finance',
-    progress: 45,
-    dueDate: '2024-06-30',
+    progress: 100,
+    dueDate: '2024-03-01',
+    completedDate: '2024-02-28',
     linkedContent: [
       {
         id: 3,
-        title: 'Wealth Building Strategies',
+        title: 'Investment Strategies',
         type: 'podcast',
         image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400'
-      }
-    ]
-  },
-  {
-    id: 3,
-    title: 'Launch Online Course',
-    description: 'Create and launch digital product',
-    category: 'Business',
-    progress: 30,
-    dueDate: '2024-05-20',
-    linkedContent: [
+      },
       {
         id: 4,
-        title: 'Digital Product Creation',
-        type: 'podcast',
-        image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400'
+        title: 'Portfolio Management',
+        type: 'course',
+        image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400'
       }
     ]
   }
@@ -66,7 +58,7 @@ interface GoalsListProps {
   status: string;
 }
 
-const GoalsList = ({ status }: GoalsListProps) => {
+const CompletedGoalsList = ({ status }: GoalsListProps) => {
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
   const { theme } = useTheme();
@@ -77,7 +69,7 @@ const GoalsList = ({ status }: GoalsListProps) => {
     dragFree: true
   };
 
-  const carouselRefs = goals.map(() => useEmblaCarousel(carouselOptions));
+  const carouselRefs = completedGoals.map(() => useEmblaCarousel(carouselOptions));
 
   const handleLinkPodcast = (goalId: number) => {
     setSelectedGoalId(goalId);
@@ -87,7 +79,7 @@ const GoalsList = ({ status }: GoalsListProps) => {
   return (
     <>
       <div className="space-y-4">
-        {goals.map((goal, index) => (
+        {completedGoals.map((goal, index) => (
           <Card key={goal.id} className={`${
             theme === 'dark' 
               ? 'bg-gray-800/50 border-gray-700/50' 
@@ -100,6 +92,7 @@ const GoalsList = ({ status }: GoalsListProps) => {
                     <h3 className={`text-xl font-semibold ${
                       theme === 'dark' ? 'text-white' : 'text-gray-900'
                     }`}>{goal.title}</h3>
+                    <Badge color="success" variant="flat">Completed</Badge>
                     <Badge color="primary" variant="flat">
                       {goal.category}
                     </Badge>
@@ -130,7 +123,7 @@ const GoalsList = ({ status }: GoalsListProps) => {
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                       }`}>
                         <BarChart2 className="w-4 h-4 text-primary" />
-                        <span>Due {goal.dueDate}</span>
+                        <span>Completed {goal.completedDate}</span>
                       </div>
                       <div className={`flex items-center gap-2 ${
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
@@ -138,26 +131,8 @@ const GoalsList = ({ status }: GoalsListProps) => {
                         <Link2 className="w-4 h-4 text-primary" />
                         <span>{goal.linkedContent.length} linked resources</span>
                       </div>
-                      <div 
-                        onClick={() => handleLinkPodcast(goal.id)}
-                        className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/20 text-secondary hover:bg-secondary/30 border border-secondary rounded-lg cursor-pointer transition-colors"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span className="text-sm">Link Podcast</span>
-                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div 
-                  className={`p-2 rounded-lg cursor-pointer transition-colors ${
-                    theme === 'dark'
-                      ? 'bg-gray-700 hover:bg-gray-600'
-                      : 'bg-gray-100 hover:bg-gray-200'
-                  }`}
-                  onClick={() => console.log('View goal details')}
-                >
-                  <ChevronRight className={theme === 'dark' ? 'text-white' : 'text-gray-900'} />
                 </div>
               </div>
 
@@ -218,4 +193,4 @@ const GoalsList = ({ status }: GoalsListProps) => {
   );
 };
 
-export default GoalsList;
+export default CompletedGoalsList;
