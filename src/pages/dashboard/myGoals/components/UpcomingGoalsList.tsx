@@ -4,6 +4,7 @@ import { Link2, BarChart2, PlayCircle, ChevronRight, Plus, Clock } from 'lucide-
 import useEmblaCarousel from 'embla-carousel-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import GoalDetailsModal from './GoalDetailsModal';
+import { useNavigate } from 'react-router-dom';
 import LinkPodcastModal from './LinkPodcastModal';
 
 const upcomingGoals = [
@@ -60,6 +61,7 @@ interface GoalsListProps {
 const UpcomingGoalsList = ({ status }: GoalsListProps) => {
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+  const navigate = useNavigate();
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
   const { theme } = useTheme();
@@ -173,7 +175,7 @@ const UpcomingGoalsList = ({ status }: GoalsListProps) => {
                         <div
                           key={content.id}
                           className="flex-none w-[280px] group cursor-pointer"
-                          onClick={() => console.log('Play content', content.id)}
+                          onClick={() => navigate(`/dashboard/feedvideo/${content.id}`)}
                         >
                           <div className="relative aspect-video rounded-lg overflow-hidden mb-2">
                             <img

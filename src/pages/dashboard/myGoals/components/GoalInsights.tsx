@@ -2,9 +2,11 @@ import React from 'react';
 import { Card, CardBody, CardHeader, Avatar } from "@nextui-org/react";
 import { Lightbulb, PlayCircle } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 const GoalInsights = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   
   const insights = [
     {
@@ -12,23 +14,30 @@ const GoalInsights = () => {
       title: 'Building Confidence',
       source: 'Public Speaking Mastery',
       image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400',
-      timestamp: '32:15'
+      timestamp: '32:15',
+      videoId: 'insight-1'
     },
     {
       id: 2,
       title: 'Investment Strategies',
       source: 'Financial Freedom',
       image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400',
-      timestamp: '45:30'
+      timestamp: '45:30',
+      videoId: 'insight-2'
     },
     {
       id: 3,
       title: 'Course Creation Tips',
       source: 'Digital Education',
       image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400',
-      timestamp: '28:45'
+      timestamp: '28:45',
+      videoId: 'insight-3'
     }
   ];
+
+  const handleVideoClick = (videoId: string) => {
+    navigate(`/dashboard/feedvideo/${videoId}`);
+  };
 
   return (
     <Card className={`${
@@ -59,6 +68,7 @@ const GoalInsights = () => {
                   ? 'hover:bg-gray-700/30'
                   : 'hover:bg-gray-100'
               } transition-colors cursor-pointer group`}
+              onClick={() => handleVideoClick(insight.videoId)}
             >
               <div className="relative flex-shrink-0">
                 <img

@@ -1,10 +1,13 @@
-import React from 'react';
-import { Card, CardBody, Avatar, Badge, Button } from "@nextui-org/react";
-import { MoreVertical, Star, MessageSquare, Share2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Card, CardBody, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from "@nextui-org/react";
+import { Share2, Star, Bookmark, ExternalLink } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
 const KnowledgeGrid = () => {
   const { theme } = useTheme();
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [tweetText, setTweetText] = useState('');
 
   const notes = [
     {
@@ -48,7 +51,21 @@ const KnowledgeGrid = () => {
     }
   ];
 
+  const handleShare = (note) => {
+    setSelectedNote(note);
+    const defaultTweet = `📝 Key insights from "${note.title}" via ${note.source.title}\n\n${note.content.slice(0, 100)}...\n\n#Learning #Knowledge`;
+    setTweetText(defaultTweet);
+    setShowShareModal(true);
+  };
+
+  const handleTweet = () => {
+    const encodedText = encodeURIComponent(tweetText);
+    window.open(`https://twitter.com/intent/tweet?text=${encodedText}`, '_blank');
+    setShowShareModal(false);
+  };
+
   return (
+    <>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {notes.map((note) => (
         <Card key={note.id} className={`${
@@ -56,81 +73,127 @@ const KnowledgeGrid = () => {
             ? 'bg-gray-800/50 border-gray-700/50' 
             : 'bg-white border-gray-200'
         } border`}>
-          <CardBody className="p-6">
-            <div className="flex items-start justify-between gap-4">
+          <CardBody className="p-4 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-3">
+              <Avatar
+                src={note.source.image}
+                className="w-10 h-10 rounded-lg ring-2 ring-white/20"
+              />
               <div>
-                <h3 className={`text-xl font-semibold mb-2 ${
-                  theme === 'dark' ? 'text-white' : 'text-gray-900'
-                }`}>{note.title}</h3>
-                <p className={`mb-4 ${
-                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                }`}>{note.content}</p>
+                <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                  {note.source.title}
+                </p>
+                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {note.date}
+                </p>
               </div>
-              <Button
-                isIconOnly
-                variant="light"
-                className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
-              >
-                <MoreVertical className="w-4 h-4" />
-              </Button>
             </div>
 
-            <div className="flex flex-wrap gap-2 mt-4">
+            <h3 className={`text-lg font-semibold mb-2 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>{note.title}</h3>
+            
+            <p className={`mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              {note.content}
+            </p>
+
+            <div className="flex flex-wrap gap-2 mb-4">
               {note.tags.map((tag) => (
-                <Badge key={tag} size="sm" variant="flat" className="text-white">
+                <Badge key={tag} variant="flat" size="sm">
                   {tag}
                 </Badge>
               ))}
             </div>
-          </CardBody>
 
-          <CardBody className={`border-t px-6 py-4 ${
-            theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
-          }`}>
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-3">
-                <Avatar
-                  src={note.source.image}
-                  size="sm"
-                  className="ring-2 ring-white/20"
-                />
-                <div>
-                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                    {note.source.title}
-                  </p>
-                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                    {note.date}
-                  </p>
-                </div>
-              </div>
+            <div className="flex-grow"></div>
+
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Button
-                  isIconOnly
+                  size="sm"
+                  startContent={<Bookmark className="w-4 h-4" />}
                   variant="light"
-                  className={note.isFavorite ? 'text-yellow-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
+                  className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
                 >
-                  <Star className="w-4 h-4" fill={note.isFavorite ? 'currentColor' : 'none'} />
+                  Save
                 </Button>
                 <Button
                   isIconOnly
+                  size="sm"
                   variant="light"
-                  className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                </Button>
-                <Button
-                  isIconOnly
-                  variant="light"
-                  className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
+                  className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
+                  onClick={() => handleShare(note)}
                 >
                   <Share2 className="w-4 h-4" />
                 </Button>
               </div>
+              <Button
+                isIconOnly
+                variant="light"
+                className={note.isFavorite ? 'text-yellow-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
+              >
+                <Star className="w-4 h-4" fill={note.isFavorite ? 'currentColor' : 'none'} />
+              </Button>
             </div>
           </CardBody>
         </Card>
       ))}
     </div>
+
+    <Modal 
+      isOpen={showShareModal} 
+      onClose={() => setShowShareModal(false)}
+      size="lg"
+      classNames={{
+        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
+      }}
+    >
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <img 
+              src="https://static.wixstatic.com/media/c67dd6_a7b28b585b034f56ad6ab32232e745fc~mv2.webp"
+              alt="X/Twitter"
+              className="w-6 h-6"
+            />
+            <span>Share on X</span>
+          </div>
+        </ModalHeader>
+        <ModalBody>
+          <Textarea
+            value={tweetText}
+            onChange={(e) => setTweetText(e.target.value)}
+            minRows={4}
+            maxLength={280}
+            classNames={{
+              input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+              inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
+            }}
+          />
+          <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            {280 - tweetText.length} characters remaining
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="danger"
+            variant="flat"
+            onPress={() => setShowShareModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="bg-[#1DA1F2] text-white"
+            endContent={<ExternalLink className="w-4 h-4" />}
+            onPress={handleTweet}
+          >
+            Share on X
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+    </>
   );
 };
 

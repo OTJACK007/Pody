@@ -41,6 +41,13 @@ const KnowledgeLibrary = () => {
           <Button
             className="bg-secondary/20 text-secondary border border-secondary hover:bg-secondary/30"
             onClick={() => setShowNotionModal(true)}
+            startContent={
+              <img 
+                src="https://static.wixstatic.com/media/c67dd6_c0f6b842de844dff9ac8e0e71e7e5a18~mv2.png"
+                alt="Notion"
+                className="w-4 h-4"
+              />
+            }
           >
             Connect to Notion
           </Button>

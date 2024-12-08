@@ -1,16 +1,20 @@
-import React from 'react';
-import { Card, CardBody, Avatar, Button, Badge } from "@nextui-org/react";
-import { MoreVertical, Star, MessageSquare, Share2, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { Card, CardBody, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from "@nextui-org/react";
+import { Share2, Star, Bookmark, ExternalLink, Calendar } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
 const KnowledgeList = () => {
   const { theme } = useTheme();
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [tweetText, setTweetText] = useState('');
 
   const notes = [
     {
       id: 1,
       title: 'Building Mental Resilience',
       content: 'Key insights on developing mental toughness and resilience in challenging situations...',
+      source: 'Mindset Mastery Podcast',
       source: {
         type: 'podcast',
         title: 'Mindset Mastery',
@@ -24,6 +28,7 @@ const KnowledgeList = () => {
       id: 2,
       title: 'Future of AI Technology',
       content: 'Discussion on emerging AI trends and their impact on various industries...',
+      source: 'Tech Insights Show',
       source: {
         type: 'podcast',
         title: 'Tech Insights',
@@ -37,6 +42,7 @@ const KnowledgeList = () => {
       id: 3,
       title: 'Investment Strategies 2024',
       content: 'Expert analysis on current market trends and investment opportunities...',
+      source: 'Finance Weekly',
       source: {
         type: 'podcast',
         title: 'Finance Weekly',
@@ -48,7 +54,21 @@ const KnowledgeList = () => {
     }
   ];
 
+  const handleShare = (note) => {
+    setSelectedNote(note);
+    const defaultTweet = `📝 Key insights from "${note.title}" via ${note.source.title}\n\n${note.content.slice(0, 100)}...\n\n#Learning #Knowledge`;
+    setTweetText(defaultTweet);
+    setShowShareModal(true);
+  };
+
+  const handleTweet = () => {
+    const encodedText = encodeURIComponent(tweetText);
+    window.open(`https://twitter.com/intent/tweet?text=${encodedText}`, '_blank');
+    setShowShareModal(false);
+  };
+
   return (
+    <>
     <div className="space-y-4">
       {notes.map((note) => (
         <Card key={note.id} className={`${
@@ -72,13 +92,6 @@ const KnowledgeList = () => {
                       {note.content}
                     </p>
                   </div>
-                  <Button
-                    isIconOnly
-                    variant="light"
-                    className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
                 </div>
 
                 <div className="flex items-center gap-4 mt-4">
@@ -103,20 +116,25 @@ const KnowledgeList = () => {
                     >
                       <Star className="w-4 h-4" fill={note.isFavorite ? 'currentColor' : 'none'} />
                     </Button>
-                    <Button
-                      isIconOnly
-                      variant="light"
-                      className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
-                    >
-                      <MessageSquare className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      isIconOnly
-                      variant="light"
-                      className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
-                    >
-                      <Share2 className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        startContent={<Bookmark className="w-4 h-4" />}
+                        variant="light"
+                        className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
+                        onClick={() => handleShare(note)}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -125,6 +143,61 @@ const KnowledgeList = () => {
         </Card>
       ))}
     </div>
+    
+    <Modal 
+      isOpen={showShareModal} 
+      onClose={() => setShowShareModal(false)}
+      size="lg"
+      classNames={{
+        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
+      }}
+    >
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <img 
+              src="https://static.wixstatic.com/media/c67dd6_a7b28b585b034f56ad6ab32232e745fc~mv2.webp"
+              alt="X/Twitter"
+              className="w-6 h-6"
+            />
+            <span>Share on X</span>
+          </div>
+        </ModalHeader>
+        <ModalBody>
+          <Textarea
+            value={tweetText}
+            onChange={(e) => setTweetText(e.target.value)}
+            minRows={4}
+            maxLength={280}
+            classNames={{
+              input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+              inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
+            }}
+          />
+          <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            {280 - tweetText.length} characters remaining
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="danger"
+            variant="flat"
+            onPress={() => setShowShareModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="bg-[#1DA1F2] text-white"
+            endContent={<ExternalLink className="w-4 h-4" />}
+            onPress={handleTweet}
+          >
+            Share on X
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+    </>
   );
 };
 
