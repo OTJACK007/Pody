@@ -113,6 +113,7 @@ export interface UserSettings {
   location: string;
   website: string;
   profilePicture: string;
+  role: 'user' | 'admin';
   appearance: AppearanceSettings;
   notifications: NotificationSettings;
   privacy: PrivacySettings;

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import AdminRoute from './components/AdminRoute';
 import ShortVideo from './pages/dashboard/shortvideo/ShortVideo';
 import { ThemeProvider } from './contexts/ThemeContext';
 import LandingPage from './pages/LandingPage';
@@ -27,6 +28,8 @@ import PrivacySettings from './pages/dashboard/settings/PrivacySettings';
 import AppearanceSettings from './pages/dashboard/settings/AppearanceSettings';
 import LanguageSettings from './pages/dashboard/settings/LanguageSettings';
 import BillingSettings from './pages/dashboard/settings/BillingSettings';
+import Backoffice from './pages/dashboard/backoffice/Backoffice';
+import FeaturesManagement from './pages/dashboard/backoffice/features/FeaturesManagement';
 import PodRoom from './pages/dashboard/PodRoom';
 import PodcastVideo from './pages/dashboard/podcasts/PodcastVideo';
 import NewFeatures from './pages/dashboard/NewFeatures';
@@ -63,6 +66,8 @@ function App() {
             <Route path="settings/appearance" element={<AppearanceSettings />} />
             <Route path="settings/language" element={<LanguageSettings />} />
             <Route path="settings/billing" element={<BillingSettings />} />
+            <Route path="backoffice" element={<AdminRoute><Backoffice /></AdminRoute>} />
+            <Route path="backoffice/features" element={<AdminRoute><FeaturesManagement /></AdminRoute>} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="newfeatures" element={<NewFeatures />} />
           </Route>

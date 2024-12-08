@@ -17,10 +17,12 @@ import {
   Sun,
   Moon,
   Bot,
-  Rocket
+  Rocket,
+  Settings2
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import UpgradePlanModal from '../../pages/dashboard/settings/billing/UpgradePlanModal';
+import { useAdmin } from '../../hooks/useAdmin';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -30,6 +32,7 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
   const location = useLocation();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { isAdmin } = useAdmin();
   const { theme, toggleTheme } = useTheme();
 
   const navItems = [
@@ -44,7 +47,8 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
     { name: 'Connected Apps', path: '/dashboard/connected-apps', icon: <AppWindow /> },
     { name: 'Social Accounts', path: '/dashboard/social', icon: <Share2 /> },
     { name: 'New Features', path: '/dashboard/newfeatures', icon: <Sparkles /> },
-    { name: 'Settings', path: '/dashboard/settings', icon: <Settings /> }
+    { name: 'Settings', path: '/dashboard/settings', icon: <Settings /> },
+    ...(isAdmin ? [{ name: 'Backoffice', path: '/dashboard/backoffice', icon: <Settings2 /> }] : [])
   ];
 
   return (

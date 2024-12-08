@@ -1,14 +1,54 @@
 import React, { useState } from 'react';
-import { Sparkles, ThumbsUp, ThumbsDown, Send, ChevronRight, Clock, Users } from 'lucide-react';
-import { Card, CardBody, Button, Tabs, Tab, Input, Textarea, Badge, Progress } from "@nextui-org/react";
+import { Sparkles, ThumbsUp, ThumbsDown, Send, ChevronRight, Clock, Users, Rocket, Calendar } from 'lucide-react';
+import { Card, CardBody, Button, Tabs, Tab, Input, Textarea, Badge, Progress, Select, SelectItem } from "@nextui-org/react";
+import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { createFeature } from '../../services/features';
 
 const NewFeatures = () => {
   const [activeTab, setActiveTab] = useState('requested');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [reason, setReason] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { theme } = useTheme();
+  const { currentUser } = useAuth();
+
+  const handleSubmit = async () => {
+    if (!currentUser) return;
+    
+    setIsSubmitting(true);
+    try {
+      await createFeature({
+        title,
+        description,
+        reason,
+        destination: 'suggested',
+        status: 'pending',
+        progress: 0,
+        features: [],
+        category: '',
+        requestedBy: currentUser.uid,
+        requestedDate: new Date(),
+        destination: 'suggested',
+        lastModified: new Date(),
+        modifiedBy: currentUser.uid
+      });
+      
+      // Reset form
+      setTitle('');
+      setDescription('');
+      setReason('');
+      
+      // Switch to requested tab
+      setActiveTab('requested');
+    } catch (error) {
+      console.error('Error submitting feature:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const requestedFeatures = [
     {
@@ -123,6 +163,12 @@ const NewFeatures = () => {
       >
         <Tab key="requested" title="Requested Features" />
         <Tab key="upcoming" title="Upcoming Features" />
+        <Tab key="published" title={
+          <div className="flex items-center gap-2">
+            <Rocket className="w-4 h-4 text-[#ff3366]" />
+            <span>Published Features</span>
+          </div>
+        } />
         <Tab key="suggest" title="Suggest Feature" />
       </Tabs>
 
@@ -255,6 +301,94 @@ const NewFeatures = () => {
           ))}
         </div>
       )}
+      
+      {activeTab === 'published' && (
+        <div className="space-y-4">
+          <div className="flex justify-end">
+            <Select
+              label="Sort by"
+              defaultSelectedKeys={["newest"]}
+              className="max-w-xs"
+              classNames={{
+                trigger: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`,
+                value: theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }}
+            >
+              <SelectItem key="newest" value="newest">Newest First</SelectItem>
+              <SelectItem key="oldest" value="oldest">Oldest First</SelectItem>
+            </Select>
+          </div>
+          
+          {[
+            {
+              title: 'AI-Powered Summaries',
+              description: 'Get instant, accurate summaries of any podcast episode using advanced AI technology',
+              publishDate: '2024-03-15',
+              category: 'AI & Machine Learning',
+              highlights: [
+                'Smart content analysis',
+                'Multi-language support',
+                'Key points extraction'
+              ]
+            },
+            {
+              title: 'Cross-Platform Sync',
+              description: 'Seamlessly sync your content and preferences across all your devices',
+              publishDate: '2024-03-10',
+              category: 'User Experience',
+              highlights: [
+                'Real-time synchronization',
+                'Offline support',
+                'Cross-device compatibility'
+              ]
+            }
+          ].map((feature, index) => (
+            <Card key={index} className={`${
+              theme === 'dark' 
+                ? 'bg-gray-800/50 border-gray-700/50' 
+                : 'bg-white border-gray-200'
+            } border`}>
+              <CardBody className="p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-grow">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className={`text-xl font-semibold ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{feature.title}</h3>
+                      <Badge variant="flat" className="bg-[#ff3366]/10 text-[#ff3366]">
+                        {feature.category}
+                      </Badge>
+                    </div>
+                    <p className={`mb-4 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>{feature.description}</p>
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      {feature.highlights.map((highlight, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#ff3366]" />
+                          <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                            {highlight}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <div className={`flex items-center gap-2 text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        <Calendar className="w-4 h-4" />
+                        <span>Published on {feature.publishDate}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {activeTab === 'suggest' && (
         <Card className={`${
@@ -306,7 +440,9 @@ const NewFeatures = () => {
               <Button
                 className="w-full bg-primary text-white"
                 endContent={<Send className="w-4 h-4" />}
-                onClick={() => {}}
+                onClick={handleSubmit}
+                isLoading={isSubmitting}
+                isDisabled={!title || !description || !reason}
               >
                 Submit Feature Request
               </Button>

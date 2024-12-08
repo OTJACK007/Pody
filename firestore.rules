@@ -11,6 +11,11 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
     
+    function isAdmin() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/userSettings/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/userSettings/$(request.auth.uid)).data.role == 'admin';
+    }
+    
     function hasValidFields(requiredFields) {
       return request.resource.data.keys().hasAll(requiredFields);
     }
@@ -22,9 +27,97 @@ service cloud.firestore {
     // User Settings
     match /userSettings/{userId} {
       allow read: if isAuthenticated() && isOwner(userId);
-      allow create: if isAuthenticated() && isOwner(userId);
+      
+      allow create: if isAuthenticated() && 
+                   isOwner(userId) &&
+                   hasValidFields(['firstName', 'lastName', 'email']) &&
+                   isValidEmail(request.resource.data.email);
+      
       allow update: if isAuthenticated() && isOwner(userId);
-      allow delete: if isAuthenticated() && isOwner(userId);
+      
+      // Validate specific settings updates
+      match /appearance {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     hasValidFields(['theme', 'colorScheme']);
+      }
+      
+      match /notifications {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     hasValidFields(['browser', 'content', 'social', 'system']);
+      }
+      
+      match /privacy {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     hasValidFields(['password_authentication', 'privacy_settings']);
+      }
+      
+      match /language {
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     hasValidFields(['language', 'region', 'timeZone', 'dateFormat']);
+      }
+      
+      match /billing {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow update: if isAuthenticated() && 
+                     isOwner(userId) &&
+                     hasValidFields(['subscription', 'paymentMethods', 'billingHistory']);
+      }
+    }
+
+    // Features Collection
+    match /features/{featureId} {
+      allow read: if isAuthenticated();
+      
+      // Only authenticated users can create feature requests
+      allow create: if isAuthenticated() &&
+                   hasValidFields(['title', 'description', 'requestedBy', 'destination']) &&
+                   request.resource.data.requestedBy == request.auth.uid;
+      
+      // Only admins can update feature status and details
+      allow update: if isAdmin() ||
+                   // Allow users to vote on their own feature requests
+                   (isAuthenticated() && 
+                    request.resource.data.diff(resource.data).affectedKeys()
+                      .hasOnly(['votes']));
+      
+      // Only admins can delete features
+      allow delete: if isAdmin();
+    }
+    
+    // Feature Votes Collection
+    match /featureVotes/{voteId} {
+      allow read: if isAuthenticated();
+      
+      // Users can only vote once per feature
+      allow create: if isAuthenticated() &&
+                   !exists(/databases/$(database)/documents/featureVotes/$(request.auth.uid + '_' + request.resource.data.featureId));
+      
+      // Users can only update/delete their own votes
+      allow update, delete: if isAuthenticated() &&
+                           request.auth.uid == resource.data.userId;
+    }
+    
+    // Feature Comments Collection
+    match /featureComments/{commentId} {
+      allow read: if true;
+      
+      // Only authenticated users can create comments
+      allow create: if isAuthenticated() &&
+                   request.resource.data.userId == request.auth.uid;
+      
+      // Users can only update/delete their own comments
+      allow update, delete: if isAuthenticated() &&
+                           request.auth.uid == resource.data.userId;
+    }
+    
+    // Feature History Collection
+    match /featureHistory/{historyId} {
+      // Only admins can read/write history
+      allow read, write: if isAdmin();
     }
 
     // Social Accounts

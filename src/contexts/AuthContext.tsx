@@ -64,6 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               firstName,
               lastName,
               email: user.email || '',
+              role: 'user',
               profilePicture: user.photoURL || 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png',
               phoneNumber: user.phoneNumber || ''
             };
@@ -96,6 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       firstName,
       lastName,
       email,
+      role: 'user',
       profilePicture: 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png',
     };
 
