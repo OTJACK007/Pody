@@ -2,9 +2,11 @@ import React from 'react';
 import { Card, CardBody, Progress, Avatar } from "@nextui-org/react";
 import { CheckCircle2 } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 const GuestPodcasts = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
 
   const podcasts = [
     {
@@ -72,7 +74,8 @@ const GuestPodcasts = () => {
                 <img
                   src={podcast.thumbnail}
                   alt={podcast.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={() => navigate(`/dashboard/feedvideo/${podcast.id}`)}
                 />
                 <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-sm rounded">
                   {podcast.duration}

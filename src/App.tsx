@@ -8,7 +8,7 @@ import DashboardLayout from './components/dashboard/DashboardLayout';
 import LiveSpace from './pages/dashboard/LiveSpace';
 import CreatorSpace from './pages/dashboard/CreatorSpace';
 import ManageChannel from './pages/dashboard/creatorSpace/pages/ManageChannel';
-import Channel from './pages/dashboard/livespace/channel/Channel';
+import Channel from './pages/dashboard/livespace/Channel';
 import FeedVideo from './pages/dashboard/feedvideo/FeedVideo';
 import GuestVideos from './pages/dashboard/guestvideos/GuestVideos';
 import KnowledgeLibrary from './pages/dashboard/KnowledgeLibrary';

@@ -4,6 +4,10 @@ import { Button, Input, Tabs, Tab } from "@nextui-org/react";
 import { useTheme } from '../../contexts/ThemeContext';
 import KnowledgeGrid from './knowledge/components/KnowledgeGrid';
 import KnowledgeList from './knowledge/components/KnowledgeList';
+import PodcastNotes from './knowledge/components/PodcastNotes';
+import AISummaries from './knowledge/components/AISummaries';
+import Highlights from './knowledge/components/Highlights';
+import Favorites from './knowledge/components/Favorites';
 import KnowledgeStats from './knowledge/components/KnowledgeStats';
 import KnowledgeFilters from './knowledge/components/KnowledgeFilters';
 import ConnectNotionModal from './knowledge/components/ConnectNotionModal';
@@ -12,6 +16,7 @@ import ImportModal from './knowledge/components/ImportModal';
 const KnowledgeLibrary = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedTab, setSelectedTab] = useState('all');
   const [showNotionModal, setShowNotionModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const { theme } = useTheme();
@@ -116,6 +121,8 @@ const KnowledgeLibrary = () => {
 
           <Tabs 
             className="mb-6"
+            selectedKey={selectedTab}
+            onSelectionChange={(key) => setSelectedTab(key.toString())}
             classNames={{
               tabList: `${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} p-1 rounded-lg`,
               cursor: `${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`,
@@ -130,7 +137,11 @@ const KnowledgeLibrary = () => {
             <Tab key="favorites" title="Favorites" />
           </Tabs>
 
-          {viewMode === 'grid' ? <KnowledgeGrid /> : <KnowledgeList />}
+          {selectedTab === 'all' && (viewMode === 'grid' ? <KnowledgeGrid /> : <KnowledgeList />)}
+          {selectedTab === 'podcasts' && <PodcastNotes />}
+          {selectedTab === 'summaries' && <AISummaries />}
+          {selectedTab === 'highlights' && <Highlights />}
+          {selectedTab === 'favorites' && <Favorites />}
         </div>
 
         {showFilters && (

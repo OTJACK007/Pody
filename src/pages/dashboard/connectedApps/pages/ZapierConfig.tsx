@@ -4,11 +4,18 @@ import { ArrowLeft, Settings2, ExternalLink, Zap, Activity, Bell, RefreshCw } fr
 import { Card, CardBody, Button, Switch } from "@nextui-org/react";
 import { useTheme } from '../../../../contexts/ThemeContext';
 
+interface Settings {
+  customAutomations: boolean;
+  multiStepZaps: boolean;
+  errorNotifications: boolean;
+  analytics: boolean;
+}
+
 const ZapierConfig = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
 
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<Settings>({
     customAutomations: true,
     multiStepZaps: true,
     errorNotifications: true,
