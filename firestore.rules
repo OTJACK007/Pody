@@ -6,130 +6,132 @@ service cloud.firestore {
     function isAuthenticated() {
       return request.auth != null;
     }
-    
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-    
-    function isAdmin() {
-      return isAuthenticated() && exists(/databases/$(database)/documents/userSettings/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/userSettings/$(request.auth.uid)).data.role == 'admin';
-    }
-    
-    function hasValidFields(requiredFields) {
-      return request.resource.data.keys().hasAll(requiredFields);
-    }
-
-    function isValidEmail(email) {
-      return email.matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
-    }
-
-    // User Settings
-    match /userSettings/{userId} {
-      allow read: if isAuthenticated() && isOwner(userId);
-      
-      allow create: if isAuthenticated() && 
-                   isOwner(userId) &&
-                   hasValidFields(['firstName', 'lastName', 'email']) &&
-                   isValidEmail(request.resource.data.email);
-      
-      allow update: if isAuthenticated() && isOwner(userId);
-      
-      // Validate specific settings updates
-      match /appearance {
-        allow update: if isAuthenticated() && 
-                     isOwner(userId) &&
-                     hasValidFields(['theme', 'colorScheme']);
-      }
-      
-      match /notifications {
-        allow update: if isAuthenticated() && 
-                     isOwner(userId) &&
-                     hasValidFields(['browser', 'content', 'social', 'system']);
-      }
-      
-      match /privacy {
-        allow update: if isAuthenticated() && 
-                     isOwner(userId) &&
-                     hasValidFields(['password_authentication', 'privacy_settings']);
-      }
-      
-      match /language {
-        allow update: if isAuthenticated() && 
-                     isOwner(userId) &&
-                     hasValidFields(['language', 'region', 'timeZone', 'dateFormat']);
-      }
-      
-      match /billing {
-        allow read: if isAuthenticated() && isOwner(userId);
-        allow update: if isAuthenticated() && 
-                     isOwner(userId) &&
-                     hasValidFields(['subscription', 'paymentMethods', 'billingHistory']);
-      }
-    }
 
     // Features Collection
     match /features/{featureId} {
-      allow read: if isAuthenticated();
-      
-      // Only authenticated users can create feature requests
-      allow create: if isAuthenticated() &&
-                   hasValidFields(['title', 'description', 'requestedBy', 'destination']) &&
-                   request.resource.data.requestedBy == request.auth.uid;
-      
-      // Only admins can update feature status and details
-      allow update: if isAdmin() ||
-                   // Allow users to vote on their own feature requests
-                   (isAuthenticated() && 
-                    request.resource.data.diff(resource.data).affectedKeys()
-                      .hasOnly(['votes']));
-      
-      // Only admins can delete features
-      allow delete: if isAdmin();
+      allow read, write: if true;
     }
     
     // Feature Votes Collection
     match /featureVotes/{voteId} {
-      allow read: if isAuthenticated();
-      
-      // Users can only vote once per feature
-      allow create: if isAuthenticated() &&
-                   !exists(/databases/$(database)/documents/featureVotes/$(request.auth.uid + '_' + request.resource.data.featureId));
-      
-      // Users can only update/delete their own votes
-      allow update, delete: if isAuthenticated() &&
-                           request.auth.uid == resource.data.userId;
+      allow read, write: if true;
     }
     
     // Feature Comments Collection
     match /featureComments/{commentId} {
-      allow read: if true;
-      
-      // Only authenticated users can create comments
-      allow create: if isAuthenticated() &&
-                   request.resource.data.userId == request.auth.uid;
-      
-      // Users can only update/delete their own comments
-      allow update, delete: if isAuthenticated() &&
-                           request.auth.uid == resource.data.userId;
+      allow read, write: if true;
     }
     
     // Feature History Collection
     match /featureHistory/{historyId} {
-      // Only admins can read/write history
-      allow read, write: if isAdmin();
+      allow read, write: if true;
+    }
+
+    // Connected Apps Collection
+    match /connectedApps/{userId} {
+      allow read, write: if true;
+    }
+
+    // App Settings Collection
+    match /appSettings/{appId} {
+      allow read, write: if true;
+    }
+
+    // App Analytics Collection
+    match /appAnalytics/{appId} {
+      allow read, write: if true;
+    }
+
+    // Integration History Collection
+    match /integrationHistory/{historyId} {
+      allow read, write: if true;
+    }
+
+    // Analytics Collections
+    match /userAnalytics/{userId} {
+      allow read, write: if true;
+    }
+
+    match /analyticsHistory/{historyId} {
+      allow read, write: if true;
+    }
+
+    match /analyticsMetrics/{metricId} {
+      allow read, write: if true;
+    }
+
+    // Tasks & Calendar Collections
+    match /tasks/{taskId} {
+      allow read, write: if true;
+    }
+
+    match /taskHistory/{historyId} {
+      allow read, write: if true;
+    }
+
+    match /taskCategories/{categoryId} {
+      allow read, write: if true;
+    }
+
+    match /kanbanColumns/{columnId} {
+      allow read, write: if true;
+    }
+
+    // Goals Collections
+    match /goals/{goalId} {
+      allow read, write: if true;
+    }
+
+    match /goalHistory/{historyId} {
+      allow read, write: if true;
+    }
+
+    match /goalCategories/{categoryId} {
+      allow read, write: if true;
+    }
+
+    match /goalInsights/{insightId} {
+      allow read, write: if true;
+    }
+
+    // Knowledge Library Collections
+    match /notes/{noteId} {
+      allow read, write: if true;
+    }
+
+    match /summaries/{summaryId} {
+      allow read, write: if true;
+    }
+
+    match /highlights/{highlightId} {
+      allow read, write: if true;
+    }
+
+    match /favorites/{favoriteId} {
+      allow read, write: if true;
+    }
+
+    match /knowledgeCategories/{categoryId} {
+      allow read, write: if true;
+    }
+
+    match /knowledgeTags/{tagId} {
+      allow read, write: if true;
+    }
+
+    // User Settings
+    match /userSettings/{userId} {
+      allow read, write: if true;
     }
 
     // Social Accounts
     match /userSocialAccounts/{userId} {
-      allow read: if isAuthenticated() && isOwner(userId);
-      allow write: if isAuthenticated() && isOwner(userId);
+      allow read, write: if true;
     }
 
     // Security Logs
     match /securityLogs/{userId} {
-      allow read: if isAuthenticated() && isOwner(userId);
-      allow write: if isAuthenticated() && isOwner(userId);
+      allow read, write: if true;
     }
   }
 }
@@ -138,25 +140,17 @@ service firebase.storage {
   match /b/{bucket}/o {
     // Profile pictures
     match /profilePictures/{userId}/{fileName} {
-      allow read: if true;
-      allow write: if request.auth != null && 
-                  request.auth.uid == userId &&
-                  request.resource.size < 5 * 1024 * 1024 && // 5MB max
-                  request.resource.contentType.matches('image/.*');
+      allow read, write: if true;
     }
 
     // Social media assets
     match /socialMedia/{userId}/{fileName} {
-      allow read: if true;
-      allow write: if request.auth != null && 
-                  request.auth.uid == userId &&
-                  request.resource.size < 10 * 1024 * 1024;
+      allow read, write: if true;
     }
 
     // Billing documents
     match /billing/{userId}/{fileName} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if false; // Only backend can write billing documents
+      allow read, write: if true;
     }
   }
 }

@@ -1,12 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings2, Flag, Users, BarChart2, FileText, Zap, MessageSquare } from 'lucide-react';
-import { Card, CardBody } from "@nextui-org/react";
+import { Settings2, Flag, Users, BarChart2, FileText, Zap, MessageSquare, Database } from 'lucide-react';
+import { Card, CardBody, Button } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
+import { loadTemplateFeatures } from '../../../services/features';
 
 const Backoffice = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLoadFirestore = async () => {
+    try {
+      setIsLoading(true);
+      await loadTemplateFeatures();
+      alert('Features loaded successfully!');
+    } catch (error) {
+      console.error('Error loading features:', error);
+      alert('Error loading features. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const sections = [
     {
@@ -49,15 +64,25 @@ const Backoffice = () => {
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-8">
-        <Settings2 className="w-8 h-8 text-[#ff3366]" />
-        <div>
-          <h1 className={`text-3xl font-bold ${
-            theme === 'dark' ? 'text-white' : 'text-gray-900'
-          }`}>Backoffice</h1>
-          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-            Manage and configure platform settings
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Settings2 className="w-8 h-8 text-[#ff3366]" />
+          <div className="flex items-center gap-4">
+            <h1 className={`text-3xl font-bold ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Backoffice</h1>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Manage and configure platform settings
+            </p>
+            <Button
+              className="ml-4 bg-primary text-white"
+              startContent={<Database className="w-4 h-4" />}
+              onClick={handleLoadFirestore}
+              isLoading={isLoading}
+            >
+              Load Firestore Templates
+            </Button>
+          </div>
         </div>
       </div>
 
