@@ -68,7 +68,7 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
               <img 
                 src={theme === 'dark' 
                   ? "https://static.wixstatic.com/media/c67dd6_b9b73a2bc2b34547ab30e55f13743abf~mv2.png"
-                  : "https://static.wixstatic.com/media/c67dd6_92127c0a8be5424a97bdcfac59c7559d~mv2.gif"
+                  : "https://static.wixstatic.com/media/c67dd6_10fdf64f9af243c68fcf9bc052b1da5e~mv2.png"
                 }
                 alt="Logo"
                 className="w-32"

@@ -19,20 +19,20 @@ const Header = () => {
 
   return (
     <header className="h-[60px] bg-background/95 backdrop-blur-sm text-white fixed top-0 left-0 right-0 z-50">
-      <div className="w-full px-6 h-full flex items-center justify-between">
+      <div className="flex items-center justify-between w-full h-full px-6">
         <nav className="flex items-center space-x-8">
           <div className="flex items-center">
             <img 
-              src="https://static.wixstatic.com/media/c67dd6_c825b43e10db4bd1b336eec46c3bce30~mv2.gif" 
+              src="https://static.wixstatic.com/media/c67dd6_b9b73a2bc2b34547ab30e55f13743abf~mv2.png" 
               alt="Logo"
-              className="h-24 w-24 object-contain" 
+              className="object-contain w-24 h-24" 
             />
           </div>
-          <ul className="hidden md:flex space-x-6">
+          <ul className="hidden space-x-6 md:flex">
             {navItems.map((item) => (
               <li key={item.name} className="relative">
                 <button 
-                  className="flex items-center space-x-2 hover:text-primary transition-colors"
+                  className="flex items-center space-x-2 transition-colors hover:text-primary"
                   onClick={() => {
                     if (item.name === 'Connect Apps') setIsAppsOpen(!isAppsOpen);
                     if (item.name === 'Features') setIsFeaturesOpen(!isFeaturesOpen);
@@ -73,7 +73,7 @@ const Header = () => {
         </nav>
         
         <div className="flex items-center space-x-4">
-          <button className="hidden md:flex items-center space-x-2 h-10 px-4 bg-secondary/20 text-white hover:bg-secondary/30 rounded-lg transition-colors">
+          <button className="items-center hidden h-10 px-4 space-x-2 text-white transition-colors rounded-lg md:flex bg-secondary/20 hover:bg-secondary/30">
             <img 
               src="https://static.wixstatic.com/media/c67dd6_6c38c4c1f3524c42b5c7c30b68fdd9bf~mv2.png" 
               alt="Discord"
@@ -83,7 +83,7 @@ const Header = () => {
           </button>
           <button 
             onClick={() => setIsAuthOpen(true)}
-            className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg transition-colors"
+            className="flex items-center px-4 py-2 space-x-2 transition-colors rounded-lg bg-primary hover:bg-primary/90"
           >
             <img 
               src="https://static.wixstatic.com/shapes/c67dd6_53baa9a980544d87b59c68b9b0020981.svg" 
