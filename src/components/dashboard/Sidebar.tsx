@@ -67,7 +67,7 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
             {isOpen ? (
               <img 
                 src={theme === 'dark' 
-                  ? "https://static.wixstatic.com/media/c67dd6_24d715247a7c45bb8b9b388880463222~mv2.gif"
+                  ? "https://static.wixstatic.com/media/c67dd6_b9b73a2bc2b34547ab30e55f13743abf~mv2.png"
                   : "https://static.wixstatic.com/media/c67dd6_92127c0a8be5424a97bdcfac59c7559d~mv2.gif"
                 }
                 alt="Logo"
@@ -75,7 +75,7 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
               />
             ) : (
               <img 
-                src="https://static.wixstatic.com/shapes/c67dd6_53baa9a980544d87b59c68b9b0020981.svg"
+                src="https://static.wixstatic.com/media/c67dd6_13666aed622048b3b2f3a929081c486f~mv2.png"
                 alt="Logo"
                 className="w-8 h-8"
               />
@@ -92,7 +92,7 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
         </div>
 
         <nav className="flex-1 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800">
-          <ul className="space-y-1 px-2">
+          <ul className="px-2 space-y-1">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
@@ -121,7 +121,7 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
                       )}
                     </span>
                     {isActive && (
-                      <span className="absolute inset-0 bg-gradient-to-r from-primary to-primary/50 opacity-50 blur-sm" />
+                      <span className="absolute inset-0 opacity-50 bg-gradient-to-r from-primary to-primary/50 blur-sm" />
                     )}
                   </NavLink>
                 </li>
