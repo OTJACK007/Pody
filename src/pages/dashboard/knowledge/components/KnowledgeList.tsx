@@ -14,7 +14,6 @@ const KnowledgeList = () => {
       id: 1,
       title: 'Building Mental Resilience',
       content: 'Key insights on developing mental toughness and resilience in challenging situations...',
-      source: 'Mindset Mastery Podcast',
       source: {
         type: 'podcast',
         title: 'Mindset Mastery',
@@ -28,7 +27,6 @@ const KnowledgeList = () => {
       id: 2,
       title: 'Future of AI Technology',
       content: 'Discussion on emerging AI trends and their impact on various industries...',
-      source: 'Tech Insights Show',
       source: {
         type: 'podcast',
         title: 'Tech Insights',
@@ -42,7 +40,6 @@ const KnowledgeList = () => {
       id: 3,
       title: 'Investment Strategies 2024',
       content: 'Expert analysis on current market trends and investment opportunities...',
-      source: 'Finance Weekly',
       source: {
         type: 'podcast',
         title: 'Finance Weekly',

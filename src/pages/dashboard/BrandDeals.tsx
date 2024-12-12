@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, Button, Avatar, Badge, Progress } from "@nextui-org/react";
 import { DollarSign, Users, Star, TrendingUp, ExternalLink, Search, Filter, Crown, Rocket } from 'lucide-react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import BrandDealsFilterModal from './branddeals/components/BrandDealsFilterModal';
 
@@ -150,16 +151,104 @@ const BrandDeals = () => {
       <div className="overflow-hidden -mx-6" ref={ref}>
         <div className="flex gap-6 px-6">
           {campaigns.map((campaign) => (
-            <div key={campaign.id} className="flex-none w-[400px]">
-              {/* Existing campaign card code */}
+            <div key={campaign.id} className="flex-none w-[300px]">
               <Card
                 className={`${
                   theme === 'dark'
                     ? 'bg-gray-800/50 border-gray-700/50'
                     : 'bg-white border-gray-200'
-                } border group hover:border-primary transition-all duration-300 transform hover:scale-[1.02]`}
+                } border group hover:border-primary transition-all duration-300`}
               >
-                {/* ... rest of the campaign card code ... */}
+                <CardBody className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <Avatar
+                      src={campaign.logo}
+                      className="w-12 h-12 rounded-lg"
+                    />
+                    <div>
+                      <h3 className={`text-lg font-semibold ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{campaign.brand}</h3>
+                    </div>
+                  </div>
+
+                  <div className="relative h-40 rounded-lg overflow-hidden mb-4 group-hover:shadow-xl transition-shadow">
+                    <img
+                      src={campaign.background}
+                      alt={campaign.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/50" />
+                    <div className="absolute inset-0 p-4">
+                      <h4 className="text-base font-bold text-white mb-1">{campaign.title}</h4>
+                      <p className="text-xs text-white/80 line-clamp-2">{campaign.description}</p>
+                      <p className="text-sm text-primary absolute bottom-4 left-4">
+                        {campaign.match}% Match
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {campaign.platforms.map((platform) => {
+                      const platformData = platforms.find(p => p.id === platform);
+                      return platformData ? (
+                        <div
+                          key={platform}
+                          className={`p-1.5 rounded-lg ${
+                            theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                          }`}
+                        >
+                          <img 
+                            src={platformData.icon}
+                            alt={platformData.name}
+                            className="w-4 h-4"
+                          />
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-3 h-3 text-primary" />
+                        <span className={`font-semibold ${
+                          theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          {campaign.budget}
+                        </span>
+                      </div>
+                      <Badge color="warning" variant="flat">
+                        {campaign.deadline}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="w-3 h-3 text-primary" />
+                      <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {campaign.requirements}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {campaign.perks.map((perk, index) => (
+                      <Badge
+                        key={index}
+                        className="bg-primary/10 text-primary"
+                      >
+                        {perk}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <Button
+                    className="w-full bg-primary text-white hover:bg-primary/90 transition-colors"
+                    endContent={<ExternalLink className="w-4 h-4" />}
+                    size="sm"
+                  >
+                    Apply Now
+                  </Button>
+                </CardBody>
               </Card>
             </div>
           ))}
@@ -295,104 +384,6 @@ const BrandDeals = () => {
         </div>
       </div>
 
-          <Card
-            key={campaign.id}
-            className={`${
-              theme === 'dark'
-                ? 'bg-gray-800/50 border-gray-700/50'
-                : 'bg-white border-gray-200'
-            } border group hover:border-primary transition-all duration-300 transform hover:scale-[1.02]`}
-          >
-            <CardBody className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <Avatar
-                  src={campaign.logo}
-                  className="w-12 h-12 rounded-lg"
-                />
-                <div>
-                  <h3 className={`text-lg font-semibold ${
-                    theme === 'dark' ? 'text-white' : 'text-gray-900'
-                  }`}>{campaign.brand}</h3>
-                </div>
-              </div>
-
-              <div className="relative h-40 rounded-lg overflow-hidden mb-4 group-hover:shadow-xl transition-shadow">
-                <img
-                  src={campaign.background}
-                  alt={campaign.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/50" />
-                <div className="absolute inset-0 p-4">
-                  <h4 className="text-xl font-bold text-white mb-2">{campaign.title}</h4>
-                  <p className="text-sm text-white/80">{campaign.description}</p>
-                  <div className="absolute top-4 right-4 flex items-center gap-2">
-                    <span className="text-sm text-white/90">Match</span>
-                    <span className="text-sm font-bold text-primary">{campaign.match}%</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-4">
-                {campaign.platforms.map((platform) => {
-                  const platformData = platforms.find(p => p.id === platform);
-                  return platformData ? (
-                    <div
-                      key={platform}
-                      className={`p-1.5 rounded-lg ${
-                        theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
-                      }`}
-                    >
-                      <img 
-                        src={platformData.icon}
-                        alt={platformData.name}
-                        className="w-4 h-4"
-                      />
-                    </div>
-                  ) : null;
-                })}
-              </div>
-
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-primary" />
-                    <span className={`font-semibold ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`}>
-                      {campaign.budget}
-                    </span>
-                  </div>
-                  <Badge color="warning" variant="flat">
-                    {campaign.deadline}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-primary" />
-                  <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                    {campaign.requirements}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-4">
-                {campaign.perks.map((perk, index) => (
-                  <Badge
-                    key={index}
-                    className="bg-primary/10 text-primary"
-                  >
-                    {perk}
-                  </Badge>
-                ))}
-              </div>
-
-              <Button
-                className="w-full bg-primary text-white hover:bg-primary/90 transition-colors"
-                endContent={<ExternalLink className="w-4 h-4" />}
-              >
-                Apply Now
-              </Button>
-            </CardBody>
       {/* Campaign Carousels */}
       {renderCampaignCarousel(emblaRef, topPayingCampaigns, "🔥 Highest Paying Deals")}
       {renderCampaignCarousel(fashionRef, fashionCampaigns, "👗 Fashion Brands")}

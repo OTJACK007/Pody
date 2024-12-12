@@ -24,7 +24,6 @@ const NewFeatures = () => {
         title,
         description,
         reason,
-        destination: 'suggested',
         status: 'pending',
         progress: 0,
         features: [],
@@ -32,6 +31,7 @@ const NewFeatures = () => {
         requestedBy: currentUser.uid,
         requestedDate: new Date(),
         destination: 'suggested',
+        votes: { up: 0, down: 0, users: {} },
         lastModified: new Date(),
         modifiedBy: currentUser.uid
       });
