@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute';
 import ShortVideo from './pages/dashboard/shortvideo/ShortVideo';
 import { ThemeProvider } from './contexts/ThemeContext';
+import BrandDeals from './pages/dashboard/BrandDeals';
 import LandingPage from './pages/LandingPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import LiveSpace from './pages/dashboard/LiveSpace';
@@ -55,6 +56,7 @@ function App() {
           <Route path="livespace" element={<LiveSpace />} />
             <Route path="creator-space" element={<CreatorSpace />} />
             <Route path="creator-space/manage-channel" element={<ManageChannel />} />
+            <Route path="branddeals" element={<BrandDeals />} />
             <Route path="livespace/channel" element={<Channel />} />
             <Route path="feedvideo/:id" element={<FeedVideo />} />
             <Route path="shortvideo/:id" element={<ShortVideo />} />

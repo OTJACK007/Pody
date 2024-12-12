@@ -23,6 +23,7 @@ import {
 import { useTheme } from '../../contexts/ThemeContext';
 import UpgradePlanModal from '../../pages/dashboard/settings/billing/UpgradePlanModal';
 import { useAdmin } from '../../hooks/useAdmin';
+import BrandDealsBanner from './BrandDealsBanner';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -67,8 +68,8 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
             {isOpen ? (
               <img 
                 src={theme === 'dark' 
-                  ? "https://static.wixstatic.com/media/c67dd6_b9b73a2bc2b34547ab30e55f13743abf~mv2.png"
-                  : "https://static.wixstatic.com/media/c67dd6_10fdf64f9af243c68fcf9bc052b1da5e~mv2.png"
+                  ? "https://static.wixstatic.com/media/c67dd6_5cc828167e994843bb5580cea3f362fa~mv2.png"
+                  : "https://static.wixstatic.com/media/c67dd6_db5e32cf31f84b6a901529f12f889b58~mv2.png"
                 }
                 alt="Logo"
                 className="w-32"
@@ -90,6 +91,8 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
             {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
           </button>
         </div>
+
+        <BrandDealsBanner isOpen={isOpen} />
 
         <nav className="flex-1 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800">
           <ul className="px-2 space-y-1">

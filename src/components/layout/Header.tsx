@@ -23,7 +23,7 @@ const Header = () => {
         <nav className="flex items-center space-x-8">
           <div className="flex items-center">
             <img 
-              src="https://static.wixstatic.com/media/c67dd6_b9b73a2bc2b34547ab30e55f13743abf~mv2.png" 
+              src="https://static.wixstatic.com/media/c67dd6_5cc828167e994843bb5580cea3f362fa~mv2.png" 
               alt="Logo"
               className="object-contain w-24 h-24" 
             />

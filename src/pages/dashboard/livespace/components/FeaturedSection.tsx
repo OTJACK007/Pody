@@ -6,7 +6,7 @@ import FeaturedChannels from './FeaturedChannels';
 import FamousGuests from './FamousGuests';
 
 const FeaturedSection = () => {
-  const [showType, setShowType] = useState<'channels' | 'guests'>('channels');
+  const [showType, setShowType] = useState('guests');
   const { theme } = useTheme();
 
   return (
@@ -28,12 +28,12 @@ const FeaturedSection = () => {
             tabContent: "group-data-[selected=true]:text-inherit"
           }}
         >
-          <Tab key="channels" title="Featured Channels" />
           <Tab key="guests" title="Famous Guests" />
+          <Tab key="channels" title="Featured Channels" />
         </Tabs>
       </div>
 
-      {showType === 'channels' ? <FeaturedChannels /> : <FamousGuests />}
+      {showType === 'guests' ? <FamousGuests /> : <FeaturedChannels />}
 
       {/* Premium Banner */}
       <div className={`mt-8 ${
