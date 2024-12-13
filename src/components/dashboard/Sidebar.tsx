@@ -68,8 +68,8 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
             {isOpen ? (
               <img 
                 src={theme === 'dark' 
-                  ? "https://static.wixstatic.com/media/c67dd6_c6f2a5568b9145b2bb45fcbb97cbc3a1~mv2.png"
-                  : "https://static.wixstatic.com/media/c67dd6_e4ab06233b8d432c941c8801a221e769~mv2.png"
+                  ? "https://static.wixstatic.com/media/c67dd6_a43afa92cdec483b8ec06544783d214b~mv2.png"
+                  : "https://static.wixstatic.com/media/c67dd6_b7e5b2d0f9674dca825d7205afa240ae~mv2.png"
                 }
                 alt="Logo"
                 className="w-32"

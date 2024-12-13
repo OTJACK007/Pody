@@ -303,12 +303,16 @@ const CreatorSpace = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
             <div className="absolute bottom-12 left-0 right-0 p-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
               <img
-                src="https://static.wixstatic.com/media/c67dd6_fe72f6ac930c4088a877a6f0fca0084b~mv2.png"
-                alt="Placemento Logo"
+                src="https://static.wixstatic.com/media/c67dd6_13666aed622048b3b2f3a929081c486f~mv2.png"
+                alt="Shogun360 Logo"
                 className="w-24 h-24 object-contain mb-4 mx-auto"
               />
               <h3 className="text-2xl font-bold text-white text-center mb-2">
-                Find Brand Deals with Placemento
+                Find Brand Deals with <img 
+                  src="https://static.wixstatic.com/media/c67dd6_cf685e278f2c44cba6aab77903f78ecf~mv2.gif"
+                  alt="360DEALS"
+                  className="inline-block h-12 align-middle"
+                />
               </h3>
               <p className="text-gray-300 text-center mb-4">
                 Connect with brands and monetize your content
@@ -317,7 +321,7 @@ const CreatorSpace = () => {
                 className="w-full bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20"
                 endContent={<TrendingUp className="w-4 h-4" />}
               >
-                Open Placemento
+                Open 360DEALS
               </Button>
             </div>
           </CardBody>
