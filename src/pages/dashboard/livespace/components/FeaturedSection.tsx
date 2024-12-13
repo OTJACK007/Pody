@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Crown } from 'lucide-react';
 import { Button, Tabs, Tab } from "@nextui-org/react";
+import UpgradePlanModal from '../../settings/billing/UpgradePlanModal';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import FeaturedChannels from './FeaturedChannels';
 import FamousGuests from './FamousGuests';
 
 const FeaturedSection = () => {
   const [showType, setShowType] = useState('guests');
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const { theme } = useTheme();
 
   return (
@@ -56,12 +58,18 @@ const FeaturedSection = () => {
           <Button
             color="success"
             size="lg"
+            onClick={() => setShowUpgradeModal(true)}
             className="bg-secondary text-black font-semibold"
           >
             Subscribe for $5
           </Button>
         </div>
       </div>
+
+      <UpgradePlanModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
     </div>
   );
 };

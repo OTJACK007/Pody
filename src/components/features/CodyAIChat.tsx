@@ -140,7 +140,7 @@ const CodyAIChat = ({ isOpen, onClose }: CodyAIChatProps) => {
             Open Full Version
           </Button>
         </ModalHeader>
-        <ModalBody className="p-0">
+        <ModalBody className="p-0 h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-lg scrollbar-track-rounded-lg scrollbar-thumb-primary scrollbar-track-transparent hover:scrollbar-thumb-primary/80">
           <div className={`flex-1 overflow-y-auto p-4 ${
             theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
           }`}>

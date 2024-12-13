@@ -1,8 +1,97 @@
 import React, { useState } from 'react';
-import { Headphones, Search, Filter, Grid, List as ListIcon, Upload, Link, Scissors, Wand2, MessageSquare, Video, Mic2 } from 'lucide-react';
+import { Headphones, Search, Filter, Grid, List as ListIcon, Upload, Link, Scissors, Wand2, MessageSquare, Video, Mic2, Play, Star, Calendar, ListVideo, Users } from 'lucide-react';
 import { Input, Button, Tabs, Tab, Card, CardBody, Avatar, Badge, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
+import FilterPanel from './podcasts/components/FilterPanel';
+
+const allPodcasts = [
+  {
+    id: 1,
+    title: 'Tech Talks Daily',
+    host: 'John Smith',
+    avatar: 'https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=400',
+    coverImage: 'https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=800',
+    category: 'Technology',
+    episodes: 156,
+    rating: 4.8,
+    listeners: '1.2M',
+    progress: 75,
+    addedDate: '2024-03-15',
+    isFavorite: true
+  },
+  {
+    id: 2,
+    title: 'Mindset Mastery',
+    host: 'Sarah Wilson',
+    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400',
+    coverImage: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800',
+    category: 'Personal Growth',
+    episodes: 89,
+    rating: 4.9,
+    listeners: '850K',
+    progress: 45,
+    addedDate: '2024-03-14',
+    isFavorite: false
+  },
+  {
+    id: 3,
+    title: 'Business Insights',
+    host: 'Mike Johnson',
+    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
+    coverImage: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800',
+    category: 'Business',
+    episodes: 234,
+    rating: 4.7,
+    listeners: '950K',
+    progress: 60,
+    addedDate: '2024-03-13',
+    isFavorite: true
+  },
+  {
+    id: 4,
+    title: 'Fitness Revolution',
+    host: 'Alex Turner',
+    avatar: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400',
+    coverImage: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800',
+    category: 'Health',
+    episodes: 120,
+    rating: 4.6,
+    listeners: '750K',
+    progress: 30,
+    addedDate: '2024-03-12',
+    isFavorite: false
+  },
+  {
+    id: 5,
+    title: 'Creative Minds',
+    host: 'Emma Davis',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+    coverImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800',
+    category: 'Entertainment',
+    episodes: 78,
+    rating: 4.5,
+    listeners: '680K',
+    progress: 85,
+    addedDate: '2024-03-11',
+    isFavorite: true
+  }
+];
+
+interface Podcast {
+  id: number;
+  title: string;
+  host: string;
+  avatar: string;
+  coverImage: string;
+  category: string;
+  episodes: number;
+  rating: number;
+  listeners: string;
+  progress: number;
+  addedDate: string;
+  isFavorite?: boolean;
+}
 
 const PodRoom = () => {
   const navigate = useNavigate();
@@ -15,46 +104,69 @@ const PodRoom = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [activeTab, setActiveTab] = useState('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterRating, setFilterRating] = useState<string>('all');
+  const [filterDuration, setFilterDuration] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [podcasts, setPodcasts] = useState(allPodcasts);
 
-  const podcasts = [
-    {
-      id: 1,
-      title: 'Tech Talks Daily',
-      host: 'John Smith',
-      avatar: 'https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=400',
-      coverImage: 'https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=800',
-      category: 'Technology',
-      episodes: 156,
-      rating: 4.8,
-      listeners: '1.2M',
-      progress: 75
-    },
-    {
-      id: 2,
-      title: 'Mindset Mastery',
-      host: 'Sarah Wilson',
-      avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400',
-      coverImage: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800',
-      category: 'Personal Growth',
-      episodes: 89,
-      rating: 4.9,
-      listeners: '850K',
-      progress: 45
-    },
-    {
-      id: 3,
-      title: 'Business Insights',
-      host: 'Mike Johnson',
-      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
-      coverImage: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800',
-      category: 'Business',
-      episodes: 234,
-      rating: 4.7,
-      listeners: '950K',
-      progress: 60
+  const handleFilterChange = (filters: any) => {
+    setFilterCategory(filters.category || 'all');
+    setFilterRating(filters.rating || 'all');
+    setFilterDuration(filters.duration || 'all');
+  };
+
+  const toggleFavorite = (podcastId: number) => {
+    setPodcasts(prevPodcasts => 
+      prevPodcasts.map(podcast => 
+        podcast.id === podcastId 
+          ? { ...podcast, isFavorite: !podcast.isFavorite }
+          : podcast
+      )
+    );
+  };
+
+  const getFilteredPodcasts = () => {
+    let filtered = [...podcasts];
+    
+    // Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter(podcast => 
+        podcast.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        podcast.host.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-  ];
+    
+    // Filter by category
+    if (filterCategory !== 'all') {
+      filtered = filtered.filter(podcast => podcast.category === filterCategory);
+    }
 
+    // Filter by rating
+    if (filterRating !== 'all') {
+      const minRating = parseInt(filterRating);
+      filtered = filtered.filter(podcast => podcast.rating >= minRating);
+    }
+
+    // Filter by duration (if we had duration data)
+    
+    // Filter by tab
+    switch (activeTab) {
+      case 'recent':
+        filtered.sort((a, b) => new Date(b.addedDate).getTime() - new Date(a.addedDate).getTime());
+        break;
+      case 'popular':
+        filtered.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'favorites':
+        filtered = filtered.filter(podcast => podcast.isFavorite);
+        break;
+    }
+    
+    return filtered;
+  };
   const features = [
     { id: 'shorts', title: 'Turn long video into viral shorts', icon: <Scissors className="w-6 h-6" /> },
     { id: 'longToShorts', title: 'Long to shorts', icon: <Video className="w-6 h-6" /> },
@@ -113,6 +225,8 @@ const PodRoom = () => {
           <Input
             placeholder="Search podcasts..."
             startContent={<Search className="w-4 h-4 text-gray-400" />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             classNames={{
               input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
               inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
@@ -127,6 +241,7 @@ const PodRoom = () => {
                 ? 'bg-gray-700 text-white hover:bg-gray-600'
                 : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
             }`}
+            onClick={() => setShowFilters(true)}
           >
             Filters
           </Button>
@@ -135,15 +250,21 @@ const PodRoom = () => {
           }`}>
             <Button
               isIconOnly
-              className={`${
+              className={`transition-colors ${
                 theme === 'dark' ? 'bg-gray-700' : 'bg-white'
-              }`}
+              } ${viewMode === 'grid' ? 'opacity-100' : 'opacity-50'}`}
+              onClick={() => setViewMode('grid')}
             >
               <Grid className="w-4 h-4" />
             </Button>
             <Button
               isIconOnly
-              className="bg-transparent"
+              className={`transition-colors ${
+                viewMode === 'list' ? 
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-white'
+                : 'bg-transparent'
+              } ${viewMode === 'list' ? 'opacity-100' : 'opacity-50'}`}
+              onClick={() => setViewMode('list')}
             >
               <ListIcon className="w-4 h-4" />
             </Button>
@@ -167,8 +288,11 @@ const PodRoom = () => {
         <Tab key="favorites" title="Favorites" />
       </Tabs>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {podcasts.map((podcast) => (
+      <div className={viewMode === 'grid' ? 
+        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : 
+        "w-full space-y-4"
+      }>
+        {getFilteredPodcasts().map((podcast) => (
           <Card 
             key={podcast.id} 
             isPressable
@@ -177,11 +301,12 @@ const PodRoom = () => {
               theme === 'dark' 
                 ? 'bg-gray-800/50 border-gray-700/50' 
                 : 'bg-white border-gray-200'
-            } border`}
+            } border w-full`}
             onClick={() => handlePodcastClick(podcast.id)}
           >
-            <CardBody className="p-6">
-              <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
+            <CardBody className="p-4">
+              {viewMode === 'grid' ? (
+                <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
                 <img
                   src={podcast.coverImage}
                   alt={podcast.title}
@@ -207,25 +332,107 @@ const PodRoom = () => {
                   />
                 </div>
               </div>
+              ) : (
+                <div className="flex items-center gap-6">
+                  <div className="relative w-48 aspect-video flex-shrink-0 rounded-lg overflow-hidden group">
+                    <img
+                      src={podcast.coverImage}
+                      alt={podcast.title}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Play className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded">
+                      45:30
+                    </div>
+                  </div>
+                  <div className="flex-grow flex flex-col min-w-0 justify-between h-full">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <Avatar
+                            src={podcast.avatar}
+                            className="w-10 h-10 ring-2 ring-white/20"
+                          />
+                          <div>
+                            <h3 className={`text-lg font-semibold ${
+                              theme === 'dark' ? 'text-white' : 'text-gray-900'
+                            }`}>{podcast.title}</h3>
+                            <p className={`text-sm ${
+                              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                            }`}>{podcast.host}</p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          isIconOnly
+                          className={`${
+                            podcast.isFavorite
+                              ? 'bg-primary/20 text-primary'
+                              : theme === 'dark'
+                                ? 'bg-gray-700/50 text-gray-400 hover:text-white'
+                                : 'bg-gray-100 text-gray-600 hover:text-black'
+                          } transition-colors`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(podcast.id);
+                          }}
+                        >
+                          <Star className={podcast.isFavorite ? 'fill-current' : ''} />
+                        </Button>
+                      </div>
 
-              <div className="flex items-center justify-between mb-4">
-                <Badge color="primary" variant="flat" className="text-white">
-                  {podcast.category}
-                </Badge>
-                <div className="flex items-center gap-2">
-                  <span className="text-yellow-400">★</span>
-                  <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                    {podcast.rating}
-                  </span>
+                      <div className="flex items-center gap-4">
+                        <Badge color="primary" variant="flat">
+                          {podcast.category}
+                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <span className="text-yellow-400">★</span>
+                          <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                            {podcast.rating}
+                          </span>
+                        </div>
+                        <div className={`flex items-center gap-2 ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                          <Users className="w-4 h-4" />
+                          <span>{podcast.listeners}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <Progress
+                        value={podcast.progress}
+                        color="success"
+                        size="sm"
+                        showValueLabel
+                        className="max-w-full"
+                        label="Progress"
+                        valueLabel={`${podcast.progress}%`}
+                        classNames={{
+                          label: theme === 'dark' ? 'text-gray-400' : 'text-gray-600',
+                          value: theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }}
+                      />
+
+                      <div className={`flex items-center gap-4 mt-2 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          <span>Added {podcast.addedDate}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <ListVideo className="w-4 h-4" />
+                          <span>{podcast.episodes} Episodes</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              <div className={`flex items-center justify-between text-sm ${
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-              }`}>
-                <span>{podcast.episodes} Episodes</span>
-                <span>{podcast.listeners} Listeners</span>
-              </div>
+              )}
             </CardBody>
           </Card>
         ))}
@@ -335,6 +542,24 @@ const PodRoom = () => {
               {uploadType === 'file' ? 'Upload' : 'Import'}
             </Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Filter Modal */}
+      <Modal
+        isOpen={showFilters}
+        onClose={() => setShowFilters(false)}
+        size="lg"
+        classNames={{
+          base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
+          closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
+        }}
+      >
+        <ModalContent>
+          <FilterPanel 
+            onClose={() => setShowFilters(false)}
+            onFilterChange={handleFilterChange}
+          />
         </ModalContent>
       </Modal>
 
