@@ -34,7 +34,7 @@ export const signUpWithEmail = async (email: string, password: string, fullName:
     email,
     password,
     options: {
-      emailRedirectTo: 'https://shogun360.netlify.app/dashboard/livespace',
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
       data: {
         first_name: firstName,
         last_name: lastName,

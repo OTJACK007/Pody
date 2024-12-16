@@ -16,7 +16,7 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
-  const [verificationSent, setVerificationSent] = useState(false);
+  const [isVerificationSent, setIsVerificationSent] = useState(false);
   const { signIn, signUp } = useAuth();
 
   const validatePassword = (password: string) => {
@@ -51,9 +51,8 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
           setIsLoading(false);
           return;
         }
+        setIsVerificationSent(true);
         await signUp(email, password, fullName);
-        setVerificationSent(true);
-        return;
       }
     } catch (error: unknown) {
       if ((error as any)?.message) {
@@ -86,7 +85,7 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
     }
   };
 
-  if (mode === 'signup' && verificationSent) {
+  if (mode === 'signup' && isVerificationSent) {
     return (
       <div className="text-center py-8 space-y-4">
         <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
@@ -99,6 +98,13 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
         <p className="text-sm text-gray-500">
           Didn't receive the email? Check your spam folder or contact support.
         </p>
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-primary hover:text-primary/80 transition-colors text-sm"
+        >
+          Back to sign in
+        </button>
       </div>
     );
   }

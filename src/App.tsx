@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute';
+import AuthCallback from './pages/AuthCallback';
 import ShortVideo from './pages/dashboard/shortvideo/ShortVideo';
 import { ThemeProvider } from './contexts/ThemeContext';
 import BrandDeals from './pages/dashboard/BrandDeals';
@@ -51,6 +52,7 @@ function App() {
     <ThemeProvider>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/livespace" replace />} />
           <Route path="livespace" element={<LiveSpace />} />
