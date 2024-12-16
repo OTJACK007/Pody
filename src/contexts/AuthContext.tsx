@@ -30,7 +30,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN') {
+        // User has been verified and signed in
+        const user = session?.user;
+        if (user) {
+          try {
+            const existingSettings = await getUserSettings(user.id);
+            if (!existingSettings) {
+              const firstName = user.user_metadata?.first_name || '';
+              const lastName = user.user_metadata?.last_name || '';
+              
+              const settings = {
+                ...defaultSettings,
+                firstName,
+                lastName,
+                email: user.email || '',
+                role: 'user',
+                profilePicture: 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png'
+              };
+
+              await createUserSettings(user.id, settings);
+              await createDefaultSocialAccounts(user.id);
+            }
+            navigate('/dashboard/livespace');
+          } catch (error) {
+            console.error('Error setting up user:', error);
+          }
+        }
+      }
       setCurrentUser(session?.user || null);
       setLoading(false);
     });

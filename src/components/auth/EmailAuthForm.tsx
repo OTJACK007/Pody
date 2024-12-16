@@ -16,6 +16,7 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
+  const [verificationSent, setVerificationSent] = useState(false);
   const { signIn, signUp } = useAuth();
 
   const validatePassword = (password: string) => {
@@ -51,7 +52,7 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
           return;
         }
         await signUp(email, password, fullName);
-        // Keep loading state for verification message
+        setVerificationSent(true);
         return;
       }
     } catch (error: unknown) {
@@ -85,7 +86,7 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
     }
   };
 
-  if (mode === 'signup' && !error && isLoading) {
+  if (mode === 'signup' && verificationSent) {
     return (
       <div className="text-center py-8 space-y-4">
         <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
