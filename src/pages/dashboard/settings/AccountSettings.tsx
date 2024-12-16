@@ -5,7 +5,7 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useUserSettings } from '../../../contexts/UserSettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
-import { getUserSettings, updateUserSettings, createUserSettings } from '../../../lib/firestore';
+import { getUserSettings, updateUserSettings, createUserSettings } from '../../../lib/database';
 import { uploadProfilePicture } from '../../../lib/storage';
 import { countryCodes, detectCountryCode, formatPhoneNumber } from '../../../utils/phoneUtils';
 

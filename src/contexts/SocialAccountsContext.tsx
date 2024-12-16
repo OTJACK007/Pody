@@ -1,12 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import {
-  getUserSocialAccounts,
-  connectSocialAccount,
-  disconnectSocialAccount,
-  type SocialAccount,
-  type UserSocialAccounts
-} from '../lib/firestore/collections/socialAccounts';
+import { getUserSocialAccounts, connectSocialAccount, disconnectSocialAccount } from '../lib/database';
+import type { SocialAccount } from '../types/socialAccounts';
 
 interface SocialAccountsContextType {
   accounts: SocialAccount[];
@@ -36,9 +31,7 @@ export const SocialAccountsProvider = ({ children }: { children: React.ReactNode
 
     try {
       const userAccounts = await getUserSocialAccounts(currentUser.uid);
-      if (userAccounts) {
-        setAccounts(userAccounts.accounts);
-      }
+      setAccounts(userAccounts);
     } catch (error) {
       console.error('Error refreshing social accounts:', error);
     }

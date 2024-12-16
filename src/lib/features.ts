@@ -1,28 +1,5 @@
-import { supabase } from '../lib/supabase';
-
-export interface Feature {
-  id: string;
-  title: string;
-  description: string;
-  status: 'planning' | 'development' | 'testing' | 'review' | 'ready';
-  stage?: string;
-  quarter?: string;
-  progress: number;
-  expected_date?: string;
-  features: string[];
-  votes: {
-    up: number;
-    down: number;
-    users: Record<string, 'up' | 'down'>;
-  };
-  category: string;
-  requested_by: string;
-  requested_date: Date;
-  destination: 'upcoming' | 'suggested' | 'maybe' | 'collecting';
-  published_date?: Date;
-  last_modified: Date;
-  modified_by: string;
-}
+import { supabase } from './supabase';
+import type { Feature } from '../types';
 
 export const fetchFeatures = async (destination: string): Promise<Feature[]> => {
   const { data, error } = await supabase
@@ -51,66 +28,6 @@ export const updateFeature = async (id: string, updates: Partial<Feature>): Prom
     .from('features')
     .update({ ...updates, last_modified: new Date() })
     .eq('id', id);
-
-  if (error) throw error;
-};
-
-export const submitVote = async (featureId: string, userId: string, voteType: 'up' | 'down'): Promise<void> => {
-  const { data: feature, error: fetchError } = await supabase
-    .from('features')
-    .select('votes')
-    .eq('id', featureId)
-    .single();
-
-  if (fetchError) throw fetchError;
-
-  const votes = feature.votes;
-  const previousVote = votes.users[userId];
-
-  // Remove previous vote if exists
-  if (previousVote) {
-    votes[previousVote]--;
-    delete votes.users[userId];
-  }
-
-  // Add new vote
-  votes[voteType]++;
-  votes.users[userId] = voteType;
-
-  const { error: updateError } = await supabase
-    .from('features')
-    .update({ 
-      votes,
-      last_modified: new Date()
-    })
-    .eq('id', featureId);
-
-  if (updateError) throw updateError;
-};
-
-export const moveFeatureToDestination = async (
-  featureId: string, 
-  destination: Feature['destination']
-): Promise<void> => {
-  const { error } = await supabase
-    .from('features')
-    .update({ 
-      destination,
-      last_modified: new Date()
-    })
-    .eq('id', featureId);
-
-  if (error) throw error;
-};
-
-export const publishFeature = async (featureId: string): Promise<void> => {
-  const { error } = await supabase
-    .from('features')
-    .update({ 
-      published_date: new Date(),
-      last_modified: new Date()
-    })
-    .eq('id', featureId);
 
   if (error) throw error;
 };

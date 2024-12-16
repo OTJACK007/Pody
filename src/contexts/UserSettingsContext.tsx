@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { getUserSettings, UserSettings } from '../lib/firestore';
+import { getUserSettings } from '../lib/database';
+import type { UserSettings } from '../types/settings';
 
 interface UserSettingsContextType {
   userSettings: UserSettings | null;

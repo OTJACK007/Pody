@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AuthMode } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
-import { AuthError } from 'firebase/auth';
-
 interface EmailAuthFormProps {
   mode: AuthMode;
   onBack: () => void;
@@ -27,56 +25,93 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
     if (mode === 'signup') {
       if (password !== confirmPassword) {
         setError('Passwords do not match');
+        setIsLoading(false);
         return;
       }
-      
+
       if (!validatePassword(password)) {
         setError('Password must contain at least one number');
+        setIsLoading(false);
         return;
       }
     }
-    
-    setIsLoading(true);
     
     try {
       if (mode === 'signin') {
         await signIn(email, password);
         navigate('/dashboard/livespace');
       } else {
+        if (!fullName) {
+          setError('Full name is required');
+          setIsLoading(false);
+          return;
+        }
         await signUp(email, password, fullName);
-        navigate('/dashboard/livespace');
+        setError('');
+        return (
+          <div className="text-center py-8 space-y-4">
+            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
+              <Mail className="w-8 h-8 text-green-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-white">Verify your email</h3>
+            <p className="text-gray-400 max-w-sm mx-auto">
+              We've sent a verification link to {email}. Please check your inbox and click the link to activate your account.
+            </p>
+            <p className="text-sm text-gray-500">
+              Didn't receive the email? Check your spam folder or contact support.
+            </p>
+          </div>
+        );
       }
     } catch (error: unknown) {
-      if ((error as AuthError)?.code) {
-        const errorCode = (error as AuthError).code;
-        switch (error.code) {
-          case 'auth/invalid-credential':
+      if ((error as any)?.message) {
+        const errorMessage = (error as any).message;
+        switch (errorMessage) {
+          case 'Failed to create user account':
+            setError('Failed to create account. Please try again.');
+            break;
+          case 'Invalid login credentials':
             setError('Invalid email or password');
             break;
-          case 'auth/user-not-found':
+          case 'User not found':
             setError('No account found with this email');
             break;
-          case 'auth/wrong-password':
-            setError('Invalid email or password');
-            break;
-          case 'auth/email-already-in-use':
+          case 'User already registered':
             setError('An account with this email already exists');
             break;
-          case 'auth/weak-password':
+          case 'Weak password':
             setError('Password should be at least 6 characters');
             break;
           default:
-            setError('An error occurred. Please try again.');
+            setError(errorMessage || 'An error occurred. Please try again.');
         }
       }
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (mode === 'signup' && !error && isLoading) {
+    return (
+      <div className="text-center py-8 space-y-4">
+        <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
+          <Mail className="w-8 h-8 text-green-500" />
+        </div>
+        <h3 className="text-xl font-semibold text-white">Verify your email</h3>
+        <p className="text-gray-400 max-w-sm mx-auto">
+          We've sent a verification link to {email}. Please check your inbox and click the link to activate your account.
+        </p>
+        <p className="text-sm text-gray-500">
+          Didn't receive the email? Check your spam folder or contact support.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

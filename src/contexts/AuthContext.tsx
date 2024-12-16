@@ -1,16 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  User,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithRedirect,
-  getRedirectResult,
-  signOut,
-  onAuthStateChanged
-} from 'firebase/auth';
-import { auth, googleProvider } from '../lib/firebase';
-import { createUserSettings, createDefaultSocialAccounts, getUserSettings } from '../lib/firestore';
-import { defaultSettings } from '../lib/firestore/collections/settings';
+import { User } from '@supabase/supabase-js';
+import { supabase, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut } from '../lib/supabase';
+import { createUserSettings, createDefaultSocialAccounts, getUserSettings } from '../lib/database';
+import { defaultSettings } from '../lib/defaultSettings';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
@@ -38,26 +30,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setCurrentUser(session?.user || null);
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          const user = result.user;
-          const existingSettings = await getUserSettings(user.uid);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const user = session.user;
+          const existingSettings = await getUserSettings(user.id);
           
           if (!existingSettings) {
-            const names = user.displayName?.split(' ') || [''];
-            const firstName = names[0];
-            const lastName = names.slice(1).join(' ');
+            const firstName = user.user_metadata?.first_name || '';
+            const lastName = user.user_metadata?.last_name || '';
             
             const settings = {
               ...defaultSettings,
@@ -65,12 +58,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               lastName,
               email: user.email || '',
               role: 'user',
-              profilePicture: user.photoURL || 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png',
-              phoneNumber: user.phoneNumber || ''
+              profilePicture: 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png'
             };
 
-            await createUserSettings(user.uid, settings);
-            await createDefaultSocialAccounts(user.uid);
+            await createUserSettings(user.id, settings);
+            await createDefaultSocialAccounts(user.id);
           }
           
           navigate('/dashboard/livespace');
@@ -83,15 +75,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     handleRedirectResult();
   }, [navigate]);
   const signIn = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    await signInWithEmail(email, password);
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const { data } = await signUpWithEmail(email, password, fullName);
+    const user = data?.user;
+    if (!user) throw new Error('Failed to create user account');
+
     const [firstName, ...lastNameParts] = fullName.trim().split(' ');
     const lastName = lastNameParts.join(' ');
     
-    // Create default settings for new user
     const settings = {
       ...defaultSettings,
       firstName,
@@ -101,8 +95,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       profilePicture: 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png',
     };
 
-    await createUserSettings(userCredential.user.uid, settings);
-    await createDefaultSocialAccounts(userCredential.user.uid);
+    try {
+      await createUserSettings(user.id, settings);
+    } catch (error) {
+      console.error('Error creating user settings:', error);
+      throw error;
+    }
+    // Return without navigating - user needs to verify email first
+    return;
   };
 
   const signInWithGoogle = async () => {
@@ -110,15 +110,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Navigate after successful sign-in
       navigate('/dashboard/livespace');
       
-      await signInWithRedirect(auth, googleProvider);
+      await signInWithGoogle();
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error;
     }
   };
 
-  const logout = async () => {
-    await signOut(auth);
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   const value = {
@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signIn,
     signUp,
     signInWithGoogle,
-    logout
+    logout: handleSignOut
   };
 
   return (

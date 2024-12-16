@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { getUserSettings } from '../lib/firestore';
+import { isAdmin } from '../lib/auth';
 
 export const useAdmin = () => {
   const { currentUser } = useAuth();
@@ -16,8 +16,8 @@ export const useAdmin = () => {
       }
 
       try {
-        const settings = await getUserSettings(currentUser.uid);
-        setIsAdmin(settings?.role === 'admin');
+        const adminStatus = await isAdmin(currentUser.id);
+        setIsAdmin(adminStatus);
       } catch (error) {
         console.error('Error checking admin status:', error);
         setIsAdmin(false);

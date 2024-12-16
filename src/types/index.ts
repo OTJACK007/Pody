@@ -31,8 +31,24 @@ export interface Feature {
   id: string;
   title: string;
   description: string;
-  videoUrl: string;
-  thumbnailUrl: string;
+  status: 'planning' | 'development' | 'testing' | 'review' | 'ready' | 'published';
+  stage?: string;
+  quarter?: string;
+  progress: number;
+  expected_date?: string;
+  features: string[];
+  votes: {
+    up: number;
+    down: number;
+    users: Record<string, 'up' | 'down'>;
+  };
+  category: string;
+  requested_by: string;
+  requested_date: Date;
+  destination: 'upcoming' | 'suggested' | 'maybe' | 'collecting' | 'published';
+  published_date?: Date;
+  last_modified: Date;
+  modified_by: string;
 }
 
 export type Platform = 'YouTube' | 'X/Twitter' | 'TikTok' | 'Instagram' | 'Spotify';

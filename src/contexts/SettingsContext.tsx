@@ -1,18 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import {
-  getUserSettings,
-  updateAppearanceSettings,
-  updateNotificationSettings,
-  updatePrivacySettings,
-  updateLanguageSettings,
-  updateBillingSettings,
-  type AppearanceSettings,
-  type NotificationSettings,
-  type PrivacySettings,
-  type LanguageSettings,
-  type BillingSettings
-} from '../lib/firestore/collections/settings';
+import { getUserSettings, updateUserSettings } from '../lib/database';
+import type { 
+  AppearanceSettings, 
+  NotificationSettings, 
+  PrivacySettings, 
+  LanguageSettings, 
+  BillingSettings 
+} from '../types/settings';
 
 interface SettingsContextType {
   appearance: AppearanceSettings | null;
@@ -81,7 +76,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     if (!currentUser?.uid) return;
     
     try {
-      await updateAppearanceSettings(currentUser.uid, settings);
+      await updateUserSettings(currentUser.uid, { appearance: settings });
       setAppearance(settings);
     } catch (error) {
       console.error('Error updating appearance settings:', error);
@@ -93,7 +88,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     if (!currentUser?.uid) return;
     
     try {
-      await updateNotificationSettings(currentUser.uid, settings);
+      await updateUserSettings(currentUser.uid, { notifications: settings });
       setNotifications(settings);
     } catch (error) {
       console.error('Error updating notification settings:', error);
@@ -105,7 +100,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     if (!currentUser?.uid) return;
     
     try {
-      await updatePrivacySettings(currentUser.uid, settings);
+      await updateUserSettings(currentUser.uid, { privacy: settings });
       setPrivacy(settings);
     } catch (error) {
       console.error('Error updating privacy settings:', error);
@@ -117,7 +112,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     if (!currentUser?.uid) return;
     
     try {
-      await updateLanguageSettings(currentUser.uid, settings);
+      await updateUserSettings(currentUser.uid, { language: settings });
       setLanguage(settings);
     } catch (error) {
       console.error('Error updating language settings:', error);
@@ -129,7 +124,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     if (!currentUser?.uid) return;
     
     try {
-      await updateBillingSettings(currentUser.uid, settings);
+      await updateUserSettings(currentUser.uid, { billing: settings });
       setBilling(settings);
     } catch (error) {
       console.error('Error updating billing settings:', error);
