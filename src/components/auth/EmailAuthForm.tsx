@@ -25,21 +25,20 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
 
     if (mode === 'signup') {
       if (password !== confirmPassword) {
         setError('Passwords do not match');
-        setIsLoading(false);
         return;
       }
 
       if (!validatePassword(password)) {
         setError('Password must contain at least one number');
-        setIsLoading(false);
         return;
       }
     }
+    
+    setIsLoading(true);
     
     try {
       if (mode === 'signin') {
@@ -52,26 +51,16 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
           return;
         }
         await signUp(email, password, fullName);
-        setError('');
-        return (
-          <div className="text-center py-8 space-y-4">
-            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
-              <Mail className="w-8 h-8 text-green-500" />
-            </div>
-            <h3 className="text-xl font-semibold text-white">Verify your email</h3>
-            <p className="text-gray-400 max-w-sm mx-auto">
-              We've sent a verification link to {email}. Please check your inbox and click the link to activate your account.
-            </p>
-            <p className="text-sm text-gray-500">
-              Didn't receive the email? Check your spam folder or contact support.
-            </p>
-          </div>
-        );
+        // Keep loading state for verification message
+        return;
       }
     } catch (error: unknown) {
       if ((error as any)?.message) {
         const errorMessage = (error as any).message;
         switch (errorMessage) {
+          case 'User already registered':
+            setError('An account with this email already exists');
+            break;
           case 'Failed to create user account':
             setError('Failed to create account. Please try again.');
             break;

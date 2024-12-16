@@ -34,7 +34,7 @@ export const signUpWithEmail = async (email: string, password: string, fullName:
     email,
     password,
     options: {
-      emailRedirectTo: `${window.location.origin}/dashboard/livespace`,
+      emailRedirectTo: 'https://shogun360.netlify.app/dashboard/livespace',
       data: {
         first_name: firstName,
         last_name: lastName,
@@ -44,6 +44,9 @@ export const signUpWithEmail = async (email: string, password: string, fullName:
   });
   
   if (error) {
+    if (error.message.includes('already registered')) {
+      throw new Error('User already registered');
+    }
     throw error;
   }
   
