@@ -5,14 +5,15 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useUserSettings } from '../../../contexts/UserSettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
-import { getUserSettings, updateUserSettings, createUserSettings } from '../../../lib/database';
-import { uploadProfilePicture } from '../../../lib/storage';
+import { supabase } from '../../../lib/supabase';
 import { countryCodes, detectCountryCode, formatPhoneNumber } from '../../../utils/phoneUtils';
+import { getUserSettings } from '../../../lib/database';
 
 const AccountSettings = () => {
   const { theme } = useTheme();
   const { currentUser } = useAuth();
   const { refreshSettings } = useUserSettings();
+  const { userSettings } = useUserSettings();
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,18 +32,35 @@ const AccountSettings = () => {
 
   useEffect(() => {
     const loadUserSettings = async () => {
-      if (currentUser?.uid) {
-        const userSettings = await getUserSettings(currentUser.uid);
-        if (userSettings) {
+      if (currentUser?.id) {
+        try {
+          // Get profile data
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .single();
+
+          if (profileError) throw profileError;
+
+          // Set settings from profile data
           setSettings({
-            ...userSettings,
-            fullName: `${userSettings.firstName} ${userSettings.lastName}`.trim()
+            fullName: profile.full_name || currentUser.user_metadata?.full_name || '',
+            email: profile.email || currentUser.email || '',
+            phoneNumber: profile.phone_number || selectedCountry.dial_code,
+            company: profile.company || '',
+            jobTitle: profile.job_title || '',
+            location: profile.location || '',
+            website: profile.website || '',
+            profilePicture: profile.avatar_url || ''
           });
+        } catch (error) {
+          console.error('Error loading user settings:', error);
         }
       }
     };
     loadUserSettings();
-  }, [currentUser]);
+  }, [currentUser?.id, selectedCountry.dial_code]);
 
   const handlePhoneChange = (value: string) => {
     const detectedCountry = detectCountryCode(value);
@@ -62,27 +80,44 @@ const AccountSettings = () => {
   );
 
   const handleSave = async () => {
-    if (!currentUser?.uid) return;
+    if (!currentUser?.id) return;
 
     setIsLoading(true);
     try {
       const [firstName, ...lastNameParts] = settings.fullName.trim().split(' ');
       const lastName = lastNameParts.join(' ');
       
-      const userSettings = await getUserSettings(currentUser.uid);
-      if (userSettings) {
-        await updateUserSettings(currentUser.uid, {
-          ...settings,
-          firstName,
-          lastName
-        });
-      } else {
-        await createUserSettings(currentUser.uid, {
-          ...settings,
-          firstName,
-          lastName
-        });
-      }
+      // Update profile in Supabase
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          full_name: settings.fullName,
+          email: settings.email,
+          phone_number: settings.phoneNumber,
+          company: settings.company,
+          job_title: settings.jobTitle,
+          location: settings.location,
+          website: settings.website,
+          avatar_url: settings.profilePicture,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', currentUser.id);
+
+      if (profileError) throw profileError;
+
+      // Update auth metadata
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: {
+          full_name: settings.fullName,
+          first_name: firstName,
+          last_name: lastName
+        }
+      });
+
+      if (metadataError) throw metadataError;
+
       await refreshSettings();
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -93,7 +128,7 @@ const AccountSettings = () => {
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !currentUser?.uid) return;
+    if (!file || !currentUser?.id) return;
 
      // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -111,16 +146,38 @@ const AccountSettings = () => {
     setUploadProgress(0);
 
     try {
-      const downloadURL = await uploadProfilePicture(currentUser.uid, file);
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${currentUser.id}/profile.${fileExt}`;
+      
+      const { error: uploadError, data } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
       
       // Update local state
       setSettings(prev => ({
         ...prev,
-        profilePicture: downloadURL
+        profilePicture: publicUrl
       }));
       
-      // Update Firestore
-      await updateUserSettings(currentUser.uid, { profilePicture: downloadURL });
+      // Update Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', currentUser.id);
+      
+      if (error) throw error;
+      
       await refreshSettings();
       
       // Reset file input

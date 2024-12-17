@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { isAdmin } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 
 export const useAdmin = () => {
   const { currentUser } = useAuth();
@@ -16,8 +16,19 @@ export const useAdmin = () => {
       }
 
       try {
-        const adminStatus = await isAdmin(currentUser.id);
-        setIsAdmin(adminStatus);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', currentUser.id)
+          .single();
+
+        if (error) {
+          console.error('Error checking admin status:', error);
+          setIsAdmin(false);
+          return;
+        }
+
+        setIsAdmin(data?.role === 'admin');
       } catch (error) {
         console.error('Error checking admin status:', error);
         setIsAdmin(false);

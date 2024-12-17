@@ -4,6 +4,7 @@ import { Menu, Settings, Search, Crown, Edit3, CreditCard, Bug, MessageCircle, L
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserSettings } from '../../contexts/UserSettingsContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAdmin } from '../../hooks/useAdmin';
 import NotificationsMenu from './NotificationsMenu';
 import ReportBugModal from './modals/ReportBugModal';
 import ContactUsModal from './modals/ContactUsModal';
@@ -18,6 +19,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
   const { theme } = useTheme();
   const { currentUser, logout } = useAuth();
   const { userSettings } = useUserSettings();
+  const { isAdmin } = useAdmin();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [showBugModal, setShowBugModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
@@ -95,7 +97,10 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
               <div className="text-right hidden sm:block">
                 <p className={`text-sm font-medium ${
                   theme === 'dark' ? 'text-white' : 'text-black'
-                }`}>{userSettings?.fullName || `${userSettings?.firstName || ''} ${userSettings?.lastName || ''}`}</p>
+                }`}> 
+                  {userSettings?.fullName || currentUser?.user_metadata?.full_name || ''}
+                  {isAdmin && <span className="ml-2 text-xs text-primary">(Admin)</span>}
+                </p>
                 <p className={`text-xs ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                 }`}>Premium Member</p>

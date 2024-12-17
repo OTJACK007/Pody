@@ -52,11 +52,15 @@ export const updatePassword = async (newPassword: string) => {
 
 export const isAdmin = async (userId: string): Promise<boolean> => {
   const { data, error } = await supabase
-    .from('users')
-    .select('is_admin')
+    .from('profiles')
+    .select('role')
     .eq('id', userId)
     .single();
     
-  if (error) throw error;
-  return data?.is_admin || false;
+  if (error) {
+    console.error('Error checking admin status:', error);
+    return false;
+  }
+  
+  return data?.role === 'admin';
 };

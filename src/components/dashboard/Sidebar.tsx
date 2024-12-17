@@ -23,6 +23,8 @@ import {
 import { useTheme } from '../../contexts/ThemeContext';
 import UpgradePlanModal from '../../pages/dashboard/settings/billing/UpgradePlanModal';
 import { useAdmin } from '../../hooks/useAdmin';
+import { useAuth } from '../../contexts/AuthContext';
+import { useUserSettings } from '../../contexts/UserSettingsContext';
 import BrandDealsBanner from './BrandDealsBanner';
 
 interface SidebarProps {
@@ -34,6 +36,8 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
   const location = useLocation();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const { isAdmin } = useAdmin();
+  const { currentUser } = useAuth();
+  const { userSettings } = useUserSettings();
   const { theme, toggleTheme } = useTheme();
 
   const navItems = [
@@ -49,7 +53,7 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
     { name: 'Social Accounts', path: '/dashboard/social', icon: <Share2 /> },
     { name: 'New Features', path: '/dashboard/newfeatures', icon: <Sparkles /> },
     { name: 'Settings', path: '/dashboard/settings', icon: <Settings /> },
-    ...(isAdmin ? [{ name: 'Backoffice', path: '/dashboard/backoffice', icon: <Settings2 /> }] : [])
+    ...(isAdmin ? [{ name: 'Admin Panel', path: '/dashboard/backoffice', icon: <Settings2 /> }] : [])
   ];
 
   return (

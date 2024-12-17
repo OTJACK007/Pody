@@ -9,40 +9,17 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get hash fragment from URL
-        const hash = window.location.hash;
-        if (!hash) {
-          navigate('/');
-          return;
-        }
-
-        // Parse hash fragment
-        const { access_token, refresh_token } = parseHashFragment(hash);
-        
-        if (!access_token) {
-          throw new Error('No access token found');
-        }
-
-        // Set the session with the tokens
-        const { data: { session }, error } = await supabase.auth.setSession({
-          access_token,
-          refresh_token
-        });
-      
-        if (error) throw error;
-        
-        if (session) {
-          // User is authenticated, redirect to dashboard
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
           navigate('/dashboard/livespace', { replace: true });
         } else {
-          throw new Error('No session established');
+          navigate('/', { replace: true });
         }
       } catch (error) {
         console.error('Error in auth callback:', error);
         navigate('/', { replace: true });
       }
     };
-
 
     handleAuthCallback();
   }, [navigate]);

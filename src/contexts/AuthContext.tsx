@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { createUserSettings, createDefaultSocialAccounts, getUserSettings } from '../lib/database';
 import { defaultSettings } from '../lib/defaultSettings';
 import { useNavigate } from 'react-router-dom';
+import { signInWithEmail, signUpWithEmail, signInWithGoogle, signOut } from '../lib/auth';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -43,29 +44,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const user = session.user;
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData?.session?.user) {
+          const user = sessionData.session.user;
           const existingSettings = await getUserSettings(user.id);
           
           if (!existingSettings) {
             const firstName = user.user_metadata?.first_name || '';
             const lastName = user.user_metadata?.last_name || '';
             
+            // Get user profile to check role
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', user.id)
+              .single();
+            
             const settings = {
               ...defaultSettings,
               firstName,
               lastName,
               email: user.email || '',
-              role: 'user',
+              role: profile?.role || 'user',
               profilePicture: 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png'
             };
 
             await createUserSettings(user.id, settings);
             await createDefaultSocialAccounts(user.id);
           }
-          
-          navigate('/dashboard/livespace');
         }
       } catch (error) {
         console.error('Error handling redirect result:', error);
@@ -74,6 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     handleRedirectResult();
   }, [navigate]);
+
   const signIn = async (email: string, password: string) => {
     await signInWithEmail(email, password);
   };
@@ -105,11 +112,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return;
   };
 
-  const signInWithGoogle = async () => {
+  const handleSignInWithGoogle = async () => {
     try {
-      // Navigate after successful sign-in
-      navigate('/dashboard/livespace');
-      
       await signInWithGoogle();
     } catch (error) {
       console.error('Error signing in with Google:', error);
@@ -126,7 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     loading,
     signIn,
     signUp,
-    signInWithGoogle,
+    signInWithGoogle: handleSignInWithGoogle,
     logout: handleSignOut
   };
 

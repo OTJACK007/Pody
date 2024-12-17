@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Loader2, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AuthMode } from '../../types';
+import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 interface EmailAuthFormProps {
   mode: AuthMode;
@@ -44,7 +45,10 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
     try {
       if (mode === 'signin') {
         await signIn(email, password);
-        navigate('/dashboard/livespace');
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          navigate('/dashboard/livespace');
+        }
       } else {
         if (!fullName) {
           setError('Full name is required');
