@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Profile } from '../types/auth';
 import { getProfile } from '../lib/auth';
@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const refreshProfile = async () => {
     if (!currentUser) return;
@@ -41,7 +42,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setCurrentUser(session.user);
           const profile = await getProfile(session.user.id);
           setProfile(profile);
-          navigate('/dashboard/livespace', { replace: true });
+          
+          // Ne redirige que si on est sur la page d'accueil
+          if (location.pathname === '/') {
+            navigate('/dashboard/livespace', { replace: true });
+          }
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
@@ -54,14 +59,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session); // Debug log
+      console.log('Auth state changed:', event, session);
       
       if (event === 'SIGNED_IN' && session?.user) {
         setCurrentUser(session.user);
         try {
           const profile = await getProfile(session.user.id);
           setProfile(profile);
-          navigate('/dashboard/livespace', { replace: true });
+          
+          // Ne redirige que si on est sur la page d'accueil
+          if (location.pathname === '/') {
+            navigate('/dashboard/livespace', { replace: true });
+          }
         } catch (error) {
           console.error('Error loading profile:', error);
           setError(error as Error);
@@ -77,7 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   return (
     <AuthContext.Provider value={{
