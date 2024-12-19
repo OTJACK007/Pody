@@ -89,19 +89,14 @@ export const linkContentToGoal = async (
   if (error) throw error;
 };
 
-export const getGoals = async (status?: string) => {
-  let query = supabase
+export const getGoals = async () => {
+  const { data, error } = await supabase
     .from('goals')
     .select(`
       *,
       goal_linked_content (*)
     `);
 
-  if (status) {
-    query = query.eq('status', status);
-  }
-
-  const { data, error } = await query;
   if (error) throw error;
   return data;
 };

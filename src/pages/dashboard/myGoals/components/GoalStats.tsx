@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardBody } from "@nextui-org/react";
 import { CheckCircle2, Clock, AlertTriangle, ListTodo } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { useGoals } from '../../../../contexts/GoalsContext';
 
 interface GoalStatsProps {
   stats: {
@@ -14,6 +15,7 @@ interface GoalStatsProps {
 
 const GoalStats = ({ stats }: GoalStatsProps) => {
   const { theme } = useTheme();
+  const { goals } = useGoals();
 
   const statCards = [
     {

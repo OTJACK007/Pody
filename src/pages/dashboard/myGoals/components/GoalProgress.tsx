@@ -2,15 +2,25 @@ import React from 'react';
 import { Card, CardBody, CardHeader, Progress } from "@nextui-org/react";
 import { Target, TrendingUp } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { useGoals } from '../../../../contexts/GoalsContext';
 
 const GoalProgress = () => {
   const { theme } = useTheme();
+  const { goals } = useGoals();
   
+  const calculateCategoryProgress = (category: string) => {
+    const categoryGoals = goals.filter(goal => goal.category === category);
+    if (categoryGoals.length === 0) return 0;
+    
+    const totalProgress = categoryGoals.reduce((sum, goal) => sum + goal.progress, 0);
+    return Math.round(totalProgress / categoryGoals.length);
+  };
+
   const categories = [
-    { name: 'Personal Growth', progress: 75, color: 'success' },
-    { name: 'Finance', progress: 45, color: 'warning' },
-    { name: 'Business', progress: 30, color: 'primary' },
-    { name: 'Health', progress: 60, color: 'secondary' }
+    { name: 'Personal Growth', progress: calculateCategoryProgress('personal'), color: 'success' },
+    { name: 'Finance', progress: calculateCategoryProgress('finance'), color: 'warning' },
+    { name: 'Business', progress: calculateCategoryProgress('business'), color: 'primary' },
+    { name: 'Health', progress: calculateCategoryProgress('health'), color: 'secondary' }
   ];
 
   return (
