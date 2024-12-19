@@ -35,30 +35,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const initAuth = async () => {
       try {
+        // Get initial session
         const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
+        
+        if (session?.user && mounted) {
           setCurrentUser(session.user);
           const profile = await getProfile(session.user.id);
           setProfile(profile);
-          
-          // Ne redirige que si on est sur la page d'accueil
+
+          // Only redirect if on home page
           if (location.pathname === '/') {
             navigate('/dashboard/livespace', { replace: true });
           }
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        setError(error as Error);
+        if (mounted) {
+          setError(error as Error);
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     initAuth();
 
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+
       console.log('Auth state changed:', event, session);
       
       if (event === 'SIGNED_IN' && session?.user) {
@@ -67,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const profile = await getProfile(session.user.id);
           setProfile(profile);
           
-          // Ne redirige que si on est sur la page d'accueil
+          // Only redirect if on home page
           if (location.pathname === '/') {
             navigate('/dashboard/livespace', { replace: true });
           }
@@ -84,6 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate, location.pathname]);

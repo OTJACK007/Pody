@@ -9,8 +9,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
+    storageKey: 'pody_auth_token',
+    storage: localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
   }
 });
