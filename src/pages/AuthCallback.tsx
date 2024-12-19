@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { parseHashFragment } from '../utils/auth';
 
 const AuthCallback = () => {
   const navigate = useNavigate();

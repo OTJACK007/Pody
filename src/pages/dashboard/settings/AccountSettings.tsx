@@ -129,37 +129,11 @@ const AccountSettings = () => {
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !currentUser?.id) return;
-
-     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
-      return;
-    }
-
-     // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB');
-      return;
-    }
-
     setIsLoading(true);
     setUploadProgress(0);
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${currentUser.id}/profile.${fileExt}`;
-      
-      const { error: uploadError, data } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, {
-          upsert: true
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
+      const publicUrl = await uploadProfilePicture(currentUser.id, file, setUploadProgress);
       
       // Update local state
       setSettings(prev => ({

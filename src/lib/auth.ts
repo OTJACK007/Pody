@@ -1,32 +1,41 @@
 import { supabase } from './supabase';
+import type { SignUpData, SignInData, Profile } from '../types/auth';
 
-export const signInWithEmail = async (email: string, password: string) => {
+export const signIn = async ({ email, password }: SignInData) => {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
-  
-  if (error) throw error;
-  return data;
+
+  if (error) {
+    if (error.message.includes('Invalid login')) {
+      throw new Error('Invalid email or password');
+    }
+    throw error;
+  }
+
+  return { data };
 };
 
-export const signUpWithEmail = async (email: string, password: string) => {
+export const signUp = async ({ email, password, fullname }: SignUpData) => {
   const { data, error } = await supabase.auth.signUp({
     email,
-    password
+    password,
+    options: {
+      data: {
+        fullname,
+      }
+    }
   });
-  
-  if (error) throw error;
-  return data;
-};
 
-export const signInWithGoogle = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google'
-  });
-  
-  if (error) throw error;
-  return data;
+  if (error) {
+    if (error.message.includes('already registered')) {
+      throw new Error('User already exists');
+    }
+    throw error;
+  }
+
+  return { data };
 };
 
 export const signOut = async () => {
@@ -34,33 +43,13 @@ export const signOut = async () => {
   if (error) throw error;
 };
 
-export const resetPassword = async (email: string) => {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/reset-password`,
-  });
-  
-  if (error) throw error;
-};
-
-export const updatePassword = async (newPassword: string) => {
-  const { error } = await supabase.auth.updateUser({
-    password: newPassword
-  });
-  
-  if (error) throw error;
-};
-
-export const isAdmin = async (userId: string): Promise<boolean> => {
+export const getProfile = async (userId: string): Promise<Profile | null> => {
   const { data, error } = await supabase
     .from('profiles')
-    .select('role')
+    .select('*')
     .eq('id', userId)
     .single();
-    
-  if (error) {
-    console.error('Error checking admin status:', error);
-    return false;
-  }
-  
-  return data?.role === 'admin';
+
+  if (error) throw error;
+  return data;
 };
