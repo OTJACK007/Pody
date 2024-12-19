@@ -33,7 +33,7 @@ const AddPaymentModal = ({ isOpen, onClose, onSubmit }: AddPaymentModalProps) =>
     {
       id: 'card',
       name: 'Credit Card',
-      icon: 'https://static.wixstatic.com/media/c67dd6_ba6512237a194a9a9297eeeb9219122e~mv2.png',
+      icon: 'https://static.wixstatic.com/media/c67dd6_0f9e633415a3470b92e088b44ec1d324~mv2.png',
       description: 'Pay with Visa, Mastercard, or American Express'
     },
     {

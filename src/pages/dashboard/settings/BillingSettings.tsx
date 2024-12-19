@@ -3,16 +3,18 @@ import { CreditCard, Clock, Receipt, Plus } from 'lucide-react';
 import { Card, CardBody, Button } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 import AddPaymentModal from './billing/AddPaymentModal';
 import UpgradePlanModal from './billing/UpgradePlanModal';
-import type { BillingSettings as BillingSettingsType } from '../../../lib/firestore/collections/settings';
+import type { BillingSettings as BillingSettingsType } from '../../../types/settings';
 
 const BillingSettings = () => {
   const [showAddCardModal, setShowAddCardModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
+  const { currentUser } = useAuth();
   const { billing, updateBilling } = useSettings();
   const [settings, setSettings] = useState<BillingSettingsType>({
     subscription: {
@@ -120,7 +122,7 @@ const BillingSettings = () => {
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }`}>Current Plan</h3>
                 <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                  You are currently on the Basic plan
+                  You are currently on the {settings.subscription.plan} plan
                 </p>
               </div>
               <Button
@@ -176,7 +178,7 @@ const BillingSettings = () => {
               </div>
               <div className="flex gap-2">
                 <Button
-                  startContent={<img src="https://static.wixstatic.com/media/c67dd6_7db17138923b4bcf92d85ed71f9f85ed~mv2.png" alt="Stripe" className="w-4 h-4" />}
+                  startContent={<img src="https://static.wixstatic.com/media/c67dd6_92e66c3f7a404298a364acd6517da616~mv2.png" alt="Stripe" className="w-4 h-4" />}
                   className={`${
                     theme === 'dark'
                       ? 'bg-gray-700 text-white hover:bg-gray-600'

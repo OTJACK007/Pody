@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, Button, Card, CardBody, CardHeader } from "@nextui-org/react";
 import { Check, Crown, Zap, Star, Rocket } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { useSettings } from '../../../../contexts/SettingsContext';
 
 interface UpgradePlanModalProps {
   isOpen: boolean;
@@ -10,12 +11,15 @@ interface UpgradePlanModalProps {
 
 const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
   const { theme } = useTheme();
+  const { billing, updateBilling } = useSettings();
+  const [isLoading, setIsLoading] = useState(false);
 
   const plans = [
     {
       name: 'Basic',
       price: '$5',
       credits: '50',
+      planId: 'basic',
       icon: <Crown className="w-6 h-6 text-yellow-400" />,
       color: 'bg-yellow-400/10',
       textColor: 'text-yellow-400',
@@ -31,6 +35,7 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
       name: 'Credit Starter',
       price: '$20',
       credits: '100',
+      planId: 'credit-starter',
       icon: <Zap className="w-6 h-6 text-blue-400" />,
       color: 'bg-blue-400/10',
       textColor: 'text-blue-400',
@@ -45,6 +50,7 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
       name: 'Pro',
       price: '$29',
       credits: '250',
+      planId: 'pro',
       icon: <Star className="w-6 h-6 text-purple-400" />,
       color: 'bg-purple-400/10',
       textColor: 'text-purple-400',
@@ -61,6 +67,7 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
       price: '$50',
       originalPrice: '$70',
       credits: '600',
+      planId: 'elite',
       icon: <Rocket className="w-6 h-6 text-secondary" />,
       color: 'bg-secondary/10',
       textColor: 'text-secondary',
@@ -72,6 +79,34 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
       ]
     }
   ];
+
+  const handleUpgrade = async (plan: any) => {
+    try {
+      setIsLoading(true);
+      
+      // Extract price without $ sign and convert to number
+      const amount = Number(plan.price.replace('$', ''));
+      
+      const updatedBilling = {
+        ...billing,
+        subscription: {
+          plan: plan.planId,
+          amount: amount,
+          status: 'active',
+          currency: 'USD',
+          nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+        }
+      };
+
+      await updateBilling(updatedBilling);
+      onClose();
+    } catch (error) {
+      console.error('Error upgrading plan:', error);
+      alert('Failed to upgrade plan. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Modal 
@@ -156,6 +191,8 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
                         : 'bg-secondary text-black hover:bg-secondary/90'
                     }`}
                     disabled={plan.current}
+                    isLoading={isLoading}
+                    onClick={() => handleUpgrade(plan)}
                   >
                     {plan.current ? 'Current Plan' : 'Upgrade Now'}
                   </Button>
