@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setCurrentUser(session.user);
           const profile = await getProfile(session.user.id);
           setProfile(profile);
-          navigate('/dashboard/livespace');
+          navigate('/dashboard/livespace', { replace: true });
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
@@ -54,12 +54,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session); // Debug log
+      
       if (event === 'SIGNED_IN' && session?.user) {
         setCurrentUser(session.user);
         try {
           const profile = await getProfile(session.user.id);
           setProfile(profile);
-          navigate('/dashboard/livespace');
+          navigate('/dashboard/livespace', { replace: true });
         } catch (error) {
           console.error('Error loading profile:', error);
           setError(error as Error);
@@ -67,7 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else if (event === 'SIGNED_OUT') {
         setCurrentUser(null);
         setProfile(null);
-        navigate('/');
+        navigate('/', { replace: true });
       }
       setLoading(false);
     });
