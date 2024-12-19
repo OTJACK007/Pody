@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Mail, Phone, MapPin, Building, Globe, Camera, Search } from 'lucide-react';
-import { Input, Button, Avatar, Progress, Card, CardBody, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { User, Mail, Phone, MapPin, Building, Globe, Search } from 'lucide-react';
+import { Input, Button, Avatar, Card, CardBody, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useUserSettings } from '../../../contexts/UserSettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 import { supabase } from '../../../lib/supabase';
-import { uploadProfilePicture } from '../../../lib/storage';
 import { countryCodes, detectCountryCode, formatPhoneNumber } from '../../../utils/phoneUtils';
+import { getUserSettings } from '../../../lib/database';
 
 const AccountSettings = () => {
   const { theme } = useTheme();
   const { currentUser } = useAuth();
   const { refreshSettings } = useUserSettings();
+  const { userSettings } = useUserSettings();
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +31,7 @@ const AccountSettings = () => {
   });
 
   useEffect(() => {
-    const loadSettings = async () => {
+    const loadUserSettings = async () => {
       if (currentUser?.id) {
         try {
           // Get profile data
@@ -58,7 +59,7 @@ const AccountSettings = () => {
         }
       }
     };
-    loadSettings();
+    loadUserSettings();
   }, [currentUser?.id, selectedCountry.dial_code]);
 
   const handlePhoneChange = (value: string) => {
@@ -77,6 +78,53 @@ const AccountSettings = () => {
     country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     country.dial_code.includes(searchQuery)
   );
+
+  const handleSave = async () => {
+    if (!currentUser?.id) return;
+
+    setIsLoading(true);
+    try {
+      const [firstName, ...lastNameParts] = settings.fullName.trim().split(' ');
+      const lastName = lastNameParts.join(' ');
+      
+      // Update profile in Supabase
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          full_name: settings.fullName,
+          email: settings.email,
+          phone_number: settings.phoneNumber,
+          company: settings.company,
+          job_title: settings.jobTitle,
+          location: settings.location,
+          website: settings.website,
+          avatar_url: settings.profilePicture,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', currentUser.id);
+
+      if (profileError) throw profileError;
+
+      // Update auth metadata
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: {
+          full_name: settings.fullName,
+          first_name: firstName,
+          last_name: lastName
+        }
+      });
+
+      if (metadataError) throw metadataError;
+
+      await refreshSettings();
+    } catch (error) {
+      console.error('Error saving settings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -123,53 +171,6 @@ const AccountSettings = () => {
     fileInputRef.current?.click();
   };
 
-  const handleSave = async () => {
-    if (!currentUser?.id) return;
-    
-    setIsLoading(true);
-    try {
-      const [firstName, ...lastNameParts] = settings.fullName.trim().split(' ');
-      const lastName = lastNameParts.join(' ');
-      
-      // Update profile in Supabase
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          first_name: firstName,
-          last_name: lastName,
-          full_name: settings.fullName,
-          email: settings.email,
-          phone_number: settings.phoneNumber,
-          company: settings.company,
-          job_title: settings.jobTitle,
-          location: settings.location,
-          website: settings.website,
-          avatar_url: settings.profilePicture,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', currentUser.id);
-
-      if (profileError) throw profileError;
-
-      // Update auth metadata
-      const { error: metadataError } = await supabase.auth.updateUser({
-        data: {
-          full_name: settings.fullName,
-          first_name: firstName,
-          last_name: lastName
-        }
-      });
-
-      if (metadataError) throw metadataError;
-
-      await refreshSettings();
-    } catch (error) {
-      console.error('Error saving settings:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="max-w-4xl">
       <SettingsHeader
@@ -206,18 +207,17 @@ const AccountSettings = () => {
                 <Button 
                   className="bg-secondary/20 text-secondary hover:bg-secondary/30 border border-secondary"
                   onClick={handleUploadClick}
-                  startContent={<Camera className="w-4 h-4" />}
                   isLoading={isLoading}
                   isDisabled={isLoading}
                 >
                   Upload New Picture
                 </Button>
                 {isLoading && (
-                  <Progress 
-                    value={uploadProgress} 
-                    color="primary"
-                    className="max-w-md"
-                  />
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
+                    Uploading image...
+                  </p>
                 )}
                 <p className={`text-sm ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-600'

@@ -2,25 +2,38 @@ import React from 'react';
 import { Card, CardBody, CardHeader, Avatar } from "@nextui-org/react";
 import { Lightbulb, PlayCircle } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
-import { useGoals } from '../../../../contexts/GoalsContext';
 import { useNavigate } from 'react-router-dom';
 
 const GoalInsights = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const { goals } = useGoals();
   
-  const insights = goals
-    .filter(goal => goal.linkedContent?.length > 0)
-    .slice(0, 3)
-    .map(goal => ({
-      id: goal.id,
-      title: goal.linkedContent[0].title,
-      source: goal.title,
-      image: goal.linkedContent[0].thumbnailUrl,
-      timestamp: goal.linkedContent[0].sourceUrl,
-      videoId: goal.linkedContent[0].id
-    }));
+  const insights = [
+    {
+      id: 1,
+      title: 'Building Confidence',
+      source: 'Public Speaking Mastery',
+      image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400',
+      timestamp: '32:15',
+      videoId: 'insight-1'
+    },
+    {
+      id: 2,
+      title: 'Investment Strategies',
+      source: 'Financial Freedom',
+      image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400',
+      timestamp: '45:30',
+      videoId: 'insight-2'
+    },
+    {
+      id: 3,
+      title: 'Course Creation Tips',
+      source: 'Digital Education',
+      image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400',
+      timestamp: '28:45',
+      videoId: 'insight-3'
+    }
+  ];
 
   const handleVideoClick = (videoId: string) => {
     navigate(`/dashboard/feedvideo/${videoId}`);

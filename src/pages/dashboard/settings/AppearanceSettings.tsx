@@ -7,9 +7,9 @@ import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 
 const AppearanceSettings = () => {
   const { theme, toggleTheme } = useTheme();
-  const { appearance, updateAppearance } = useSettings();
+  const { appearance, updateAppearance, isLoading } = useSettings();
   const [selectedTheme, setSelectedTheme] = useState(theme);
-  const [selectedColor, setSelectedColor] = useState('#ff3366');
+  const [selectedColor, setSelectedColor] = useState(appearance?.colorScheme || '#ff3366');
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const AppearanceSettings = () => {
 
   const colors = [
     '#ff3366',
-    '#2eff94', 
+    '#2eff94',
     '#147dff',
     '#9333ea',
     '#f97316',

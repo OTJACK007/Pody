@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Profile } from '../types/auth';
 import { getProfile } from '../lib/auth';
@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const refreshProfile = async () => {
     if (!currentUser) return;
@@ -35,53 +34,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    let mounted = true;
-
     const initAuth = async () => {
       try {
-        // Get initial session
         const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user && mounted) {
+        if (session?.user) {
           setCurrentUser(session.user);
           const profile = await getProfile(session.user.id);
           setProfile(profile);
-
-          // Only redirect if on home page
-          if (location.pathname === '/') {
-            navigate('/dashboard/livespace', { replace: true });
-          }
+          navigate('/dashboard/livespace');
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        if (mounted) {
-          setError(error as Error);
-        }
+        setError(error as Error);
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
     initAuth();
 
-    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted) return;
-
-      console.log('Auth state changed:', event, session);
-      
       if (event === 'SIGNED_IN' && session?.user) {
         setCurrentUser(session.user);
         try {
           const profile = await getProfile(session.user.id);
           setProfile(profile);
-          
-          // Only redirect if on home page
-          if (location.pathname === '/') {
-            navigate('/dashboard/livespace', { replace: true });
-          }
+          navigate('/dashboard/livespace');
         } catch (error) {
           console.error('Error loading profile:', error);
           setError(error as Error);
@@ -89,16 +67,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else if (event === 'SIGNED_OUT') {
         setCurrentUser(null);
         setProfile(null);
-        navigate('/', { replace: true });
+        navigate('/');
       }
       setLoading(false);
     });
 
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname]);
+  }, [navigate]);
 
   return (
     <AuthContext.Provider value={{

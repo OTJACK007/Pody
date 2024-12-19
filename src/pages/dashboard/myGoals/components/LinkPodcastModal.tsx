@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Card, CardBody } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Card, CardBody, Chip, Avatar, Progress } from "@nextui-org/react";
 import { Search, PlayCircle, Plus, CheckCircle, Tag, Clock, Star, TrendingUp } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
-import { useGoals } from '../../../../contexts/GoalsContext';
-import { linkContentToGoal } from '../../../../services/goals';
 
 interface LinkPodcastModalProps {
   isOpen: boolean;
   onClose: () => void;
-  goalId: string;
+  goalId: number;
 }
 
 const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) => {
@@ -16,7 +14,6 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
   const [selectedPodcasts, setSelectedPodcasts] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'search' | 'recommended' | 'history'>('recommended');
   const { theme } = useTheme();
-  const { refreshGoals } = useGoals();
 
   const recommendedPodcasts = [
     {
@@ -46,7 +43,7 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
       title: 'Voice Training Essentials',
       channel: 'Voice Academy',
       duration: '28 min',
-      image: 'https://images.unsplash.com/photo-1478737270239-f74eccf877e2?w=400',
+      image: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400',
       tags: ['Voice Training', 'Speaking'],
       relevanceScore: 92,
       rating: 4.7,
@@ -63,25 +60,8 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
   };
 
   const handleSave = async () => {
-    try {
-      const selectedContent = recommendedPodcasts
-        .filter(podcast => selectedPodcasts.includes(podcast.id))
-        .map(podcast => ({
-          contentType: 'podcast',
-          title: podcast.title,
-          thumbnailUrl: podcast.image,
-          sourceUrl: `https://example.com/podcast/${podcast.id}`
-        }));
-
-      for (const content of selectedContent) {
-        await linkContentToGoal(goalId, content);
-      }
-
-      await refreshGoals();
-      onClose();
-    } catch (error) {
-      console.error('Error linking content:', error);
-    }
+    // Handle saving selected podcasts
+    onClose();
   };
 
   return (
@@ -177,7 +157,7 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
                           <h3 className={`text-lg font-semibold mb-1 ${
                             theme === 'dark' ? 'text-white' : 'text-gray-900'
                           }`}>{podcast.title}</h3>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 mb-2">
                             <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                               {podcast.channel}
                             </span>
@@ -189,23 +169,12 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
                             </div>
                           </div>
                         </div>
-                        <Button
-                          isIconOnly
-                          className={`${
-                            selectedPodcasts.includes(podcast.id)
-                              ? 'bg-primary text-white'
-                              : theme === 'dark' ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'
-                          } self-start`}
-                        >
-                          {selectedPodcasts.includes(podcast.id) ? (
-                            <CheckCircle className="w-4 h-4" />
-                          ) : (
-                            <Plus className="w-4 h-4" />
-                          )}
-                        </Button>
+                        <Chip color="success" size="sm">
+                          {podcast.relevanceScore}% Match
+                        </Chip>
                       </div>
 
-                      <div className="flex items-center gap-4 mt-2">
+                      <div className="flex items-center gap-4 mb-3">
                         <div className={`flex items-center gap-2 text-sm ${
                           theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                         }`}>
@@ -220,22 +189,34 @@ const LinkPodcastModal = ({ isOpen, onClose, goalId }: LinkPodcastModalProps) =>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 mt-3">
+                      <div className="flex flex-wrap gap-2">
                         {podcast.tags.map((tag) => (
-                          <div
+                          <Chip
                             key={tag}
-                            className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                              theme === 'dark'
-                                ? 'bg-gray-600 text-gray-300'
-                                : 'bg-gray-200 text-gray-700'
-                            }`}
+                            size="sm"
+                            variant="flat"
+                            className={theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'}
                           >
-                            <Tag className="w-3 h-3" />
-                            <span>{tag}</span>
-                          </div>
+                            {tag}
+                          </Chip>
                         ))}
                       </div>
                     </div>
+
+                    <Button
+                      isIconOnly
+                      className={`${
+                        selectedPodcasts.includes(podcast.id)
+                          ? 'bg-primary text-white'
+                          : theme === 'dark' ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'
+                      } self-start`}
+                    >
+                      {selectedPodcasts.includes(podcast.id) ? (
+                        <CheckCircle className="w-4 h-4" />
+                      ) : (
+                        <Plus className="w-4 h-4" />
+                      )}
+                    </Button>
                   </div>
                 </CardBody>
               </Card>

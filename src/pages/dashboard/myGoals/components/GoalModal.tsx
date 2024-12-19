@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
 import { Calendar, Target, Tag } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
-import { useGoals } from '../../../../contexts/GoalsContext';
-import { createGoal } from '../../../../services/goals';
 
 interface GoalModalProps {
   isOpen: boolean;
@@ -17,7 +15,6 @@ const GoalModal = ({ isOpen, onClose }: GoalModalProps) => {
   const [dueDate, setDueDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
-  const { refreshGoals } = useGoals();
 
   const categories = [
     { value: 'personal', label: 'Personal Growth' },
@@ -28,24 +25,10 @@ const GoalModal = ({ isOpen, onClose }: GoalModalProps) => {
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    try {
-      await createGoal({
-        title,
-        description,
-        category,
-        progress: 0,
-        status: 'active',
-        startDate: new Date(),
-        dueDate: new Date(dueDate)
-      });
-      
-      await refreshGoals();
-      onClose();
-    } catch (error) {
-      console.error('Error creating goal:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsLoading(false);
+    onClose();
   };
 
   return (

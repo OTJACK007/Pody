@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Target, Plus } from 'lucide-react';
 import { Button, Tabs, Tab, Chip } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
-import { useGoals } from '../../../contexts/GoalsContext';
 import ActiveGoalsList from './components/ActiveGoalsList';
 import CompletedGoalsList from './components/CompletedGoalsList';
 import UpcomingGoalsList from './components/UpcomingGoalsList';
@@ -15,13 +14,12 @@ const MyGoals = () => {
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [selectedView, setSelectedView] = useState('active');
   const { theme } = useTheme();
-  const { activeGoals, completedGoals, upcomingGoals, isLoading } = useGoals();
 
   const goalStats = {
-    total: activeGoals.length + completedGoals.length + upcomingGoals.length,
-    completed: completedGoals.length,
-    pending: activeGoals.length,
-    upcoming: upcomingGoals.length
+    total: 8,
+    completed: 3,
+    pending: 4,
+    upcoming: 1
   };
 
   return (
@@ -33,12 +31,9 @@ const MyGoals = () => {
             <h1 className={`text-3xl font-bold ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'
             }`}>My Goals</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <Chip size="sm" color="default">{goalStats.total} Total Goals</Chip>
-              <Chip size="sm" color="success">{goalStats.completed} Completed</Chip>
-              <Chip size="sm" color="warning">{goalStats.pending} Pending</Chip>
-              <Chip size="sm" color="primary">{goalStats.upcoming} Upcoming</Chip>
-            </div>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Track your progress and achievements
+            </p>
           </div>
         </div>
         <Button

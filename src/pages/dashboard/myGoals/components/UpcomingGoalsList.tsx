@@ -1,11 +1,58 @@
 import React, { useState } from 'react';
-import { Card, CardBody, Progress, Button, Badge } from "@nextui-org/react";
+import { Card, CardBody, Progress, Button, Avatar, Badge } from "@nextui-org/react";
 import { Link2, BarChart2, PlayCircle, ChevronRight, Plus, Clock } from 'lucide-react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
-import { useGoals } from '../../../../contexts/GoalsContext';
 import GoalDetailsModal from './GoalDetailsModal';
 import { useNavigate } from 'react-router-dom';
 import LinkPodcastModal from './LinkPodcastModal';
+
+const upcomingGoals = [
+  {
+    id: 1,
+    title: 'Start YouTube Channel',
+    description: 'Create and launch educational tech content',
+    category: 'Content Creation',
+    progress: 15,
+    dueDate: '2024-05-30',
+    linkedContent: [
+      {
+        id: 1,
+        title: 'YouTube Success Guide',
+        type: 'course',
+        image: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=400'
+      },
+      {
+        id: 2,
+        title: 'Content Creation Mastery',
+        type: 'video',
+        image: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400'
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: 'Learn Machine Learning',
+    description: 'Complete ML certification and build projects',
+    category: 'Education',
+    progress: 5,
+    dueDate: '2024-07-15',
+    linkedContent: [
+      {
+        id: 3,
+        title: 'ML Fundamentals',
+        type: 'course',
+        image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400'
+      },
+      {
+        id: 4,
+        title: 'AI Project Planning',
+        type: 'podcast',
+        image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400'
+      }
+    ]
+  }
+];
 
 interface GoalsListProps {
   status: string;
@@ -13,31 +60,34 @@ interface GoalsListProps {
 
 const UpcomingGoalsList = ({ status }: GoalsListProps) => {
   const [showLinkModal, setShowLinkModal] = useState(false);
-  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
+  const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+  const navigate = useNavigate();
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
   const { theme } = useTheme();
-  const { upcomingGoals } = useGoals();
-  const navigate = useNavigate();
+  
+  const carouselOptions = {
+    align: 'start',
+    containScroll: 'trimSnaps',
+    dragFree: true
+  };
 
-  const handleLinkPodcast = (goalId: string) => {
+  const carouselRefs = upcomingGoals.map(() => useEmblaCarousel(carouselOptions));
+
+  const handleLinkPodcast = (goalId: number) => {
     setSelectedGoalId(goalId);
     setShowLinkModal(true);
   };
 
-  const handleGoalDetails = (goal: any) => {
+  const handleGoalDetails = (goal) => {
     setSelectedGoal(goal);
     setShowDetailsModal(true);
-  };
-
-  const handleContentClick = (contentId: string) => {
-    navigate(`/dashboard/feedvideo/${contentId}`);
   };
 
   return (
     <>
       <div className="space-y-4">
-        {upcomingGoals.map((goal) => (
+        {upcomingGoals.map((goal, index) => (
           <Card key={goal.id} className={`${
             theme === 'dark' 
               ? 'bg-gray-800/50 border-gray-700/50' 
@@ -81,13 +131,13 @@ const UpcomingGoalsList = ({ status }: GoalsListProps) => {
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                       }`}>
                         <BarChart2 className="w-4 h-4 text-primary" />
-                        <span>Due {new Date(goal.dueDate).toLocaleDateString()}</span>
+                        <span>Due {goal.dueDate}</span>
                       </div>
                       <div className={`flex items-center gap-2 ${
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                       }`}>
                         <Link2 className="w-4 h-4 text-primary" />
-                        <span>{goal.linkedContent?.length || 0} linked resources</span>
+                        <span>{goal.linkedContent.length} linked resources</span>
                       </div>
                       <div 
                         onClick={() => handleLinkPodcast(goal.id)}
@@ -112,42 +162,44 @@ const UpcomingGoalsList = ({ status }: GoalsListProps) => {
                 </div>
               </div>
 
-              {goal.linkedContent && goal.linkedContent.length > 0 && (
+              {goal.linkedContent.length > 0 && (
                 <div className={`mt-6 pt-6 border-t ${
                   theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
-                }`}>
+                } overflow-hidden`}>
                   <h4 className={`text-sm font-medium mb-3 ${
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                   }`}>Linked Content</h4>
-                  <div className="flex gap-4 overflow-x-auto pb-2">
-                    {goal.linkedContent.map((content) => (
-                      <div
-                        key={content.id}
-                        className="flex-none w-[280px] group cursor-pointer"
-                        onClick={() => handleContentClick(content.id)}
-                      >
-                        <div className="relative aspect-video rounded-lg overflow-hidden mb-2">
-                          <img
-                            src={content.thumbnailUrl}
-                            alt={content.title}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <PlayCircle className="w-8 h-8 text-white" />
+                  <div className="overflow-hidden" ref={carouselRefs[index][0]}>
+                    <div className="flex gap-4">
+                      {goal.linkedContent.map((content) => (
+                        <div
+                          key={content.id}
+                          className="flex-none w-[280px] group cursor-pointer"
+                          onClick={() => navigate(`/dashboard/feedvideo/${content.id}`)}
+                        >
+                          <div className="relative aspect-video rounded-lg overflow-hidden mb-2">
+                            <img
+                              src={content.image}
+                              alt={content.title}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <PlayCircle className="w-8 h-8 text-white" />
+                            </div>
+                          </div>
+                          <p className={`text-sm truncate ${
+                            theme === 'dark' ? 'text-white' : 'text-gray-900'
+                          }`}>{content.title}</p>
+                          <p className={`text-xs capitalize ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>{content.type}</p>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                            <Clock className="w-3 h-3" />
+                            <span>15:30</span>
                           </div>
                         </div>
-                        <p className={`text-sm truncate ${
-                          theme === 'dark' ? 'text-white' : 'text-gray-900'
-                        }`}>{content.title}</p>
-                        <p className={`text-xs capitalize ${
-                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                        }`}>{content.contentType}</p>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
-                          <Clock className="w-3 h-3" />
-                          <span>15:30</span>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

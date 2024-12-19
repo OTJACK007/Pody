@@ -1,33 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Progress, Input, Textarea, Card, CardBody } from "@nextui-org/react";
 import { Target, Calendar, Clock, BarChart2, Link2, PlayCircle, Rocket } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
-import { useGoals } from '../../../../contexts/GoalsContext';
-import { updateGoal, updateGoalProgress } from '../../../../services/goals';
 
 interface GoalDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   isUpcoming?: boolean;
   goal: {
-    id: string;
+    id: number;
     title: string;
     description: string;
     category: string;
     progress: number;
     dueDate: string;
     linkedContent: Array<{
-      id: string;
+      id: number;
       title: string;
-      contentType: string;
-      thumbnailUrl: string;
+      type: string;
+      image: string;
     }>;
   };
 }
 
 const GoalDetailsModal = ({ isOpen, onClose, goal, isUpcoming = false }: GoalDetailsModalProps) => {
   const { theme } = useTheme();
-  const { refreshGoals } = useGoals();
   const [progress, setProgress] = useState(goal.progress);
   const [title, setTitle] = useState(goal.title);
   const [description, setDescription] = useState(goal.description);
@@ -36,55 +33,28 @@ const GoalDetailsModal = ({ isOpen, onClose, goal, isUpcoming = false }: GoalDet
   const [isActivating, setIsActivating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    setProgress(goal.progress);
-    setTitle(goal.title);
-    setDescription(goal.description);
-  }, [goal]);
-
   const handleUpdateProgress = async () => {
     setIsUpdating(true);
-    try {
-      await updateGoalProgress(goal.id, progress, notes);
-      await refreshGoals();
-      onClose();
-    } catch (error) {
-      console.error('Error updating progress:', error);
-    } finally {
-      setIsUpdating(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsUpdating(false);
+    onClose();
   };
 
   const handleMakeActive = async () => {
     setIsActivating(true);
-    try {
-      await updateGoal(goal.id, {
-        status: 'active',
-        startDate: new Date()
-      });
-      await refreshGoals();
-      onClose();
-    } catch (error) {
-      console.error('Error activating goal:', error);
-    } finally {
-      setIsActivating(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsActivating(false);
+    onClose();
   };
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
-    try {
-      await updateGoal(goal.id, {
-        title,
-        description
-      });
-      await refreshGoals();
-      onClose();
-    } catch (error) {
-      console.error('Error saving changes:', error);
-    } finally {
-      setIsSaving(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsSaving(false);
+    onClose();
   };
 
   const timeLeft = () => {
@@ -120,6 +90,7 @@ const GoalDetailsModal = ({ isOpen, onClose, goal, isUpcoming = false }: GoalDet
           </div>
         </ModalHeader>
         <ModalBody>
+          {/* Title and Description */}
           <div className="space-y-4">
             <Input
               label="Goal Title"
@@ -130,7 +101,6 @@ const GoalDetailsModal = ({ isOpen, onClose, goal, isUpcoming = false }: GoalDet
                 inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
               }}
             />
-
             <Textarea
               label="Goal Description"
               value={description}
@@ -140,123 +110,126 @@ const GoalDetailsModal = ({ isOpen, onClose, goal, isUpcoming = false }: GoalDet
                 inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
               }}
             />
+          </div>
 
-            <div className="space-y-6">
-              <div>
-                <h3 className={`text-lg font-semibold mb-4 ${
-                  theme === 'dark' ? 'text-white' : 'text-gray-900'
-                }`}>Update Progress</h3>
-                <div className="flex items-center gap-4 mb-4">
-                  <Input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={progress}
-                    onChange={(e) => setProgress(Number(e.target.value))}
-                    startContent={<BarChart2 className="w-4 h-4 text-gray-400" />}
-                    endContent="%"
-                    classNames={{
-                      input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
-                      inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
-                    }}
-                  />
-                  <Progress 
-                    value={progress} 
-                    color="success"
-                    className="max-w-md"
-                  />
-                </div>
-                <Textarea
-                  label="Progress Notes"
-                  placeholder="Add notes about your progress..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
+          <div className="space-y-6">
+            {/* Progress Update */}
+            <div>
+              <h3 className={`text-lg font-semibold mb-4 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>Update Progress</h3>
+              <div className="flex items-center gap-4 mb-4">
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={progress}
+                  onChange={(e) => setProgress(Number(e.target.value))}
+                  startContent={<BarChart2 className="w-4 h-4 text-gray-400" />}
+                  endContent="%"
                   classNames={{
                     input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
                     inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
+                <Progress 
+                  value={progress} 
+                  color="success"
+                  className="max-w-md"
+                />
               </div>
+              <Textarea
+                label="Progress Notes"
+                placeholder="Add notes about your progress..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                classNames={{
+                  input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+                  inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
+                }}
+              />
+            </div>
 
-              <Card className={`${
-                theme === 'dark' 
-                  ? 'bg-gray-700/50 border-gray-600' 
-                  : 'bg-gray-50 border-gray-200'
-              } border`}>
-                <CardBody className="p-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-primary" />
-                      <div>
-                        <p className={`text-sm ${
-                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                        }`}>Due Date</p>
-                        <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                          {new Date(goal.dueDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-primary" />
-                      <div>
-                        <p className={`text-sm ${
-                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                        }`}>Time Left</p>
-                        <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                          {timeLeft()}
-                        </p>
-                      </div>
+            {/* Goal Info */}
+            <Card className={`${
+              theme === 'dark' 
+                ? 'bg-gray-700/50 border-gray-600' 
+                : 'bg-gray-50 border-gray-200'
+            } border`}>
+              <CardBody className="p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-primary" />
+                    <div>
+                      <p className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Due Date</p>
+                      <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                        {goal.dueDate}
+                      </p>
                     </div>
                   </div>
-                </CardBody>
-              </Card>
-
-              {goal.linkedContent && goal.linkedContent.length > 0 && (
-                <div>
-                  <h3 className={`text-lg font-semibold mb-4 ${
-                    theme === 'dark' ? 'text-white' : 'text-gray-900'
-                  }`}>Linked Resources</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {goal.linkedContent.map((content) => (
-                      <Card
-                        key={content.id}
-                        isPressable
-                        className={`${
-                          theme === 'dark'
-                            ? 'bg-gray-700/50 border-gray-600'
-                            : 'bg-white border-gray-200'
-                        } border`}
-                      >
-                        <CardBody className="p-4">
-                          <div className="flex gap-4">
-                            <div className="relative flex-shrink-0">
-                              <div className="w-24 aspect-video rounded-lg overflow-hidden">
-                                <img
-                                  src={content.thumbnailUrl}
-                                  alt={content.title}
-                                  className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                                  <PlayCircle className="w-6 h-6 text-white" />
-                                </div>
-                              </div>
-                            </div>
-                            <div>
-                              <p className={`font-medium ${
-                                theme === 'dark' ? 'text-white' : 'text-gray-900'
-                              }`}>{content.title}</p>
-                              <p className={`text-sm capitalize ${
-                                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                              }`}>{content.contentType}</p>
-                            </div>
-                          </div>
-                        </CardBody>
-                      </Card>
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-primary" />
+                    <div>
+                      <p className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Time Left</p>
+                      <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                        {timeLeft()}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </CardBody>
+            </Card>
+
+            {/* Linked Content */}
+            {goal.linkedContent.length > 0 && (
+              <div>
+                <h3 className={`text-lg font-semibold mb-4 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Linked Resources</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {goal.linkedContent.map((content) => (
+                    <Card
+                      key={content.id}
+                      isPressable
+                      className={`${
+                        theme === 'dark'
+                          ? 'bg-gray-700/50 border-gray-600'
+                          : 'bg-white border-gray-200'
+                      } border`}
+                    >
+                      <CardBody className="p-4">
+                        <div className="flex gap-4">
+                          <div className="relative flex-shrink-0">
+                            <div className="w-24 aspect-video rounded-lg overflow-hidden">
+                              <img
+                                src={content.image}
+                                alt={content.title}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <PlayCircle className="w-6 h-6 text-white" />
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <p className={`font-medium ${
+                              theme === 'dark' ? 'text-white' : 'text-gray-900'
+                            }`}>{content.title}</p>
+                            <p className={`text-sm capitalize ${
+                              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                            }`}>{content.type}</p>
+                          </div>
+                        </div>
+                      </CardBody>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </ModalBody>
         <ModalFooter>
