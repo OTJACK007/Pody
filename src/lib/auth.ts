@@ -1,7 +1,12 @@
 import { supabase } from './supabase';
-import type { SignUpData, SignInData, Profile } from '../types/auth';
+import type { SignUpData, SignInData } from '../types/auth';
 
 export const signIn = async ({ email, password }: SignInData) => {
+  // Vérifier que les champs ne sont pas vides
+  if (!email || !password) {
+    throw new Error('Email and password are required');
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
@@ -14,16 +19,32 @@ export const signIn = async ({ email, password }: SignInData) => {
     throw error;
   }
 
-  return { data };
+  // Vérifier que l'utilisateur existe dans la table profiles
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', data.user.id)
+    .single();
+
+  if (profileError) {
+    throw new Error('User profile not found');
+  }
+
+  return { data, error: null, profile };
 };
 
 export const signUp = async ({ email, password, fullname }: SignUpData) => {
+  // Vérifier que les champs ne sont pas vides
+  if (!email || !password || !fullname) {
+    throw new Error('All fields are required');
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
-        fullname,
+        full_name: fullname,
       }
     }
   });
@@ -35,7 +56,7 @@ export const signUp = async ({ email, password, fullname }: SignUpData) => {
     throw error;
   }
 
-  return { data };
+  return { data, error: null };
 };
 
 export const signOut = async () => {
@@ -43,7 +64,7 @@ export const signOut = async () => {
   if (error) throw error;
 };
 
-export const getProfile = async (userId: string): Promise<Profile | null> => {
+export const getProfile = async (userId: string) => {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -52,4 +73,19 @@ export const getProfile = async (userId: string): Promise<Profile | null> => {
 
   if (error) throw error;
   return data;
+};
+
+export const isAdmin = async (userId: string): Promise<boolean> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('Error checking admin status:', error);
+    return false;
+  }
+
+  return data?.role === 'admin';
 };
