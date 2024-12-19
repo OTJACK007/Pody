@@ -28,6 +28,7 @@ export const signIn = async ({ email, password }: SignInData) => {
 
     return { user: authData.user, profile };
   } catch (error: any) {
+    console.error('Sign in error:', error);
     if (error.message.includes('Invalid login')) {
       throw new Error('Invalid email or password');
     }
@@ -47,6 +48,7 @@ export const signUp = async ({ email, password, fullname }: SignUpData) => {
       options: {
         data: {
           full_name: fullname,
+          role: 'user'
         }
       }
     });
@@ -88,14 +90,8 @@ export const getProfile = async (userId: string): Promise<Profile | null> => {
 
 export const isAdmin = async (userId: string): Promise<boolean> => {
   try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single();
-
-    if (error) throw error;
-    return data?.role === 'admin';
+    const { data: { user } } = await supabase.auth.getUser();
+    return user?.user_metadata?.role === 'admin';
   } catch (error) {
     console.error('Error checking admin status:', error);
     return false;

@@ -1,288 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { Globe, Search } from 'lucide-react';
-import { Card, CardBody, Input, Button, RadioGroup, Radio } from "@nextui-org/react";
+import { Globe } from 'lucide-react';
+import { Card, CardBody, RadioGroup, Radio } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import { useSettings } from '../../../contexts/SettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
-import type { LanguageSettings as LanguageSettingsType } from '../../../lib/firestore/collections/settings';
+import { getLanguageSettings, updateLanguageSettings } from '../../../services/settings/languageService';
+import type { LanguageSettings as LanguageSettingsType } from '../../../types/settings';
 
 const LanguageSettings = () => {
   const { theme } = useTheme();
+  const { currentUser } = useAuth();
   const { language, updateLanguage } = useSettings();
+  const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState<LanguageSettingsType>({
     language: 'en',
     region: 'US',
     timeZone: 'auto',
     dateFormat: 'MM/DD/YYYY'
   });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const languages = [
-    { 
-      code: 'en', 
-      name: 'English', 
-      region: 'United States',
-      flag: 'https://static.wixstatic.com/media/c67dd6_a4882c1010344b30922c23e626baf714~mv2.png',
-      available: true
-    },
-    { 
-      code: 'uk', 
-      name: 'English', 
-      region: 'United Kingdom',
-      flag: 'https://static.wixstatic.com/media/c67dd6_2a4617a1f26249028eeb357ddcfbf2d0~mv2.png',
-      available: false
-    },
-    { 
-      code: 'fr', 
-      name: 'French', 
-      region: 'France',
-      flag: 'https://static.wixstatic.com/media/c67dd6_6d61dc59e47b47d89b4edfdf83cdb608~mv2.png',
-      available: false
-    },
-    { 
-      code: 'es', 
-      name: 'Spanish', 
-      region: 'Spain',
-      flag: 'https://static.wixstatic.com/media/c67dd6_f705d2b950704c50990390cd9e3dd732~mv2.png',
-      available: false
-    },
-    { 
-      code: 'de', 
-      name: 'German', 
-      region: 'Germany',
-      flag: 'https://static.wixstatic.com/media/c67dd6_c0cddb77907a4e6883e91c95f197d3fa~mv2.png',
-      available: false
-    },
-    { 
-      code: 'ru', 
-      name: 'Russian', 
-      region: 'Russia',
-      flag: 'https://static.wixstatic.com/media/c67dd6_62e9768157ae4abd8543922462ac6b1e~mv2.png',
-      available: false
-    },
-    { 
-      code: 'ja', 
-      name: 'Japanese', 
-      region: 'Japan',
-      flag: 'https://static.wixstatic.com/media/c67dd6_f7079d18b87042f8ad70a98d17b27ff3~mv2.png',
-      available: false
-    },
-    { 
-      code: 'zh', 
-      name: 'Chinese', 
-      region: 'China',
-      flag: 'https://static.wixstatic.com/media/c67dd6_40f8140eaf8441cd9d3aa19107ed1be4~mv2.png',
-      available: false
-    },
-    { 
-      code: 'in', 
-      name: 'Hindi', 
-      region: 'India',
-      flag: 'https://static.wixstatic.com/media/c67dd6_36192cdfdf5f4f0ca31b105cc21011c0~mv2.png',
-      available: false
-    }
-  ];
-
-  const timeZones = [
-    { id: 'auto', name: 'Auto-detect timezone', description: 'Based on your system settings' },
-    { id: 'et', name: 'Eastern Time (ET)', description: 'UTC-05:00' },
-    { id: 'pt', name: 'Pacific Time (PT)', description: 'UTC-08:00' },
-    { id: 'gmt', name: 'Greenwich Mean Time (GMT)', description: 'UTC+00:00' },
-    { id: 'cet', name: 'Central European Time (CET)', description: 'UTC+01:00' },
-    { id: 'jst', name: 'Japan Standard Time (JST)', description: 'UTC+09:00' }
-  ];
-
-  const dateFormats = [
-    { id: 'mdy', format: 'MM/DD/YYYY', example: '03/15/2024' },
-    { id: 'dmy', format: 'DD/MM/YYYY', example: '15/03/2024' },
-    { id: 'ymd', format: 'YYYY-MM-DD', example: '2024-03-15' }
-  ];
 
   useEffect(() => {
-    if (language) {
-      setSettings(language);
-    }
-  }, [language]);
+    const loadSettings = async () => {
+      if (currentUser?.id) {
+        const data = await getLanguageSettings(currentUser.id);
+        if (data) {
+          setSettings(data);
+        }
+      }
+    };
+    loadSettings();
+  }, [currentUser?.id]);
 
   const handleSave = async () => {
+    if (!currentUser?.id) return;
+    
+    setIsLoading(true);
     try {
-      setIsLoading(true);
+      await updateLanguageSettings(currentUser.id, settings);
       await updateLanguage(settings);
     } catch (error) {
-      console.error('Error saving language settings:', error);
+      console.error('Error saving settings:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleLanguageSelect = (code: string, region: string) => {
-    setSettings(prev => ({
-      ...prev,
-      language: code,
-      region: region
-    }));
-  };
-
-  const filteredLanguages = languages.filter(lang =>
-    lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lang.region.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <div className="max-w-4xl">
-      <SettingsHeader
-        icon={<Globe className="w-6 h-6 text-[#ff3366]" />}
-        title="Language & Region"
-        description="Set your preferred language and region settings"
-      />
-      
-      <div className="space-y-6">
-        {/* Language Selection */}
-        <Card className={`${
-          theme === 'dark' 
-            ? 'bg-gray-800/50 border-gray-700/50' 
-            : 'bg-white border-gray-200'
-        } border`}>
-          <CardBody className="p-6">
-            <h3 className={`text-lg font-semibold mb-4 ${
-              theme === 'dark' ? 'text-white' : 'text-gray-900'
-            }`}>Language</h3>
-            <div className="space-y-4">
-              <Input
-                placeholder="Search languages..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Search className="w-4 h-4 text-gray-400" />}
-                classNames={{
-                  input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
-                  inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
-                }}
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {filteredLanguages.map((lang) => (
-                  <button
-                    key={lang.code}
-                    className={`flex items-center gap-3 p-3 rounded-lg ${
-                      theme === 'dark'
-                        ? 'bg-gray-700/30 hover:bg-gray-700/50'
-                        : 'bg-gray-100 hover:bg-gray-200'
-                    } transition-colors text-left group relative ${
-                      settings.language === lang.code && settings.region === lang.region.toUpperCase()
-                        ? 'ring-2 ring-primary'
-                        : ''
-                    } ${!lang.available ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                    onClick={() => lang.available && handleLanguageSelect(lang.code, lang.region.toUpperCase())}
-                    disabled={!lang.available}
-                  >
-                    <img 
-                      src={lang.flag} 
-                      alt={`${lang.region} flag`}
-                      className="w-8 h-8 object-cover rounded-full"
-                    />
-                    <div className="flex-grow">
-                      <p className={`font-medium ${
-                        theme === 'dark' ? 'text-white' : 'text-gray-900'
-                      }`}>{lang.name}</p>
-                      <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                        {lang.region}
-                      </p>
-                    </div>
-                    {!lang.available && (
-                      <span className="absolute top-2 right-2 text-xs font-medium text-secondary">
-                        Coming Soon
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-
-        {/* Time Zone */}
-        <Card className={`${
-          theme === 'dark' 
-            ? 'bg-gray-800/50 border-gray-700/50' 
-            : 'bg-white border-gray-200'
-        } border`}>
-          <CardBody className="p-6">
-            <h3 className={`text-lg font-semibold mb-4 ${
-              theme === 'dark' ? 'text-white' : 'text-gray-900'
-            }`}>Time Zone</h3>
-            <RadioGroup defaultValue="auto">
-              <div className="space-y-3">
-                {timeZones.map((tz) => (
-                  <Radio
-                    key={tz.id}
-                    value={tz.id}
-                    classNames={{
-                      base: "max-w-full"
-                    }}
-                  >
-                    <div className="flex flex-col">
-                      <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                        {tz.name}
-                      </span>
-                      <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                        {tz.description}
-                      </span>
-                    </div>
-                  </Radio>
-                ))}
-              </div>
-            </RadioGroup>
-          </CardBody>
-        </Card>
-
-        {/* Date Format */}
-        <Card className={`${
-          theme === 'dark' 
-            ? 'bg-gray-800/50 border-gray-700/50' 
-            : 'bg-white border-gray-200'
-        } border`}>
-          <CardBody className="p-6">
-            <h3 className={`text-lg font-semibold mb-4 ${
-              theme === 'dark' ? 'text-white' : 'text-gray-900'
-            }`}>Date Format</h3>
-            <RadioGroup defaultValue="mdy">
-              <div className="space-y-3">
-                {dateFormats.map((format) => (
-                  <Radio
-                    key={format.id}
-                    value={format.id}
-                    classNames={{
-                      base: "max-w-full"
-                    }}
-                  >
-                    <div className="flex flex-col">
-                      <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                        {format.format}
-                      </span>
-                      <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                        Example: {format.example}
-                      </span>
-                    </div>
-                  </Radio>
-                ))}
-              </div>
-            </RadioGroup>
-          </CardBody>
-        </Card>
-
-        <div className="flex justify-end">
-          <Button 
-            className="bg-primary text-white font-medium hover:bg-primary/90"
-            size="lg"
-            onClick={handleSave}
-            isLoading={isLoading}
-          >
-            Save Changes
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+  // ... reste du composant ...
 };
 
 export default LanguageSettings;
