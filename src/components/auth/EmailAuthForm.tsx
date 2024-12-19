@@ -53,13 +53,15 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
         
         setIsVerificationSent(true);
       } else {
-        await signIn({
+        const { user } = await signIn({
           email: formData.email,
           password: formData.password
         });
-        
-        await refreshProfile();
-        navigate('/dashboard/livespace');
+
+        if (user) {
+          await refreshProfile();
+          navigate('/dashboard/livespace', { replace: true });
+        }
       }
     } catch (error: any) {
       console.error('Auth error:', error);
