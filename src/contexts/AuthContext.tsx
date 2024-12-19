@@ -1,101 +1,142 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import type { Profile } from '../types/auth';
-import { getProfile } from '../lib/auth';
+import { createUserSettings, createDefaultSocialAccounts, getUserSettings } from '../lib/database';
+import { defaultSettings } from '../lib/defaultSettings';
+import { useNavigate } from 'react-router-dom';
+import { signInWithEmail, signUpWithEmail, signInWithGoogle, signOut } from '../lib/auth';
 
 interface AuthContextType {
   currentUser: User | null;
-  profile: Profile | null;
   loading: boolean;
-  error: Error | null;
-  refreshProfile: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
   const navigate = useNavigate();
 
-  const refreshProfile = async () => {
-    if (!currentUser) return;
-    try {
-      const profile = await getProfile(currentUser.id);
-      setProfile(profile);
-    } catch (error) {
-      console.error('Error refreshing profile:', error);
-      setError(error as Error);
-    }
-  };
-
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setCurrentUser(session.user);
-          const profile = await getProfile(session.user.id);
-          setProfile(profile);
-          navigate('/dashboard/livespace', { replace: true });
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error);
-        setError(error as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session); // Debug log
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        setCurrentUser(session.user);
-        try {
-          const profile = await getProfile(session.user.id);
-          setProfile(profile);
-          navigate('/dashboard/livespace', { replace: true });
-        } catch (error) {
-          console.error('Error loading profile:', error);
-          setError(error as Error);
-        }
-      } else if (event === 'SIGNED_OUT') {
-        setCurrentUser(null);
-        setProfile(null);
-        navigate('/', { replace: true });
-      }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setCurrentUser(session?.user || null);
       setLoading(false);
     });
 
     return () => {
       subscription.unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData?.session?.user) {
+          const user = sessionData.session.user;
+          const existingSettings = await getUserSettings(user.id);
+          
+          if (!existingSettings) {
+            const firstName = user.user_metadata?.first_name || '';
+            const lastName = user.user_metadata?.last_name || '';
+            
+            // Get user profile to check role
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', user.id)
+              .single();
+            
+            const settings = {
+              ...defaultSettings,
+              firstName,
+              lastName,
+              email: user.email || '',
+              role: profile?.role || 'user',
+              profilePicture: 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png'
+            };
+
+            await createUserSettings(user.id, settings);
+            await createDefaultSocialAccounts(user.id);
+          }
+        }
+      } catch (error) {
+        console.error('Error handling redirect result:', error);
+      }
+    };
+
+    handleRedirectResult();
   }, [navigate]);
 
+  const signIn = async (email: string, password: string) => {
+    await signInWithEmail(email, password);
+  };
+
+  const signUp = async (email: string, password: string, fullName: string) => {
+    const { data } = await signUpWithEmail(email, password, fullName);
+    const user = data?.user;
+    if (!user) throw new Error('Failed to create user account');
+
+    const [firstName, ...lastNameParts] = fullName.trim().split(' ');
+    const lastName = lastNameParts.join(' ');
+    
+    const settings = {
+      ...defaultSettings,
+      firstName,
+      lastName,
+      email,
+      role: 'user',
+      profilePicture: 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png',
+    };
+
+    try {
+      await createUserSettings(user.id, settings);
+    } catch (error) {
+      console.error('Error creating user settings:', error);
+      throw error;
+    }
+    // Return without navigating - user needs to verify email first
+    return;
+  };
+
+  const handleSignInWithGoogle = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+      throw error;
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const value = {
+    currentUser,
+    loading,
+    signIn,
+    signUp,
+    signInWithGoogle: handleSignInWithGoogle,
+    logout: handleSignOut
+  };
+
   return (
-    <AuthContext.Provider value={{
-      currentUser,
-      profile,
-      loading,
-      error,
-      refreshProfile
-    }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };
