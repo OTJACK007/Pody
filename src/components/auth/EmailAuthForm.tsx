@@ -5,7 +5,6 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { signIn, signUp } from '../../lib/auth';
 import { validateEmail, validatePassword, validateFullName } from '../../utils/validation';
 import type { AuthMode } from '../../types';
-import { useNavigate } from 'react-router-dom';
 
 interface EmailAuthFormProps {
   mode: AuthMode;
@@ -14,7 +13,6 @@ interface EmailAuthFormProps {
 
 const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
   const { theme } = useTheme();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isVerificationSent, setIsVerificationSent] = useState(false);
@@ -43,22 +41,18 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
           throw new Error('Please enter your full name');
         }
 
-        const { error: signUpError } = await signUp({
+        await signUp({
           email: formData.email,
           password: formData.password,
           fullname: formData.fullname
         });
         
-        if (signUpError) throw signUpError;
         setIsVerificationSent(true);
       } else {
-        const { error: signInError } = await signIn({
+        await signIn({
           email: formData.email,
           password: formData.password
         });
-
-        if (signInError) throw signInError;
-        navigate('/dashboard/livespace');
       }
     } catch (error: any) {
       console.error('Auth error:', error);

@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { SignUpData, SignInData } from '../types/auth';
+import type { SignUpData, SignInData, Profile } from '../types/auth';
 
 export const signIn = async ({ email, password }: SignInData) => {
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -14,7 +14,7 @@ export const signIn = async ({ email, password }: SignInData) => {
     throw error;
   }
 
-  return { data, error: null };
+  return { data };
 };
 
 export const signUp = async ({ email, password, fullname }: SignUpData) => {
@@ -23,7 +23,7 @@ export const signUp = async ({ email, password, fullname }: SignUpData) => {
     password,
     options: {
       data: {
-        full_name: fullname,
+        fullname,
       }
     }
   });
@@ -35,7 +35,7 @@ export const signUp = async ({ email, password, fullname }: SignUpData) => {
     throw error;
   }
 
-  return { data, error: null };
+  return { data };
 };
 
 export const signOut = async () => {
@@ -43,7 +43,7 @@ export const signOut = async () => {
   if (error) throw error;
 };
 
-export const getProfile = async (userId: string) => {
+export const getProfile = async (userId: string): Promise<Profile | null> => {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
