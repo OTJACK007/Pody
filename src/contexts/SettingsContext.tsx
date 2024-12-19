@@ -44,10 +44,10 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshSettings = async () => {
-    if (!currentUser?.uid) return;
-
+    if (!currentUser?.id) return;
+    
     try {
-      const settings = await getUserSettings(currentUser.uid);
+      const settings = await getUserSettings(currentUser.id);
       if (settings) {
         setAppearance(settings.appearance);
         setNotifications(settings.notifications);
@@ -67,16 +67,16 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
       setIsLoading(false);
     };
 
-    if (currentUser?.uid) {
+    if (currentUser?.id) {
       loadSettings();
     }
   }, [currentUser]);
 
   const updateAppearance = async (settings: AppearanceSettings) => {
-    if (!currentUser?.uid) return;
+    if (!currentUser?.id) return;
     
     try {
-      await updateUserSettings(currentUser.uid, { appearance: settings });
+      await updateUserSettings(currentUser.id, { appearance: settings });
       setAppearance(settings);
     } catch (error) {
       console.error('Error updating appearance settings:', error);
@@ -85,10 +85,10 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   const updateNotifications = async (settings: NotificationSettings) => {
-    if (!currentUser?.uid) return;
+    if (!currentUser?.id) return;
     
     try {
-      await updateUserSettings(currentUser.uid, { notifications: settings });
+      await updateUserSettings(currentUser.id, { notifications: settings });
       setNotifications(settings);
     } catch (error) {
       console.error('Error updating notification settings:', error);
@@ -97,10 +97,10 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   const updatePrivacy = async (settings: PrivacySettings) => {
-    if (!currentUser?.uid) return;
+    if (!currentUser?.id) return;
     
     try {
-      await updateUserSettings(currentUser.uid, { privacy: settings });
+      await updateUserSettings(currentUser.id, { privacy: settings });
       setPrivacy(settings);
     } catch (error) {
       console.error('Error updating privacy settings:', error);
@@ -109,10 +109,10 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   const updateLanguage = async (settings: LanguageSettings) => {
-    if (!currentUser?.uid) return;
+    if (!currentUser?.id) return;
     
     try {
-      await updateUserSettings(currentUser.uid, { language: settings });
+      await updateUserSettings(currentUser.id, { language: settings });
       setLanguage(settings);
     } catch (error) {
       console.error('Error updating language settings:', error);
@@ -121,10 +121,10 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   const updateBilling = async (settings: BillingSettings) => {
-    if (!currentUser?.uid) return;
+    if (!currentUser?.id) return;
     
     try {
-      await updateUserSettings(currentUser.uid, { billing: settings });
+      await updateUserSettings(currentUser.id, { billing: settings });
       setBilling(settings);
     } catch (error) {
       console.error('Error updating billing settings:', error);

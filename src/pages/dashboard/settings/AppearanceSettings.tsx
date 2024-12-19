@@ -9,7 +9,7 @@ const AppearanceSettings = () => {
   const { theme, toggleTheme } = useTheme();
   const { appearance, updateAppearance, isLoading } = useSettings();
   const [selectedTheme, setSelectedTheme] = useState(theme);
-  const [selectedColor, setSelectedColor] = useState(appearance?.colorScheme || '#ff3366');
+  const [selectedColor, setSelectedColor] = useState('#ff3366');
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {

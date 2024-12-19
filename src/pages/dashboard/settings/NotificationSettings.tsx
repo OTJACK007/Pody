@@ -10,7 +10,42 @@ const NotificationSettings = () => {
   const { theme } = useTheme();
   const { notifications, updateNotifications } = useSettings();
   const [isLoading, setIsLoading] = useState(false);
-  const [settings, setSettings] = useState<NotificationSettingsType>({
+  const defaultSettings: NotificationSettingsType = {
+    browser: true,
+    categories: {},
+    content: {
+      'new-episodes': true,
+      recommendations: true,
+      trending: true
+    },
+    social: {
+      follows: true,
+      mentions: true,
+      replies: true
+    },
+    system: {
+      maintenance: false,
+      security: true,
+      updates: true,
+      email: true,
+      emailFrequency: 'immediate',
+      mobile: false,
+      quietHours: {
+        enabled: false,
+        end: '07:00',
+        start: '22:00',
+        sound: true
+      }
+    },
+    quietHours: {
+      enabled: false,
+      start: '22:00',
+      end: '07:00',
+      sound: true
+    }
+  };
+
+  const [localSettings, setLocalSettings] = useState<NotificationSettingsType>({
     browser: true,
     categories: {},
     content: {
@@ -47,7 +82,7 @@ const NotificationSettings = () => {
 
   useEffect(() => {
     if (notifications) {
-      setSettings(notifications);
+      setLocalSettings(notifications);
     }
   }, [notifications]);
 
@@ -91,16 +126,18 @@ const NotificationSettings = () => {
   const handleSave = async () => {
     try {
       setIsLoading(true);
-      await updateNotifications(settings);
+      await updateNotifications(localSettings);
+      alert('Notification settings updated successfully!');
     } catch (error) {
       console.error('Error saving notification settings:', error);
+      alert('Error updating notification settings. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleToggle = (key: string, value: boolean) => {
-    setSettings(prev => ({
+  const handleContentToggle = (key: string, value: boolean) => {
+    setLocalSettings(prev => ({
       ...prev,
       content: {
         ...prev.content,
@@ -109,8 +146,28 @@ const NotificationSettings = () => {
     }));
   };
 
+  const handleSocialToggle = (key: string, value: boolean) => {
+    setLocalSettings(prev => ({
+      ...prev,
+      social: {
+        ...prev.social,
+        [key]: value
+      }
+    }));
+  };
+
+  const handleSystemToggle = (key: string, value: boolean) => {
+    setLocalSettings(prev => ({
+      ...prev,
+      system: {
+        ...prev.system,
+        [key]: value
+      }
+    }));
+  };
+
   const handleEmailFrequencyChange = (value: string) => {
-    setSettings(prev => ({
+    setLocalSettings(prev => ({
       ...prev,
       system: {
         ...prev.system,
@@ -120,7 +177,7 @@ const NotificationSettings = () => {
   };
 
   const handleQuietHoursChange = (key: string, value: string | boolean) => {
-    setSettings(prev => ({
+    setLocalSettings(prev => ({
       ...prev,
       quietHours: {
         ...prev.quietHours,
@@ -164,7 +221,7 @@ const NotificationSettings = () => {
                   </div>
                 </div>
                 <Select
-                  selectedKeys={[settings?.system?.emailFrequency || 'immediate']}
+                  selectedKeys={[localSettings.system.emailFrequency]}
                   onChange={(e) => handleEmailFrequencyChange(e.target.value)}
                   className="max-w-xs"
                   size="sm"
@@ -194,8 +251,8 @@ const NotificationSettings = () => {
                   </div>
                 </div>
                 <Switch
-                  isSelected={settings?.browser ?? true}
-                  onValueChange={(value) => setSettings(prev => ({ ...prev, browser: value }))}
+                  isSelected={localSettings.browser}
+                  onValueChange={(value) => setLocalSettings(prev => ({ ...prev, browser: value }))}
                   color="success"
                 />
               </div>
@@ -217,8 +274,8 @@ const NotificationSettings = () => {
                   </div>
                 </div>
                 <Switch
-                  isSelected={settings?.system?.mobile ?? false}
-                  onValueChange={(value) => setSettings(prev => ({
+                  isSelected={localSettings.system.mobile}
+                  onValueChange={(value) => setLocalSettings(prev => ({
                     ...prev,
                     system: { ...prev.system, mobile: value }
                   }))}
@@ -243,8 +300,8 @@ const NotificationSettings = () => {
                   </div>
                 </div>
                 <Switch
-                  isSelected={settings?.system?.quietHours?.sound ?? true}
-                  onValueChange={(value) => setSettings(prev => ({
+                  isSelected={localSettings.system.quietHours.sound}
+                  onValueChange={(value) => setLocalSettings(prev => ({
                     ...prev,
                     system: {
                       ...prev.system,
@@ -282,8 +339,8 @@ const NotificationSettings = () => {
                         </p>
                       </div>
                       <Switch
-                        isSelected={settings?.content?.[item.id as keyof typeof settings.content] ?? true}
-                        onValueChange={(value) => setSettings(prev => ({
+                        isSelected={localSettings.content[item.id as keyof typeof localSettings.content]}
+                        onValueChange={(value) => setLocalSettings(prev => ({
                           ...prev,
                           content: { ...prev.content, [item.id]: value }
                         }))}
@@ -317,7 +374,7 @@ const NotificationSettings = () => {
                 </p>
               </div>
               <Switch
-                isSelected={settings?.system?.quietHours?.enabled ?? false}
+                isSelected={localSettings.system.quietHours.enabled}
                 onValueChange={(value) => handleQuietHoursChange('enabled', value)}
                 color="success"
               />
@@ -329,7 +386,7 @@ const NotificationSettings = () => {
                 }`}>Start Time</label>
                 <input
                   type="time"
-                  value={settings?.system?.quietHours?.start || '22:00'}
+                  value={localSettings.system.quietHours.start}
                   onChange={(e) => handleQuietHoursChange('start', e.target.value)}
                   className={`w-full px-4 py-2 rounded-lg focus:ring-1 focus:ring-primary outline-none ${
                     theme === 'dark'
@@ -344,7 +401,7 @@ const NotificationSettings = () => {
                 }`}>End Time</label>
                 <input
                   type="time"
-                  value={settings?.system?.quietHours?.end || '07:00'}
+                  value={localSettings.system.quietHours.end}
                   onChange={(e) => handleQuietHoursChange('end', e.target.value)}
                   className={`w-full px-4 py-2 rounded-lg focus:ring-1 focus:ring-primary outline-none ${
                     theme === 'dark'
@@ -361,7 +418,7 @@ const NotificationSettings = () => {
           <Button 
             color="danger" 
             variant="flat"
-            onClick={() => setSettings(notifications || settings)}
+            onClick={() => setLocalSettings(defaultSettings)}
           >
             Reset to Default
           </Button>

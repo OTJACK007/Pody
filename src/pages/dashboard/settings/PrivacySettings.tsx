@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Lock, Smartphone, QrCode, Key, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Card, CardBody, Input, Button, Switch, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
+import { supabase } from '../../../lib/supabase';
+import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useSettings } from '../../../contexts/SettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
@@ -10,6 +12,7 @@ const PrivacySettings = () => {
   const [showQRModal, setShowQRModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const { currentUser } = useAuth();
   const { privacy, updatePrivacy } = useSettings();
   const [settings, setSettings] = useState<PrivacySettingsType>({
     password_authentication: {
@@ -69,23 +72,65 @@ const PrivacySettings = () => {
   };
 
   const handlePasswordChange = async () => {
+    if (!currentPassword) {
+      alert('Please enter your current password');
+      return;
+    }
+    
+    if (!currentUser?.email) {
+      alert('No user email found');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    if (passwordStrength < 75) {
+      alert('Please choose a stronger password');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await updatePrivacy({
+      // First verify current password
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: currentUser?.email || '',
+        password: currentPassword
+      });
+
+      if (signInError) {
+        throw new Error('Current password is incorrect');
+      }
+
+      // Update password
+      const { error: updateError } = await supabase.auth.updateUser({ 
+        password: newPassword
+      });
+
+      if (updateError) throw updateError;
+
+      // Update privacy settings
+      const updatedSettings = {
         ...settings,
         password_authentication: {
           ...settings.password_authentication,
           change_password: true
         }
-      });
+      };
+      
+      await updatePrivacy(updatedSettings);
       
       setIsLoading(false);
       setShowPasswordModal(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      alert('Password updated successfully!');
     } catch (error) {
       console.error('Error changing password:', error);
+      alert(error instanceof Error ? error.message : 'Error changing password. Please try again.');
     } finally {
       setIsLoading(false);
     }
