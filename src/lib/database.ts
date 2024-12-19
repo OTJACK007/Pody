@@ -108,7 +108,7 @@ export const updateUserSettings = async (userId: string, settings: Partial<UserS
           first_name: settings.firstName,
           last_name: settings.lastName,
           email: settings.email,
-          avatar_url: settings.profilePicture
+          profile_picture: settings.profilePicture
         })
         .eq('id', userId);
 

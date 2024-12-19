@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Building, Globe, Search } from 'lucide-react';
 import { Input, Button, Avatar, Card, CardBody, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
@@ -20,6 +20,7 @@ const AccountSettings = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedCountry, setSelectedCountry] = useState(countryCodes[0]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -32,36 +33,46 @@ const AccountSettings = () => {
   });
 
   useEffect(() => {
+    if (!currentUser?.id) return;
+
     const loadUserSettings = async () => {
-      if (currentUser?.id) {
-        try {
-          const [profile, settings] = await Promise.all([
-            getUserProfile(currentUser.id),
-            getUserSettings(currentUser.id)
-          ]);
+      try {
+        const [profile, settings] = await Promise.all([
+          getUserProfile(currentUser.id),
+          getUserSettings(currentUser.id)
+        ]);
 
-          if (profile && settings) {
-            const { professionalInfo } = settings;
-
-            setFormData({
-              fullName: profile.fullname || currentUser.user_metadata?.full_name || '',
-              email: profile.email || currentUser.email || '',
-              phoneNumber: profile.phone_number || selectedCountry.dial_code,
-              company: professionalInfo.company || '',
-              jobTitle: professionalInfo.jobTitle || '',
-              location: professionalInfo.location || '',
-              website: professionalInfo.website || '',
-              profilePicture: profile.profile_picture || currentUser.user_metadata?.avatar_url || ''
-            });
-          }
-        } catch (error) {
-          console.error('Error loading user settings:', error);
-          alert('Error loading settings. Please refresh the page.');
+        if (profile && settings) {
+          const { professionalInfo } = settings;
+          
+          setFormData({
+            fullName: profile.fullname || currentUser.user_metadata?.full_name || '',
+            email: profile.email || currentUser.email || '',
+            phoneNumber: profile.phone_number || selectedCountry.dial_code,
+            company: professionalInfo.company || '',
+            jobTitle: professionalInfo.jobTitle || '',
+            location: professionalInfo.location || '',
+            website: professionalInfo.website || '',
+            profilePicture: profile.profile_picture || currentUser.user_metadata?.avatar_url || ''
+          });
         }
+      } catch (error) {
+        console.error('Error loading user settings:', error);
+        alert('Error loading settings. Please refresh the page.');
       }
     };
+
     loadUserSettings();
-  }, [currentUser?.id, selectedCountry.dial_code]);
+  }, [currentUser?.id, selectedCountry?.dial_code, currentUser?.email, currentUser?.user_metadata?.full_name, currentUser?.user_metadata?.avatar_url]);
+
+  useEffect(() => {
+    // Cleanup preview URL on unmount
+    return () => {
+      if (previewImage) {
+        URL.revokeObjectURL(previewImage);
+      }
+    };
+  }, [previewImage]);
 
   const handlePhoneChange = (value: string) => {
     const detectedCountry = detectCountryCode(value);
@@ -156,18 +167,8 @@ const AccountSettings = () => {
         profilePicture: publicUrl
       }));
       
-      // Update Supabase
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          avatar_url: publicUrl,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', currentUser.id);
-      
-      if (error) throw error;
-      
-      await refreshSettings();
+      // Save changes immediately after upload
+      await handleSave();
       
       // Reset file input
       if (fileInputRef.current) {
@@ -208,7 +209,7 @@ const AccountSettings = () => {
             <div className="flex items-center gap-6">
               <Avatar
                 isBordered
-                src={settings.profilePicture || currentUser?.photoURL || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400"}
+                src={previewImage || formData.profilePicture || "https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png"}
                 className="w-24 h-24"
               />
               <div className="space-y-3">

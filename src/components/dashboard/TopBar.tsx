@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Settings, Search, Crown, Edit3, CreditCard, Bug, MessageCircle, LogOut, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserSettings } from '../../contexts/UserSettingsContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAdmin } from '../../hooks/useAdmin';
+import { supabase } from '../../lib/supabase';
 import NotificationsMenu from './NotificationsMenu';
 import ReportBugModal from './modals/ReportBugModal';
 import ContactUsModal from './modals/ContactUsModal';
@@ -19,11 +20,61 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
   const { theme } = useTheme();
   const { currentUser, logout } = useAuth();
   const { userSettings } = useUserSettings();
-  const { isAdmin } = useAdmin();
+  const { isAdmin } = useAdmin(); 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [showBugModal, setShowBugModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<string | null>(
+    currentUser?.user_metadata?.avatar_url || null
+  );
+
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      if (currentUser?.id) {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('profile_picture')
+          .eq('id', currentUser.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching profile picture:', error);
+          return;
+        }
+
+        if (profile?.profile_picture) {
+          setProfilePicture(profile.profile_picture);
+        }
+      }
+    };
+
+    fetchProfilePicture();
+
+    // Subscribe to profile changes
+    const channel = supabase
+      .channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${currentUser?.id}`
+        },
+        (payload) => {
+          if (payload.new.profile_picture) {
+            setProfilePicture(payload.new.profile_picture);
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [currentUser?.id]);
 
   const handleLogout = async () => {
     try {
@@ -107,7 +158,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
               </div>
               <div className="relative">
                 <img
-                  src={userSettings?.profilePicture || currentUser?.photoURL || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"}
+                  src={profilePicture || "https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png"}
                   alt="Profile"
                   className="w-10 h-10 rounded-full ring-2 ring-primary"
                 />
