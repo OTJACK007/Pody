@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from "@nextui-org/react";
 import { Mail, AlertCircle } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
-import { resetPassword } from '../../lib/auth';
+import { supabase } from '../../lib/supabase';
 
 interface ForgotPasswordModalProps {
   isOpen: boolean;
@@ -22,7 +22,11 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
     setIsLoading(true);
 
     try {
-      await resetPassword(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
       setSuccess(true);
     } catch (error: any) {
       setError(error.message);

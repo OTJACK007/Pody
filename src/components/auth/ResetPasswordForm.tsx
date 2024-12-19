@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardBody, Input, Button, Progress } from "@nextui-org/react";
 import { Eye, EyeOff, Lock, AlertCircle } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
-import { updatePassword } from '../../lib/auth';
+import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 
 const ResetPasswordForm = () => {
@@ -48,7 +48,11 @@ const ResetPasswordForm = () => {
 
     setIsLoading(true);
     try {
-      await updatePassword(newPassword);
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
       navigate('/login', { replace: true });
     } catch (error: any) {
       setError(error.message);

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthMode } from '../../types';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+
 interface EmailAuthFormProps {
   mode: AuthMode;
   onBack: () => void;
@@ -38,6 +39,11 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
         setError('Password must contain at least one number');
         return;
       }
+
+      if (!fullName) {
+        setError('Full name is required');
+        return;
+      }
     }
     
     setIsLoading(true);
@@ -50,18 +56,12 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
           navigate('/dashboard/livespace');
         }
       } else {
-        if (!fullName) {
-          setError('Full name is required');
-          setIsLoading(false);
-          return;
-        }
         setIsVerificationSent(true);
         await signUp(email, password, fullName);
       }
-    } catch (error: unknown) {
-      if ((error as any)?.message) {
-        const errorMessage = (error as any).message;
-        switch (errorMessage) {
+    } catch (error: any) {
+      if (error.message) {
+        switch (error.message) {
           case 'User already registered':
             setError('An account with this email already exists');
             break;
@@ -74,14 +74,11 @@ const EmailAuthForm = ({ mode, onBack }: EmailAuthFormProps) => {
           case 'User not found':
             setError('No account found with this email');
             break;
-          case 'User already registered':
-            setError('An account with this email already exists');
-            break;
           case 'Weak password':
             setError('Password should be at least 6 characters');
             break;
           default:
-            setError(errorMessage || 'An error occurred. Please try again.');
+            setError(error.message);
         }
       }
     } finally {

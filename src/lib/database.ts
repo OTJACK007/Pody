@@ -1,9 +1,9 @@
 import { supabase } from './supabase';
 import type { UserSettings } from '../types/settings';
-import type { SocialAccount } from '../types/socialAccounts';
+import type { ProfileData, ProfessionalInfo } from '../types/settings';
 
 // User Settings
-export const getUserSettings = async (userId: string): Promise<UserSettings | null> => {
+export const getUserProfile = async (userId: string): Promise<ProfileData | null> => {
   try {
     const { data: profile, error: profileError } = await supabase 
       .from('profiles')
@@ -12,7 +12,15 @@ export const getUserSettings = async (userId: string): Promise<UserSettings | nu
       .single();
 
     if (profileError) throw profileError;
+    return profile;
+  } catch (error) {
+    console.error('Error getting user profile:', error);
+    return null;
+  }
+};
 
+export const getUserSettings = async (userId: string): Promise<UserSettings | null> => {
+  try {
     const { data: settings, error: settingsError } = await supabase
       .from('user_settings')
       .select('*')
@@ -20,25 +28,45 @@ export const getUserSettings = async (userId: string): Promise<UserSettings | nu
       .single();
 
     if (settingsError) throw settingsError;
-
-    if (!profile || !settings) return null;
+    if (!settings) return null;
 
     return {
-      firstName: profile.first_name || '',
-      lastName: profile.last_name || '',
-      email: profile.email || '',
-      role: profile.role || 'user',
-      profilePicture: profile.avatar_url || '',
       theme: settings.theme || 'dark',
       colorScheme: settings.color_scheme || '#ff3366',
       notifications: settings.notifications || {},
       language: settings.language || {},
-      privacy: settings.privacy || {}
+      privacy: settings.privacy || {},
+      professionalInfo: settings.professional_info || {
+        company: '',
+        jobTitle: '',
+        location: '',
+        website: ''
+      }
     };
   } catch (error) {
     console.error('Error getting user settings:', error);
     return null;
   }
+};
+
+export const updateUserProfile = async (userId: string, profileData: Partial<ProfileData>) => {
+  const { error } = await supabase
+    .from('profiles')
+    .update(profileData)
+    .eq('id', userId);
+
+  if (error) throw error;
+};
+
+export const updateUserProfessionalInfo = async (userId: string, professionalInfo: ProfessionalInfo) => {
+  const { error } = await supabase 
+    .from('user_settings')
+    .update({
+      professional_info: professionalInfo
+    })
+    .eq('user_id', userId);
+
+  if (error) throw error;
 };
 
 export const createUserSettings = async (userId: string, settings: Partial<UserSettings>) => {

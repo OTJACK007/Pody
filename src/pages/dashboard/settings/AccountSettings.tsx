@@ -7,7 +7,8 @@ import { useUserSettings } from '../../../contexts/UserSettingsContext';
 import SettingsHeader from '../../../components/dashboard/SettingsHeader';
 import { supabase } from '../../../lib/supabase';
 import { countryCodes, detectCountryCode, formatPhoneNumber } from '../../../utils/phoneUtils';
-import { getUserSettings } from '../../../lib/database';
+import { getUserProfile, getUserSettings, updateUserProfile, updateUserProfessionalInfo } from '../../../lib/database';
+import type { ProfileData, ProfessionalInfo } from '../../../types/settings';
 
 const AccountSettings = () => {
   const { theme } = useTheme();
@@ -19,7 +20,7 @@ const AccountSettings = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedCountry, setSelectedCountry] = useState(countryCodes[0]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [settings, setSettings] = useState({
+  const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phoneNumber: selectedCountry.dial_code,
@@ -34,28 +35,28 @@ const AccountSettings = () => {
     const loadUserSettings = async () => {
       if (currentUser?.id) {
         try {
-          // Get profile data
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', currentUser.id)
-            .single();
+          const [profile, settings] = await Promise.all([
+            getUserProfile(currentUser.id),
+            getUserSettings(currentUser.id)
+          ]);
 
-          if (profileError) throw profileError;
+          if (profile && settings) {
+            const { professionalInfo } = settings;
 
-          // Set settings from profile data
-          setSettings({
-            fullName: profile.full_name || currentUser.user_metadata?.full_name || '',
-            email: profile.email || currentUser.email || '',
-            phoneNumber: profile.phone_number || selectedCountry.dial_code,
-            company: profile.company || '',
-            jobTitle: profile.job_title || '',
-            location: profile.location || '',
-            website: profile.website || '',
-            profilePicture: profile.avatar_url || ''
-          });
+            setFormData({
+              fullName: profile.fullname || currentUser.user_metadata?.full_name || '',
+              email: profile.email || currentUser.email || '',
+              phoneNumber: profile.phone_number || selectedCountry.dial_code,
+              company: professionalInfo.company || '',
+              jobTitle: professionalInfo.jobTitle || '',
+              location: professionalInfo.location || '',
+              website: professionalInfo.website || '',
+              profilePicture: profile.profile_picture || currentUser.user_metadata?.avatar_url || ''
+            });
+          }
         } catch (error) {
           console.error('Error loading user settings:', error);
+          alert('Error loading settings. Please refresh the page.');
         }
       }
     };
@@ -68,7 +69,7 @@ const AccountSettings = () => {
       setSelectedCountry(detectedCountry);
     }
     const phoneValue = value || '';
-    setSettings(prev => ({ 
+    setFormData(prev => ({ 
       ...prev, 
       phoneNumber: formatPhoneNumber(phoneValue, selectedCountry)
     }));
@@ -84,43 +85,32 @@ const AccountSettings = () => {
 
     setIsLoading(true);
     try {
-      const [firstName, ...lastNameParts] = settings.fullName.trim().split(' ');
-      const lastName = lastNameParts.join(' ');
-      
-      // Update profile in Supabase
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          first_name: firstName,
-          last_name: lastName,
-          full_name: settings.fullName,
-          email: settings.email,
-          phone_number: settings.phoneNumber,
-          company: settings.company,
-          job_title: settings.jobTitle,
-          location: settings.location,
-          website: settings.website,
-          avatar_url: settings.profilePicture,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', currentUser.id);
+      const profileData: Partial<ProfileData> = {
+        fullname: formData.fullName,
+        email: formData.email,
+        phone_number: formData.phoneNumber,
+        profile_picture: formData.profilePicture,
+        updated_at: new Date().toISOString()
+      };
 
-      if (profileError) throw profileError;
+      const professionalInfo: ProfessionalInfo = {
+        company: formData.company,
+        jobTitle: formData.jobTitle,
+        location: formData.location,
+        website: formData.website
+      };
 
-      // Update auth metadata
-      const { error: metadataError } = await supabase.auth.updateUser({
-        data: {
-          full_name: settings.fullName,
-          first_name: firstName,
-          last_name: lastName
-        }
-      });
-
-      if (metadataError) throw metadataError;
+      await Promise.all([
+        updateUserProfile(currentUser.id, profileData),
+        updateUserProfessionalInfo(currentUser.id, professionalInfo)
+      ]);
 
       await refreshSettings();
+      
+      alert('Settings updated successfully!');
     } catch (error) {
       console.error('Error saving settings:', error);
+      alert('Error updating settings. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -160,9 +150,8 @@ const AccountSettings = () => {
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
-      
-      // Update local state
-      setSettings(prev => ({
+
+      setFormData(prev => ({
         ...prev,
         profilePicture: publicUrl
       }));
@@ -271,8 +260,8 @@ const AccountSettings = () => {
                   theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                 }`}>Full Name</label>
                 <Input
-                  value={settings.fullName}
-                  onChange={(e) => setSettings(prev => ({ ...prev, fullName: e.target.value }))}
+                  value={formData.fullName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
                   startContent={<User className="w-4 h-4 text-gray-400" />}
                   classNames={{
                     input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -286,8 +275,8 @@ const AccountSettings = () => {
                 }`}>Email Address</label>
                 <Input
                   type="email"
-                  value={settings.email}
-                  onChange={(e) => setSettings(prev => ({ ...prev, email: e.target.value }))}
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   startContent={<Mail className="w-4 h-4 text-gray-400" />}
                   classNames={{
                     input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -347,7 +336,7 @@ const AccountSettings = () => {
                   </Dropdown>
                   <Input
                     type="tel"
-                    value={(settings.phoneNumber || '').replace(selectedCountry.dial_code, '')}
+                    value={(formData.phoneNumber || '').replace(selectedCountry.dial_code, '')}
                     onChange={(e) => handlePhoneChange(e.target.value)}
                     startContent={<Phone className="w-4 h-4 text-gray-400" />}
                     placeholder="Phone number"
@@ -378,8 +367,8 @@ const AccountSettings = () => {
                   theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                 }`}>Company</label>
                 <Input
-                  value={settings.company}
-                  onChange={(e) => setSettings(prev => ({ ...prev, company: e.target.value }))}
+                  value={formData.company}
+                  onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
                   startContent={<Building className="w-4 h-4 text-gray-400" />}
                   classNames={{
                     input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -392,8 +381,8 @@ const AccountSettings = () => {
                   theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                 }`}>Job Title</label>
                 <Input
-                  value={settings.jobTitle}
-                  onChange={(e) => setSettings(prev => ({ ...prev, jobTitle: e.target.value }))}
+                  value={formData.jobTitle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, jobTitle: e.target.value }))}
                   startContent={<Building className="w-4 h-4 text-gray-400" />}
                   classNames={{
                     input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -406,8 +395,8 @@ const AccountSettings = () => {
                   theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                 }`}>Location</label>
                 <Input
-                  value={settings.location}
-                  onChange={(e) => setSettings(prev => ({ ...prev, location: e.target.value }))}
+                  value={formData.location}
+                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                   startContent={<MapPin className="w-4 h-4 text-gray-400" />}
                   classNames={{
                     input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -421,8 +410,8 @@ const AccountSettings = () => {
                 }`}>Website</label>
                 <Input
                   type="url"
-                  value={settings.website}
-                  onChange={(e) => setSettings(prev => ({ ...prev, website: e.target.value }))}
+                  value={formData.website}
+                  onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
                   startContent={<Globe className="w-4 h-4 text-gray-400" />}
                   classNames={{
                     input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,

@@ -1,3 +1,19 @@
+export interface ProfileData {
+  id: string;
+  fullname: string;
+  email: string;
+  phone_number?: string;
+  profile_picture?: string;
+  updated_at?: string;
+}
+
+export interface ProfessionalInfo {
+  company: string;
+  jobTitle: string;
+  location: string;
+  website: string;
+}
+
 export interface AppearanceSettings {
   theme: 'dark' | 'light';
   colorScheme: string;
@@ -99,5 +115,6 @@ export interface UserSettings {
   notifications: NotificationSettings;
   privacy: PrivacySettings;
   language: LanguageSettings;
+  professionalInfo: ProfessionalInfo;
   billing: BillingSettings;
 }
