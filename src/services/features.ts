@@ -3,182 +3,219 @@ import { supabase } from '../lib/supabase';
 export interface Feature {
   id: string;
   title: string;
+  subtitle: string | null;
   description: string;
-  status: 'planning' | 'development' | 'testing' | 'review' | 'ready';
-  stage?: string;
-  quarter?: string;
-  progress: number;
-  expected_date?: string;
-  features: string[];
-  votes: {
-    up: number;
-    down: number;
-    users: Record<string, 'up' | 'down'>;
-  };
-  category: string;
-  requested_by: string;
-  requested_date: Date;
-  destination: 'upcoming' | 'suggested' | 'maybe' | 'collecting';
-  published_date?: Date;
-  last_modified: Date;
-  modified_by: string;
+  requested_at: Date;
+  development_progress: number;
+  expected_release: string | null;
+  subfeatures: string[];
+  votes_up: number;
+  votes_down: number;
+  status: 'inbox' | 'collectingvotes' | 'upcoming' | 'published';
+  created_by: string | null;
+  created_at: Date;
+  updated_at: Date;
 }
 
-export const fetchFeatures = async (destination: string): Promise<Feature[]> => {
+export interface CreateFeatureInput {
+  title: string;
+  subtitle: string;
+  description: string;
+  status: Feature['status'];
+  created_by: string;
+}
+
+export const createFeature = async (feature: CreateFeatureInput): Promise<string> => {
   const { data, error } = await supabase
     .from('features')
-    .select('*')
-    .eq('destination', destination)
-    .order('last_modified', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
-};
-
-export const createFeature = async (feature: Omit<Feature, 'id'>): Promise<string> => {
-  const { data, error } = await supabase
-    .from('features')
-    .insert([feature])
+    .insert([{
+      ...feature,
+      requested_at: new Date(),
+      development_progress: 0,
+      votes_up: 0,
+      votes_down: 0,
+      subfeatures: []
+    }])
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error creating feature:', error);
+    throw error;
+  }
+
   return data.id;
 };
 
-export const updateFeature = async (id: string, updates: Partial<Feature>): Promise<void> => {
-  const { error } = await supabase
+export const fetchFeatures = async (status: Feature['status']): Promise<Feature[]> => {
+  const { data, error } = await supabase
     .from('features')
-    .update({ ...updates, last_modified: new Date() })
-    .eq('id', id);
+    .select('*')
+    .eq('status', status)
+    .order('requested_at', { ascending: false });
 
-  if (error) throw error;
-};
-
-export const submitVote = async (featureId: string, userId: string, voteType: 'up' | 'down'): Promise<void> => {
-  const { data: feature, error: fetchError } = await supabase
-    .from('features')
-    .select('votes')
-    .eq('id', featureId)
-    .single();
-
-  if (fetchError) throw fetchError;
-
-  const votes = feature.votes;
-  const previousVote = votes.users[userId];
-
-  // Remove previous vote if exists
-  if (previousVote) {
-    votes[previousVote]--;
-    delete votes.users[userId];
+  if (error) {
+    console.error('Error fetching features:', error);
+    throw error;
   }
 
-  // Add new vote
-  votes[voteType]++;
-  votes.users[userId] = voteType;
-
-  const { error: updateError } = await supabase
-    .from('features')
-    .update({ 
-      votes,
-      last_modified: new Date()
-    })
-    .eq('id', featureId);
-
-  if (updateError) throw updateError;
+  return data || [];
 };
 
-export const moveFeatureToDestination = async (
-  featureId: string, 
-  destination: Feature['destination']
-): Promise<void> => {
-  const { error } = await supabase
+export const suggestFeature = async (feature: { 
+  title: string; 
+  subtitle: string; 
+  description: string; 
+  status: Feature['status']; 
+  created_by: string;
+}): Promise<Feature> => {
+  const { data, error } = await supabase
     .from('features')
-    .update({ 
-      destination,
-      last_modified: new Date()
-    })
-    .eq('id', featureId);
+    .insert([{
+      ...feature,
+      requested_at: new Date(),
+      development_progress: 0,
+      votes_up: 0,
+      votes_down: 0,
+      subfeatures: []
+    }])
+    .select()
+    .single();
 
-  if (error) throw error;
-};
+  if (error) {
+    console.error('Error suggesting feature:', error);
+    throw error;
+  }
 
-export const publishFeature = async (featureId: string): Promise<void> => {
-  const { error } = await supabase
-    .from('features')
-    .update({ 
-      published_date: new Date(),
-      last_modified: new Date()
-    })
-    .eq('id', featureId);
-
-  if (error) throw error;
+  return data;
 };
 
 export const updateExistingFeature = async (id: string, updates: Partial<Feature>): Promise<void> => {
   const { error } = await supabase
     .from('features')
-    .update({ ...updates, last_modified: new Date() })
+    .update({
+      ...updates,
+      updated_at: new Date()
+    })
     .eq('id', id);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error updating feature:', error);
+    throw error;
+  }
+};
+
+export const submitVote = async (featureId: string, userId: string, voteType: 'up' | 'down'): Promise<void> => {
+  const { data: existingVote } = await supabase
+    .from('feature_votes')
+    .select('vote_type')
+    .eq('feature_id', featureId)
+    .eq('user_id', userId)
+    .single();
+
+  if (existingVote) {
+    // Remove previous vote
+    await supabase
+      .from('features')
+      .update({
+        [`votes_${existingVote.vote_type}`]: supabase.sql`${`votes_${existingVote.vote_type}`} - 1`
+      })
+      .eq('id', featureId);
+
+    await supabase
+      .from('feature_votes')
+      .delete()
+      .eq('feature_id', featureId)
+      .eq('user_id', userId);
+  }
+
+  // Add new vote
+  await supabase
+    .from('feature_votes')
+    .insert([{
+      feature_id: featureId,
+      user_id: userId,
+      vote_type: voteType
+    }]);
+
+  await supabase
+    .from('features')
+    .update({
+      [`votes_${voteType}`]: supabase.sql`${`votes_${voteType}`} + 1`,
+      updated_at: new Date()
+    })
+    .eq('id', featureId);
+};
+
+export const moveFeatureToDestination = async (featureId: string, status: Feature['status']): Promise<void> => {
+  const { error } = await supabase
+    .from('features')
+    .update({
+      status,
+      updated_at: new Date()
+    })
+    .eq('id', featureId);
+
+  if (error) {
+    console.error('Error moving feature:', error);
+    throw error;
+  }
 };
 
 export const publishFeatureToProduction = async (featureId: string): Promise<void> => {
   const { error } = await supabase
     .from('features')
-    .update({ 
-      published_date: new Date(),
-      last_modified: new Date(),
-      status: 'published'
+    .update({
+      status: 'published',
+      development_progress: 100,
+      updated_at: new Date()
     })
     .eq('id', featureId);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error publishing feature:', error);
+    throw error;
+  }
 };
 
 export const loadTemplateFeatures = async (): Promise<void> => {
   const templateFeatures = [
     {
       title: 'AI-Powered Summaries',
+      subtitle: 'Get instant podcast insights',
       description: 'Get instant, accurate summaries of any podcast episode using advanced AI technology',
-      status: 'published',
-      progress: 100,
-      features: [
+      development_progress: 100,
+      expected_release: 'Released',
+      subfeatures: [
         'Smart content analysis',
         'Multi-language support',
         'Key points extraction'
       ],
-      category: 'AI & Machine Learning',
-      requested_by: 'system',
-      destination: 'published',
-      votes: { up: 0, down: 0, users: {} }
+      status: 'published',
+      created_by: 'system'
     },
     {
       title: 'Cross-Platform Sync',
+      subtitle: 'Seamless device integration',
       description: 'Seamlessly sync your content and preferences across all your devices',
-      status: 'development',
-      progress: 75,
-      features: [
+      development_progress: 75,
+      expected_release: 'Q2 2024',
+      subfeatures: [
         'Real-time synchronization',
         'Offline support',
         'Cross-device compatibility'
       ],
-      category: 'User Experience',
-      requested_by: 'system',
-      destination: 'upcoming',
-      votes: { up: 0, down: 0, users: {} }
+      status: 'upcoming',
+      created_by: 'system'
     }
   ];
 
   const { error } = await supabase
     .from('features')
-    .insert(templateFeatures.map(feature => ({
-      ...feature,
-      requested_date: new Date(),
-      last_modified: new Date(),
-      modified_by: 'system'
-    })));
+    .insert(templateFeatures);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error loading template features:', error);
+    throw error;
+  }
 };
