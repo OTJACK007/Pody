@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, ThumbsUp, ThumbsDown, Send, ChevronRight, Clock, Users, Rocket } from 'lucide-react';
+import { Sparkles, ThumbsUp, ThumbsDown, Send, ChevronRight, Clock, Rocket } from 'lucide-react';
 import { Card, CardBody, Button, Tabs, Tab, Input, Textarea, Badge, Progress, Select, SelectItem } from "@nextui-org/react";
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -95,9 +95,6 @@ const NewFeatures = () => {
           </p>
         </div>
       </div>
-    </div>
-  );
-  
 
       <Tabs 
         selectedKey={activeTab}
@@ -270,7 +267,7 @@ const NewFeatures = () => {
                         <Button
                           size="sm"
                           startContent={<ThumbsUp className="w-4 h-4" />}
-                          className={`${
+                          className={`$${
                             theme === 'dark'
                               ? 'bg-gray-700 text-white hover:bg-gray-600'
                               : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
@@ -282,7 +279,7 @@ const NewFeatures = () => {
                         <Button
                           size="sm"
                           startContent={<ThumbsDown className="w-4 h-4" />}
-                          className={`${
+                          className={`$${
                             theme === 'dark'
                               ? 'bg-gray-700 text-white hover:bg-gray-600'
                               : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
@@ -308,7 +305,7 @@ const NewFeatures = () => {
               theme === 'dark' 
                 ? 'bg-gray-800/50 border-gray-700/50' 
                 : 'bg-white border-gray-200'
-            } border`}>
+              } border`}>
               <CardBody className="p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-grow">
@@ -317,42 +314,30 @@ const NewFeatures = () => {
                         theme === 'dark' ? 'text-white' : 'text-gray-900'
                       }`}>{feature.title}</h3>
                       <Badge color="primary" variant="flat">
-                        In Development
+                        Upcoming
                       </Badge>
                     </div>
                     <p className={`mb-4 ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                     }`}>{feature.description}</p>
-                    
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                          Development Progress
-                        </span>
-                        <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                          {feature.development_progress}%
-                        </span>
+                    <div className="flex items-center gap-4">
+                      <div className={`flex items-center gap-2 text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        <Clock className="w-4 h-4" />
+                        <span>Expected Release: {feature.expected_release || "TBA"}</span>
                       </div>
-                      <Progress 
-                        value={feature.development_progress} 
-                        color="primary"
-                        className="max-w-full"
+                      <Progress
+                        value={feature.development_progress}
+                        size="sm"
+                        className="flex-grow"
+                        classNames={{
+                          track: `${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`,
+                          indicator: "bg-primary"
+                        }}
                       />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      {feature.subfeatures.map((subfeature, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <ChevronRight className="w-4 h-4 text-primary" />
-                          <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                            {subfeature}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-4 mt-4">
-                      <span className="text-primary">Expected: {feature.expected_release}</span>
                       <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                        {feature.votes_up + feature.votes_down} votes
+                        {feature.development_progress}%
                       </span>
                     </div>
                   </div>
