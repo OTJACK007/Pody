@@ -82,19 +82,28 @@ const NewFeatures = () => {
     }
   };
 
-  return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-3">
-        <Sparkles className="w-8 h-8 text-primary" />
-        <div>
-          <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            New Features
-          </h1>
-          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-            Vote for upcoming features or suggest new ones
-          </p>
+  interface NewFeaturesProps {
+    theme: 'dark' | 'light';
+  }
+  
+  const NewFeatures = ({ theme }: NewFeaturesProps) => {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center gap-3">
+          <Sparkles className="w-8 h-8 text-primary" />
+          <div>
+            <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              New Features
+            </h1>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Vote for upcoming features or suggest new ones
+            </p>
+          </div>
         </div>
       </div>
+    );
+  };
+
 
       <Tabs 
         selectedKey={activeTab}
