@@ -37,7 +37,6 @@ const NewFeatures = () => {
         default:
           return;
       }
-
       const data = await fetchFeatures(status);
       setFeatures(data);
     } catch (error) {
@@ -83,20 +82,25 @@ const NewFeatures = () => {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'in_progress':
+        return 'primary';
+      case 'planned':
+        return 'secondary';
+      default:
+        return 'default';
+    }
+  };
 
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-3">
         <Sparkles className="w-8 h-8 text-primary" />
         <div>
-          <h1 className={`text-3xl font-bold ${
-    <div className="space-y-8">
-      <div className="flex items-center gap-3">
-        <Sparkles className="w-8 h-8 text-primary" />
-        <div>
-          <h1 className={`text-3xl font-bold ${
-            theme === 'dark' ? 'text-white' : 'text-gray-900'
-          }`}>New Features</h1>
+          <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            New Features
+          </h1>
           <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
             Vote for upcoming features or suggest new ones
           </p>
@@ -142,7 +146,6 @@ const NewFeatures = () => {
                   inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                 }}
               />
-
               <Textarea
                 label="Feature Description"
                 placeholder="Describe the feature you'd like to see"
@@ -153,7 +156,6 @@ const NewFeatures = () => {
                   inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                 }}
               />
-
               <Textarea
                 label="Why do you need this feature?"
                 placeholder="Explain how this feature would help you"
@@ -164,9 +166,8 @@ const NewFeatures = () => {
                   inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                 }}
               />
-
               <Button
-                className="w-full bg-primary text-white"
+                className="w-full text-white bg-primary"
                 endContent={<Send className="w-4 h-4" />}
                 onClick={handleSubmit}
                 isLoading={isSubmitting}
@@ -178,7 +179,7 @@ const NewFeatures = () => {
           </CardBody>
         </Card>
       )}
-      
+
       {activeTab === 'published' && (
         <div className="space-y-4">
           <div className="flex justify-end">
@@ -216,7 +217,6 @@ const NewFeatures = () => {
                     <p className={`mb-4 ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                     }`}>{feature.description}</p>
-
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       {feature.subfeatures.map((subfeature, idx) => (
                         <div key={idx} className="flex items-center gap-2">
@@ -227,7 +227,6 @@ const NewFeatures = () => {
                         </div>
                       ))}
                     </div>
-
                     <div className="flex items-center gap-4">
                       <div className={`flex items-center gap-2 text-sm ${
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
@@ -266,7 +265,6 @@ const NewFeatures = () => {
                     <p className={`mb-4 ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                     }`}>{feature.description}</p>
-
                     <div className="flex items-center gap-6">
                       <div className="flex items-center gap-4">
                         <div className={`flex items-center gap-2 text-sm ${
@@ -348,250 +346,33 @@ const NewFeatures = () => {
                         color="primary"
                         className="max-w-full"
                       />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      {feature.subfeatures.map((subfeature, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <ChevronRight className="w-4 h-4 text-primary" />
-                          <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                            {subfeature}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-4 mt-4">
-                      <span className="text-primary">Expected: {feature.expected_release}</span>
-                      <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                        {feature.votes_up + feature.votes_down} votes
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      <Tabs 
-        selectedKey={activeTab}
-        onSelectionChange={(key) => setActiveTab(key.toString())}
-        classNames={{
-          tabList: `${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} p-1 rounded-lg`,
-          cursor: `${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`,
-          tab: `${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} data-[selected=true]:${theme === 'dark' ? 'text-white' : 'text-gray-900'}`,
-          tabContent: "group-data-[selected=true]:text-inherit"
-        }}
-      >
-        <Tab key="requested" title="Requested Features" />
-        <Tab key="upcoming" title="Upcoming Features" />
-        <Tab key="published" title={
-          <div className="flex items-center gap-2">
-            <Rocket className="w-4 h-4 text-[#ff3366]" />
-            <span>Published Features</span>
-          </div>
-        } />
-        <Tab key="suggest" title="Suggest Feature" />
-      </Tabs>
-
-      {activeTab === 'requested' && (
-        <div className="space-y-4">
-          {requestedFeatures.map((feature) => (
-            <Card key={feature.id} className={`${
-              theme === 'dark' 
-                ? 'bg-gray-800/50 border-gray-700/50' 
-                : 'bg-white border-gray-200'
-            } border`}>
-              <CardBody className="p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-grow">
-                    <h3 className={`text-xl font-semibold mb-2 ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`}>{feature.title}</h3>
-                    <p className={`mb-4 ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                    }`}>{feature.description}</p>
-                    <div className="flex items-center gap-4 text-sm">
-                      <div className={`flex items-center gap-2 ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                      }`}>
-                        <Users className="w-4 h-4" />
-                        <span>{feature.supporters} supporters</span>
                       </div>
-                      <div className={`flex items-center gap-2 ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                      }`}>
-                        <Clock className="w-4 h-4" />
-                        <span>Requested on {feature.requestedDate}</span>
+                      <div className="grid grid-cols-2 gap-4">
+                        {feature.subfeatures.map((subfeature, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <ChevronRight className="w-4 h-4 text-primary" />
+                            <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                              {subfeature}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      startContent={<ThumbsUp className="w-4 h-4" />}
-                      className={`${
-                        theme === 'dark'
-                          ? 'bg-gray-700 text-white hover:bg-gray-600'
-                          : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                      }`}
-                    >
-                      {feature.votes.up}
-                    </Button>
-                    <Button
-                      startContent={<ThumbsDown className="w-4 h-4" />}
-                      className={`${
-                        theme === 'dark'
-                          ? 'bg-gray-700 text-white hover:bg-gray-600'
-                          : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                      }`}
-                    >
-                      {feature.votes.down}
-                    </Button>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'upcoming' && (
-        <div className="space-y-4">
-          {upcomingFeatures.map((feature) => (
-            <Card key={feature.id} className={`${
-              theme === 'dark' 
-                ? 'bg-gray-800/50 border-gray-700/50' 
-                : 'bg-white border-gray-200'
-            } border`}>
-              <CardBody className="p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-grow">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className={`text-xl font-semibold ${
-                        theme === 'dark' ? 'text-white' : 'text-gray-900'
-                      }`}>{feature.title}</h3>
-                      <Badge color={getStatusColor(feature.status)} variant="flat">
-                        {feature.status}
-                      </Badge>
-                    </div>
-                    <p className={`mb-4 ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                    }`}>{feature.description}</p>
-                    
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-4 mt-4">
+                        <span className="text-primary">Expected: {feature.expected_release}</span>
                         <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                          Development Progress
-                        </span>
-                        <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                          {feature.progress}%
+                          {feature.votes_up + feature.votes_down} votes
                         </span>
                       </div>
-                      <Progress 
-                        value={feature.progress} 
-                        color={getStatusColor(feature.status)}
-                        className="max-w-full"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      {feature.details.map((detail, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <ChevronRight className="w-4 h-4 text-primary" />
-                          <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                            {detail}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-4 mt-4 text-sm">
-                      <span className="text-primary">Expected: {feature.eta}</span>
-                      <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                        {feature.votes} votes
-                      </span>
                     </div>
                   </div>
-                  <Button
-                    className="bg-secondary text-black font-medium hover:bg-secondary/90"
-                  >
-                    More Details
-                  </Button>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      )}
-      
-
-
-      )}
-
-      {activeTab === 'suggest' && (
-        <Card className={`${
-          theme === 'dark' 
-            ? 'bg-gray-800/50 border-gray-700/50' 
-            : 'bg-white border-gray-200'
-        } border`}>
-          <CardBody className="p-6">
-            <div className="space-y-6">
-              <div>
-                <Input
-                  label="Feature Title"
-                  placeholder="Enter feature title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  classNames={{
-                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
-                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
-                  }}
-                />
-              </div>
-
-              <div>
-                <Textarea
-                  label="Feature Description"
-                  placeholder="Describe the feature you'd like to see"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  classNames={{
-                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
-                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
-                  }}
-                />
-              </div>
-
-              <div>
-                <Textarea
-                  label="Why do you need this feature?"
-                  placeholder="Explain how this feature would help you"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  classNames={{
-                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
-                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
-                  }}
-                />
-              </div>
-
-              <Button
-                className="w-full bg-primary text-white"
-                endContent={<Send className="w-4 h-4" />}
-                onClick={handleSubmit}
-                isLoading={isSubmitting}
-                isDisabled={!title || !description || !reason}
-              >
-                Submit Feature Request
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
-      )}
-    </div>
-  );
-};
-
-export default NewFeatures;
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+  
+  export default NewFeatures;
+  
