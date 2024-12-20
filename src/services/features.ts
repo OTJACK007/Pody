@@ -82,17 +82,6 @@ const NewFeatures = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'in_progress':
-        return 'primary';
-      case 'planned':
-        return 'secondary';
-      default:
-        return 'default';
-    }
-  };
-
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-3">
@@ -346,33 +335,32 @@ const NewFeatures = () => {
                         color="primary"
                         className="max-w-full"
                       />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        {feature.subfeatures.map((subfeature, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
-                            <ChevronRight className="w-4 h-4 text-primary" />
-                            <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                              {subfeature}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-4 mt-4">
-                        <span className="text-primary">Expected: {feature.expected_release}</span>
-                        <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                          {feature.votes_up + feature.votes_down} votes
-                        </span>
-                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {feature.subfeatures.map((subfeature, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <ChevronRight className="w-4 h-4 text-primary" />
+                          <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                            {subfeature}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-4 mt-4">
+                      <span className="text-primary">Expected: {feature.expected_release}</span>
+                      <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                        {feature.votes_up + feature.votes_down} votes
+                      </span>
                     </div>
                   </div>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-  
-  export default NewFeatures;
-  
+                </div>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default NewFeatures;
