@@ -1,13 +1,34 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from "@nextui-org/react";
-import { Share2, Star, Bookmark, ExternalLink, Calendar, Heart, Quote } from 'lucide-react';
+import { Share2, Star, Bookmark, ExternalLink, Calendar, Heart, Trash2, Quote } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import DeleteNoteModal from '../../../../components/dashboard/modals/DeleteNoteModal';
 
 const Favorites = () => {
   const { theme } = useTheme();
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedFavorite, setSelectedFavorite] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [tweetText, setTweetText] = useState('');
+
+  const handleDelete = async () => {
+    if (!selectedFavorite) return;
+    
+    setIsDeleting(true);
+    try {
+      // Add your delete logic here
+      console.log('Deleting favorite:', selectedFavorite);
+      
+      // Close modal after successful deletion
+      setShowDeleteModal(false);
+      setSelectedFavorite(null);
+    } catch (error) {
+      console.error('Error deleting favorite:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const favorites = [
     {
@@ -156,6 +177,18 @@ const Favorites = () => {
                     </Button>
                     <Button
                       isIconOnly
+                      size="sm"
+                      variant="light"
+                      className={theme === 'dark' ? 'text-gray-400 hover:text-red-500' : 'text-gray-600 hover:text-red-500'}
+                      onClick={() => {
+                        setSelectedFavorite(favorite);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      isIconOnly
                       variant="light"
                       className="text-yellow-400"
                     >
@@ -223,6 +256,17 @@ const Favorites = () => {
         </ModalFooter>
       </ModalContent>
     </Modal>
+
+    <DeleteNoteModal
+      isOpen={showDeleteModal}
+      onClose={() => {
+        setShowDeleteModal(false);
+        setSelectedFavorite(null);
+      }}
+      onConfirm={handleDelete}
+      title="this favorite"
+      isLoading={isDeleting}
+    />
     </>
   );
 };

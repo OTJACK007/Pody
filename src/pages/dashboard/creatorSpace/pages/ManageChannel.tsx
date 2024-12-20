@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera, Mail, Building, MapPin, Globe, DollarSign, CreditCard, Wallet, Crown } from 'lucide-react';
+import { ArrowLeft, Camera, Mail, Building, MapPin, Globe, DollarSign, CreditCard, Wallet, Crown, ListVideo } from 'lucide-react';
 import { Button, Card, CardBody, Input, Avatar, Tabs, Tab, Progress } from "@nextui-org/react";
 import { useTheme } from '../../../../contexts/ThemeContext';
 
@@ -54,6 +54,37 @@ const ManageChannel = () => {
           </p>
         </div>
       </div>
+
+      {/* Video Management Card */}
+      <Card className={`${
+        theme === 'dark' 
+          ? 'bg-gray-800/50 border-gray-700/50' 
+          : 'bg-white border-gray-200'
+      } border`}>
+        <CardBody className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <ListVideo className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className={`font-medium ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Manage Videos</p>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  Upload, edit and organize your videos
+                </p>
+              </div>
+            </div>
+            <Button
+              className="bg-primary text-white hover:bg-primary/90"
+              onClick={() => navigate('/dashboard/creator-space/manage-videos')}
+            >
+              Manage Videos
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
 
       <Tabs 
         selectedKey={selectedTab}
@@ -155,6 +186,14 @@ const ManageChannel = () => {
                     inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
+              </div>
+              <div className="flex justify-end mt-6">
+                <Button
+                  color="primary"
+                  className="px-8"
+                >
+                  Save Changes
+                </Button>
               </div>
             </CardBody>
           </Card>

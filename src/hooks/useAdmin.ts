@@ -18,17 +18,23 @@ export const useAdmin = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('role')
+          .select('*')
           .eq('id', currentUser.id)
           .single();
 
         if (error) {
-          console.error('Error checking admin status:', error);
+          // If error is about missing column, default to non-admin
+          if (error.code === '42703') {
+            setIsAdmin(false);
+          } else {
+            console.error('Error checking admin status:', error);
+          }
           setIsAdmin(false);
           return;
         }
 
-        setIsAdmin(data?.role === 'admin');
+        // Check if role exists, default to 'user' if not
+        setIsAdmin(data?.role === 'admin' || false);
       } catch (error) {
         console.error('Error checking admin status:', error);
         setIsAdmin(false);

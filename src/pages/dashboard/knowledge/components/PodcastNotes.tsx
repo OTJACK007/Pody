@@ -1,13 +1,34 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from "@nextui-org/react";
-import { Share2, Star, Bookmark, ExternalLink, Calendar, Headphones } from 'lucide-react';
+import { Share2, Star, Bookmark, ExternalLink, Calendar, Headphones, Trash2 } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import DeleteNoteModal from '../../../../components/dashboard/modals/DeleteNoteModal';
 
 const PodcastNotes = () => {
   const { theme } = useTheme();
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
   const [tweetText, setTweetText] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!selectedNote) return;
+    
+    setIsDeleting(true);
+    try {
+      // Add your delete logic here
+      console.log('Deleting note:', selectedNote);
+      
+      // Close modal after successful deletion
+      setShowDeleteModal(false);
+      setSelectedNote(null);
+    } catch (error) {
+      console.error('Error deleting note:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const notes = [
     {
@@ -120,6 +141,18 @@ const PodcastNotes = () => {
                     </Button>
                     <Button
                       isIconOnly
+                      size="sm"
+                      variant="light"
+                      className={theme === 'dark' ? 'text-gray-400 hover:text-red-500' : 'text-gray-600 hover:text-red-500'}
+                      onClick={() => {
+                        setSelectedNote(note);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      isIconOnly
                       variant="light"
                       className={note.isFavorite ? 'text-yellow-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                     >
@@ -187,6 +220,17 @@ const PodcastNotes = () => {
         </ModalFooter>
       </ModalContent>
     </Modal>
+
+    <DeleteNoteModal
+      isOpen={showDeleteModal}
+      onClose={() => {
+        setShowDeleteModal(false);
+        setSelectedNote(null);
+      }}
+      onConfirm={handleDelete}
+      title="this podcast note"
+      isLoading={isDeleting}
+    />
     </>
   );
 };

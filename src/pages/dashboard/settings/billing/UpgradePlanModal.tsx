@@ -32,10 +32,10 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
       current: true
     },
     {
-      name: 'Credit Starter',
+      name: 'Starter',
       price: '$20',
       credits: '100',
-      planId: 'credit-starter',
+      planId: 'starter',
       icon: <Zap className="w-6 h-6 text-blue-400" />,
       color: 'bg-blue-400/10',
       textColor: 'text-blue-400',
@@ -55,7 +55,7 @@ const UpgradePlanModal = ({ isOpen, onClose }: UpgradePlanModalProps) => {
       color: 'bg-purple-400/10',
       textColor: 'text-purple-400',
       features: [
-        'Everything in Credit Starter',
+        'Everything in Starter',
         'Custom AI training',
         'Team collaboration',
         'Priority support'

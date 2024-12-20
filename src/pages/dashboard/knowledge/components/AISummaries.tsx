@@ -1,46 +1,39 @@
 import React, { useState } from 'react';
-import { Card, CardBody, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from "@nextui-org/react";
-import { Share2, Star, Bookmark, ExternalLink, Calendar, Brain, Sparkles } from 'lucide-react';
+import { Card, CardBody, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Input } from "@nextui-org/react";
+import { Share2, Star, Bookmark, ExternalLink, Calendar, Brain, Sparkles, Search, Tag, Plus, MessageSquare, Trash2 } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import DeleteNoteModal from '../../../../components/dashboard/modals/DeleteNoteModal';
 
-const AISummaries = () => {
+interface AISummariesProps {
+  summaries: any[];
+}
+
+const AISummaries = ({ summaries }: AISummariesProps) => {
   const { theme } = useTheme();
+  const [searchQuery, setSearchQuery] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedSummary, setSelectedSummary] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [tweetText, setTweetText] = useState('');
 
-  const summaries = [
-    {
-      id: 1,
-      title: 'AI Ethics and Society',
-      content: 'AI-generated summary of key ethical considerations in artificial intelligence development...',
-      source: {
-        type: 'podcast',
-        title: 'Tech Ethics Today',
-        image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400'
-      },
-      tags: ['AI', 'Ethics', 'Technology'],
-      date: '2024-03-15',
-      isFavorite: true,
-      accuracy: 98,
-      confidence: 95
-    },
-    {
-      id: 2,
-      title: 'Future of Work Trends',
-      content: 'AI analysis of emerging workplace trends and their implications...',
-      source: {
-        type: 'podcast',
-        title: 'Future Work',
-        image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400'
-      },
-      tags: ['Work', 'Future', 'Trends'],
-      date: '2024-03-14',
-      isFavorite: false,
-      accuracy: 96,
-      confidence: 92
+  const handleDelete = async () => {
+    if (!selectedSummary) return;
+    
+    setIsDeleting(true);
+    try {
+      // Add your delete logic here
+      console.log('Deleting summary:', selectedSummary);
+      
+      // Close modal after successful deletion
+      setShowDeleteModal(false);
+      setSelectedSummary(null);
+    } catch (error) {
+      console.error('Error deleting summary:', error);
+    } finally {
+      setIsDeleting(false);
     }
-  ];
+  };
 
   const handleShare = (summary) => {
     setSelectedSummary(summary);
@@ -131,6 +124,18 @@ const AISummaries = () => {
                     </Button>
                     <Button
                       isIconOnly
+                      size="sm"
+                      variant="light"
+                      className={theme === 'dark' ? 'text-gray-400 hover:text-red-500' : 'text-gray-600 hover:text-red-500'}
+                      onClick={() => {
+                        setSelectedSummary(summary);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      isIconOnly
                       variant="light"
                       className={summary.isFavorite ? 'text-yellow-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                     >
@@ -143,6 +148,17 @@ const AISummaries = () => {
           </CardBody>
         </Card>
       ))}
+
+      <DeleteNoteModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSelectedSummary(null);
+        }}
+        onConfirm={handleDelete}
+        title="this AI summary"
+        isLoading={isDeleting}
+      />
     </div>
 
     <Modal 

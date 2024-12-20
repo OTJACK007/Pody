@@ -13,6 +13,39 @@ import KnowledgeFilters from './knowledge/components/KnowledgeFilters';
 import ConnectNotionModal from './knowledge/components/ConnectNotionModal';
 import ImportModal from './knowledge/components/ImportModal';
 
+const mockSummaries = [
+  {
+    id: 1,
+    title: 'AI Ethics and Society',
+    content: 'AI-generated summary of key ethical considerations in AI development...',
+    source: {
+      type: 'podcast',
+      title: 'Tech Ethics Today',
+      image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400'
+    },
+    tags: ['AI', 'Ethics', 'Technology'],
+    date: '2024-03-15',
+    accuracy: 98,
+    confidence: 95,
+    isFavorite: true
+  },
+  {
+    id: 2,
+    title: 'Future of Work Trends',
+    content: 'AI analysis of emerging workplace trends and their implications...',
+    source: {
+      type: 'podcast',
+      title: 'Future Work',
+      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400'
+    },
+    tags: ['Work', 'Future', 'Trends'],
+    date: '2024-03-14',
+    accuracy: 96,
+    confidence: 92,
+    isFavorite: false
+  }
+];
+
 const KnowledgeLibrary = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -139,7 +172,7 @@ const KnowledgeLibrary = () => {
 
           {selectedTab === 'all' && (viewMode === 'grid' ? <KnowledgeGrid /> : <KnowledgeList />)}
           {selectedTab === 'podcasts' && <PodcastNotes />}
-          {selectedTab === 'summaries' && <AISummaries />}
+          {selectedTab === 'summaries' && <AISummaries summaries={mockSummaries} />}
           {selectedTab === 'highlights' && <Highlights />}
           {selectedTab === 'favorites' && <Favorites />}
         </div>

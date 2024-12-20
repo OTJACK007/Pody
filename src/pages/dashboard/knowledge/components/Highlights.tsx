@@ -1,13 +1,34 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from "@nextui-org/react";
-import { Share2, Star, Bookmark, ExternalLink, Calendar, Quote } from 'lucide-react';
+import { Share2, Star, Bookmark, ExternalLink, Calendar, Quote, Trash2 } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import DeleteNoteModal from '../../../../components/dashboard/modals/DeleteNoteModal';
 
 const Highlights = () => {
   const { theme } = useTheme();
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedHighlight, setSelectedHighlight] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [tweetText, setTweetText] = useState('');
+
+  const handleDelete = async () => {
+    if (!selectedHighlight) return;
+    
+    setIsDeleting(true);
+    try {
+      // Add your delete logic here
+      console.log('Deleting highlight:', selectedHighlight);
+      
+      // Close modal after successful deletion
+      setShowDeleteModal(false);
+      setSelectedHighlight(null);
+    } catch (error) {
+      console.error('Error deleting highlight:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const highlights = [
     {
@@ -127,6 +148,18 @@ const Highlights = () => {
                     </Button>
                     <Button
                       isIconOnly
+                      size="sm"
+                      variant="light"
+                      className={theme === 'dark' ? 'text-gray-400 hover:text-red-500' : 'text-gray-600 hover:text-red-500'}
+                      onClick={() => {
+                        setSelectedHighlight(highlight);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      isIconOnly
                       variant="light"
                       className={highlight.isFavorite ? 'text-yellow-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                     >
@@ -194,6 +227,17 @@ const Highlights = () => {
         </ModalFooter>
       </ModalContent>
     </Modal>
+
+    <DeleteNoteModal
+      isOpen={showDeleteModal}
+      onClose={() => {
+        setShowDeleteModal(false);
+        setSelectedHighlight(null);
+      }}
+      onConfirm={handleDelete}
+      title="this highlight"
+      isLoading={isDeleting}
+    />
     </>
   );
 };

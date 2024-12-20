@@ -10,6 +10,7 @@ import DashboardLayout from './components/dashboard/DashboardLayout';
 import LiveSpace from './pages/dashboard/LiveSpace';
 import CreatorSpace from './pages/dashboard/CreatorSpace';
 import ManageChannel from './pages/dashboard/creatorSpace/pages/ManageChannel';
+import ManageVideos from './pages/dashboard/creatorSpace/pages/ManageVideos';
 import Channel from './pages/dashboard/livespace/Channel';
 import FeedVideo from './pages/dashboard/feedvideo/FeedVideo';
 import GuestVideos from './pages/dashboard/guestvideos/GuestVideos';
@@ -58,6 +59,7 @@ function App() {
           <Route path="livespace" element={<LiveSpace />} />
             <Route path="creator-space" element={<CreatorSpace />} />
             <Route path="creator-space/manage-channel" element={<ManageChannel />} />
+            <Route path="creator-space/manage-videos" element={<ManageVideos />} />
             <Route path="branddeals" element={<BrandDeals />} />
             <Route path="livespace/channel" element={<Channel />} />
             <Route path="feedvideo/:id" element={<FeedVideo />} />
