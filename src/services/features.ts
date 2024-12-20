@@ -95,6 +95,9 @@ const NewFeatures = () => {
           </p>
         </div>
       </div>
+    </div>
+  );
+  
 
       <Tabs 
         selectedKey={activeTab}
