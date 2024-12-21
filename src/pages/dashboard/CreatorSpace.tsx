@@ -4,12 +4,12 @@ import { Card, CardBody, Button, Badge } from "@nextui-org/react";
 import { Crown, TrendingUp, Youtube, Upload, Wand2, Subtitles, VideoIcon, Megaphone, Rocket, DollarSign, Wallet, CreditCard, Settings } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import CreatorStats from './creatorSpace/components/CreatorStats';
-import PublishPodcastModal from './creatorSpace/components/PublishPodcastModal';
+import VideoUploadModal from './creatorSpace/components/VideoUploadModal';
 import CreatorToolCard from './creatorSpace/components/CreatorToolCard';
 
 const CreatorSpace = () => {
   const navigate = useNavigate();
-  const [showPublishPodcast, setShowPublishPodcast] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const { theme } = useTheme();
 
   const monetizationActive = true; // This would come from your actual data
@@ -260,7 +260,7 @@ const CreatorSpace = () => {
                   ? 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-800'
                   : 'bg-white border-gray-200 hover:bg-gray-50'
               } border transition-all duration-300`}
-              onClick={() => setShowPublishPodcast(true)}
+              onClick={() => setShowUploadModal(true)}
             >
               <CardBody className="p-6">
                 <div className="flex flex-col items-center text-center gap-4">
@@ -328,9 +328,9 @@ const CreatorSpace = () => {
         </Card>
       </div>
 
-      <PublishPodcastModal
-        isOpen={showPublishPodcast}
-        onClose={() => setShowPublishPodcast(false)}
+      <VideoUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
       />
     </div>
   );

@@ -9,6 +9,7 @@ interface VideoUploadModalProps {
 }
 
 const VideoUploadModal = ({ isOpen, onClose }: VideoUploadModalProps) => {
+  const [contentType, setContentType] = useState<'video' | 'short' | null>(null);
   const [uploadType, setUploadType] = useState<'file' | 'link' | null>(null);
   const [videoUrl, setVideoUrl] = useState('');
   const [title, setTitle] = useState('');
@@ -52,16 +53,62 @@ const VideoUploadModal = ({ isOpen, onClose }: VideoUploadModalProps) => {
     <Modal 
       isOpen={isOpen} 
       onClose={onClose}
-      size="3xl"
+      size="lg"
       classNames={{
         base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
         closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
       }}
     >
       <ModalContent>
-        <ModalHeader>Upload Video</ModalHeader>
+        <ModalHeader>{contentType ? `Upload ${contentType === 'video' ? 'Video' : 'Short'}` : 'Choose Content Type'}</ModalHeader>
         <ModalBody>
-          {!uploadType ? (
+          {!contentType ? (
+            <div className="grid grid-cols-2 gap-4">
+              <Card
+                isPressable
+                className={`${
+                  theme === 'dark'
+                    ? 'bg-gray-700/50 border-gray-600 hover:bg-gray-700'
+                    : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+                } border transition-colors`}
+                onClick={() => setContentType('video')}
+              >
+                <CardBody className="p-4 text-center">
+                  <div className="p-3 bg-primary/10 rounded-lg w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                    <Upload className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className={`text-lg font-semibold ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Video</h3>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Upload long-form content
+                  </p>
+                </CardBody>
+              </Card>
+
+              <Card
+                isPressable
+                className={`${
+                  theme === 'dark'
+                    ? 'bg-gray-700/50 border-gray-600 hover:bg-gray-700'
+                    : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+                } border transition-colors`}
+                onClick={() => setContentType('short')}
+              >
+                <CardBody className="p-4 text-center">
+                  <div className="p-3 bg-secondary/10 rounded-lg w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                    <Upload className="w-6 h-6 text-secondary" />
+                  </div>
+                  <h3 className={`text-lg font-semibold ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Short</h3>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Upload short-form content
+                  </p>
+                </CardBody>
+              </Card>
+            </div>
+          ) : !uploadType ? (
             <div className="grid grid-cols-2 gap-4">
               <Card
                 isPressable
@@ -72,12 +119,14 @@ const VideoUploadModal = ({ isOpen, onClose }: VideoUploadModalProps) => {
                 } border transition-colors`}
                 onClick={() => setUploadType('file')}
               >
-                <CardBody className="p-6 text-center">
-                  <Upload className="w-8 h-8 text-primary mx-auto mb-3" />
+                <CardBody className="p-4 text-center">
+                  <div className="p-3 bg-primary/10 rounded-lg w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                    <Upload className="w-6 h-6 text-primary" />
+                  </div>
                   <h3 className={`text-lg font-semibold ${
                     theme === 'dark' ? 'text-white' : 'text-gray-900'
                   }`}>Upload File</h3>
-                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                     Upload from your device
                   </p>
                 </CardBody>
@@ -92,12 +141,14 @@ const VideoUploadModal = ({ isOpen, onClose }: VideoUploadModalProps) => {
                 } border transition-colors`}
                 onClick={() => setUploadType('link')}
               >
-                <CardBody className="p-6 text-center">
-                  <LinkIcon className="w-8 h-8 text-primary mx-auto mb-3" />
+                <CardBody className="p-4 text-center">
+                  <div className="p-3 bg-primary/10 rounded-lg w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                    <LinkIcon className="w-6 h-6 text-primary" />
+                  </div>
                   <h3 className={`text-lg font-semibold ${
                     theme === 'dark' ? 'text-white' : 'text-gray-900'
                   }`}>Import from URL</h3>
-                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                     Add from YouTube or other platforms
                   </p>
                 </CardBody>
@@ -225,7 +276,7 @@ const VideoUploadModal = ({ isOpen, onClose }: VideoUploadModalProps) => {
           )}
         </ModalBody>
         <ModalFooter>
-          {uploadType && (
+          {(contentType || uploadType) && (
             <Button
               variant="flat"
               className={`mr-auto ${
@@ -233,7 +284,13 @@ const VideoUploadModal = ({ isOpen, onClose }: VideoUploadModalProps) => {
                   ? 'bg-gray-700 text-white hover:bg-gray-600'
                   : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
               }`}
-              onPress={() => setUploadType(null)}
+              onPress={() => {
+                if (uploadType) {
+                  setUploadType(null);
+                } else {
+                  setContentType(null);
+                }
+              }}
             >
               Back
             </Button>
