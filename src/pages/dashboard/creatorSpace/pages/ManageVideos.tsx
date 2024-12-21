@@ -215,7 +215,7 @@ const ManageVideos = () => {
                 : 'bg-white border-gray-200'
             } border hover:scale-[1.02] transition-all duration-300`}
             isPressable
-            onPress={() => navigate('/dashboard/podroom/podcastvideo')}
+            onPress={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)}
           >
             <CardBody className="p-4">
               {viewMode === 'grid' ? (
@@ -226,8 +226,10 @@ const ManageVideos = () => {
                       alt={video.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Play className="w-8 h-8 text-white cursor-pointer" onClick={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)} />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="w-8 h-8 text-white">
+                        <Play className="w-full h-full" />
+                      </div>
                     </div>
                     <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded">
                       {video.duration}
@@ -300,13 +302,8 @@ const ManageVideos = () => {
                       </DropdownMenu>
                     </Dropdown>
                   </div>
-                  {video.progress < 100 && (
-                    <Progress 
-                      value={video.progress}
-                      color="primary"
-                      size="sm"
-                      className="mt-4"
-                    />
+                  {video.progress < 100 && video.status !== 'unlisted' && (
+                    <Progress value={video.progress} color="primary" size="sm" className="mt-4" />
                   )}
                 </>
               ) : (
@@ -315,11 +312,12 @@ const ManageVideos = () => {
                     <img
                       src={video.thumbnail}
                       alt={video.title}
-                      onClick={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Play className="w-8 h-8 text-white cursor-pointer" onClick={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)} />
+                      <div className="w-8 h-8 text-white">
+                        <Play className="w-full h-full" />
+                      </div>
                     </div>
                     <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded">
                       {video.duration}
@@ -402,7 +400,7 @@ const ManageVideos = () => {
                           </DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
-                      {video.progress < 100 && (
+                      {video.progress < 100 && video.status !== 'unlisted' && (
                         <Progress 
                           value={video.progress}
                           color="primary"

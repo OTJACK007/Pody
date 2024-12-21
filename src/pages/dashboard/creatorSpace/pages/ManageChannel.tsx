@@ -1,13 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Camera, Mail, Building, MapPin, Globe, DollarSign, CreditCard, Wallet, Crown, ListVideo } from 'lucide-react';
 import { Button, Card, CardBody, Input, Avatar, Tabs, Tab, Progress } from "@nextui-org/react";
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { useAuth } from '../../../../contexts/AuthContext';
+import { getUserChannel, createUserChannel, updateUserChannel, uploadChannelImage } from '../../../../services/channel';
+import type { UserChannel } from '../../../../services/channel';
 
 const ManageChannel = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { currentUser } = useAuth();
   const [selectedTab, setSelectedTab] = useState('account');
+  const [isLoading, setIsLoading] = useState(false);
+  const [channelData, setChannelData] = useState<UserChannel | null>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const profileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const loadChannel = async () => {
+      if (!currentUser?.id) return;
+      
+      const channel = await getUserChannel(currentUser.id);
+      if (channel) {
+        setChannelData(channel);
+      } else {
+        // Create default channel if none exists
+        const newChannel = await createUserChannel(currentUser.id, {
+          channel_name: 'My Channel',
+          youtube_link: ''
+        });
+        setChannelData(newChannel);
+      }
+    };
+
+    loadChannel();
+  }, [currentUser?.id]);
+
+  const handleImageUpload = async (file: File, type: 'banner' | 'profile') => {
+    if (!currentUser?.id || !file) return;
+
+    setIsLoading(true);
+    try {
+      const imageUrl = await uploadChannelImage(currentUser.id, file, type);
+      if (imageUrl && channelData) {
+        const updates = type === 'banner' 
+          ? { banner_image: imageUrl }
+          : { profile_image: imageUrl };
+        
+        const updated = await updateUserChannel(currentUser.id, updates);
+        if (updated) {
+          setChannelData(updated);
+        }
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!currentUser?.id || !channelData) return;
+
+    setIsLoading(true);
+    try {
+      const updated = await updateUserChannel(currentUser.id, {
+        channel_name: channelData.channel_name,
+        youtube_link: channelData.youtube_link
+      });
+      
+      if (updated) {
+        setChannelData(updated);
+        alert('Channel settings saved successfully!');
+      }
+    } catch (error) {
+      console.error('Error saving channel:', error);
+      alert('Error saving channel settings. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const [subscriptionPrice, setSubscriptionPrice] = useState('');
 
   const stats = {
@@ -114,87 +187,96 @@ const ManageChannel = () => {
                 <div className={`h-48 rounded-xl overflow-hidden ${
                   theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
                 }`}>
+                  {channelData?.banner_image && (
+                    <img
+                      src={channelData.banner_image}
+                      alt="Channel banner"
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   <Button
                     className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 hover:opacity-100 transition-opacity"
                     variant="flat"
+                    onClick={() => bannerInputRef.current?.click()}
                   >
                     <Camera className="w-6 h-6" />
                     <span>Change Banner</span>
                   </Button>
+                  <input
+                    type="file"
+                    ref={bannerInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(file, 'banner');
+                    }}
+                  />
                 </div>
 
                 <div className="absolute -bottom-12 left-6 flex items-end gap-4">
                   <div className="relative">
                     <Avatar
-                      src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+                      src={channelData?.profile_image || "https://i.pravatar.cc/150?u=a042581f4e29026024d"}
                       className="w-24 h-24 ring-4 ring-background"
                     />
                     <Button
                       isIconOnly
                       className="absolute -bottom-2 -right-2 rounded-full"
                       size="sm"
+                      onClick={() => profileInputRef.current?.click()}
                     >
                       <Camera className="w-4 h-4" />
                     </Button>
+                    <input
+                      type="file"
+                      ref={profileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageUpload(file, 'profile');
+                      }}
+                    />
                   </div>
                 </div>
               </div>
 
-              <div className="mt-16 grid grid-cols-2 gap-6">
+              <div className="mt-16">
                 <Input
                   label="Channel Name"
                   placeholder="Enter channel name"
-                  defaultValue="Tech Insights"
+                  value={channelData?.channel_name || ''}
+                  onChange={(e) => setChannelData(prev => prev ? { ...prev, channel_name: e.target.value } : null)}
+                  className="mb-4 w-full"
                   classNames={{
                     input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
                     inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
-                <Input
-                  label="Email"
-                  placeholder="Enter email"
-                  startContent={<Mail className="w-4 h-4 text-gray-400" />}
-                  classNames={{
-                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
-                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
-                  }}
-                />
-                <Input
-                  label="Company"
-                  placeholder="Enter company name"
-                  startContent={<Building className="w-4 h-4 text-gray-400" />}
-                  classNames={{
-                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
-                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
-                  }}
-                />
-                <Input
-                  label="Location"
-                  placeholder="Enter location"
-                  startContent={<MapPin className="w-4 h-4 text-gray-400" />}
-                  classNames={{
-                    input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
-                    inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
-                  }}
-                />
-                <Input
-                  label="Website"
-                  placeholder="Enter website URL"
-                  startContent={<Globe className="w-4 h-4 text-gray-400" />}
+                <Input 
+                  label="YouTube Channel URL"
+                  placeholder="https://youtube.com/@channel"
+                  value={channelData?.youtube_link || ''}
+                  onChange={(e) => setChannelData(prev => prev ? { ...prev, youtube_link: e.target.value } : null)}
+                  startContent={<img src="https://static.wixstatic.com/media/c67dd6_aea51bc85e594033b8a29040d67b1d15~mv2.png" alt="YouTube" className="w-4 h-4" />}
+                  className="mb-4 w-full"
                   classNames={{
                     input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
                     inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
                   }}
                 />
               </div>
-              <div className="flex justify-end mt-6">
-                <Button
-                  color="primary"
-                  className="px-8"
-                >
-                  Save Changes
-                </Button>
-              </div>
+               <div className="flex justify-end mt-6">
+                 <Button
+                   color="primary"
+                   className="px-8"
+                    onClick={handleSave}
+                    isLoading={isLoading}
+                 >
+                   Save Changes
+                 </Button>
+               </div>
             </CardBody>
           </Card>
         </div>
