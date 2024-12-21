@@ -14,12 +14,30 @@ const SubscriptionModal = ({ isOpen, onClose, channelName, subscriptionPrice }: 
   const { theme } = useTheme();
 
   const benefits = [
-    'Exclusive content access',
-    'Early access to new episodes',
-    'Ad-free experience',
-    'Exclusive community access',
-    'Direct messaging with creator',
-    'Monthly Q&A sessions'
+    {
+      title: 'Shogun360 Basic Plan',
+      price: '$5',
+      description: 'Unlock all content across the platform',
+      features: [
+        'Access to all videos and content',
+        'AI-powered summaries',
+        'Knowledge library access',
+        'Basic analytics'
+      ]
+    },
+    {
+      title: channelName + ' Channel',
+      price: '$7.99',
+      description: 'Support your favorite creator',
+      features: [
+        'Exclusive content access',
+        'Early access to new episodes',
+        'Ad-free experience',
+        'Exclusive community access',
+        'Direct messaging with creator',
+        'Monthly Q&A sessions'
+      ]
+    }
   ];
 
   return (
@@ -37,15 +55,17 @@ const SubscriptionModal = ({ isOpen, onClose, channelName, subscriptionPrice }: 
           <div className="flex items-center gap-3">
             <Crown className="w-6 h-6 text-secondary" />
             <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Subscribe to {channelName}
+              Choose Your Plan
             </h2>
           </div>
           <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-            Get exclusive access and support your favorite creator
+            Select the plan that best fits your needs
           </p>
         </ModalHeader>
         <ModalBody className="py-6">
-          <Card className={`${
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {benefits.map((plan, index) => (
+            <Card key={index} className={`${
             theme === 'dark'
               ? 'bg-gray-700/50 border-gray-600'
               : 'bg-gray-50 border-gray-200'
@@ -53,13 +73,13 @@ const SubscriptionModal = ({ isOpen, onClose, channelName, subscriptionPrice }: 
             <CardBody className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Monthly Subscription
-                  </h3>
+                  <h3 className={`text-xl font-bold ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>{plan.title}</h3>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className={`text-3xl font-bold ${theme === 'dark' ? 'text-secondary' : 'text-secondary-600'}`}>
-                      ${subscriptionPrice}
-                    </span>
+                    <span className={`text-3xl font-bold ${
+                      theme === 'dark' ? 'text-secondary' : 'text-secondary/90'
+                    }`}>{plan.price}</span>
                     <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                       per month
                     </span>
@@ -69,13 +89,13 @@ const SubscriptionModal = ({ isOpen, onClose, channelName, subscriptionPrice }: 
               </div>
 
               <div className="space-y-4">
-                {benefits.map((benefit, index) => (
+                {plan.features.map((feature, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className="p-1 rounded-full bg-secondary/20">
                       <Check className="w-4 h-4 text-secondary" />
                     </div>
                     <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                      {benefit}
+                      {feature}
                     </span>
                   </div>
                 ))}
@@ -83,16 +103,13 @@ const SubscriptionModal = ({ isOpen, onClose, channelName, subscriptionPrice }: 
 
               <Button
                 className="w-full mt-6 bg-secondary text-black font-medium hover:bg-secondary/90"
-                size="lg"
               >
-                Subscribe Now
+                Choose {plan.title}
               </Button>
-
-              <p className={`text-center text-xs mt-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Cancel anytime. Subscription renews monthly.
-              </p>
             </CardBody>
           </Card>
+          ))}
+          </div>
         </ModalBody>
       </ModalContent>
     </Modal>

@@ -42,7 +42,7 @@ const GuestVideos = () => {
               className="bg-secondary text-black font-medium hover:bg-secondary/90"
               onClick={() => setShowSubscriptionModal(true)}
             >
-              Subscribe • $5/mo
+              Unlock all content
             </Button>
             <Button
               startContent={<UserPlus className="w-4 h-4" />}
@@ -61,7 +61,7 @@ const GuestVideos = () => {
         isOpen={showSubscriptionModal}
         onClose={() => setShowSubscriptionModal(false)}
         channelName="Elon Musk"
-        subscriptionPrice="5.00"
+        subscriptionPrice="7.99"
       />
     </div>
   );
