@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Headphones, Search, Filter, Grid, List as ListIcon, Upload, Link, Scissors, Wand2, MessageSquare, Video, Mic2, Play, Star, Calendar, ListVideo, Users } from 'lucide-react';
+import { Headphones, Search, Filter, Grid, List as ListIcon, Upload, Link, Scissors, Wand2, MessageSquare, Video, Mic2, Play, Star, Calendar, ListVideo, Users, CheckCircle2 } from 'lucide-react';
 import { Input, Button, Tabs, Tab, Card, CardBody, Avatar, Badge, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -16,7 +16,6 @@ const allPodcasts = [
     episodes: 156,
     rating: 4.8,
     listeners: '1.2M',
-    progress: 75,
     addedDate: '2024-03-15',
     isFavorite: true
   },
@@ -30,7 +29,6 @@ const allPodcasts = [
     episodes: 89,
     rating: 4.9,
     listeners: '850K',
-    progress: 45,
     addedDate: '2024-03-14',
     isFavorite: false
   },
@@ -44,7 +42,6 @@ const allPodcasts = [
     episodes: 234,
     rating: 4.7,
     listeners: '950K',
-    progress: 60,
     addedDate: '2024-03-13',
     isFavorite: true
   },
@@ -58,7 +55,6 @@ const allPodcasts = [
     episodes: 120,
     rating: 4.6,
     listeners: '750K',
-    progress: 30,
     addedDate: '2024-03-12',
     isFavorite: false
   },
@@ -72,7 +68,6 @@ const allPodcasts = [
     episodes: 78,
     rating: 4.5,
     listeners: '680K',
-    progress: 85,
     addedDate: '2024-03-11',
     isFavorite: true
   }
@@ -88,7 +83,6 @@ interface Podcast {
   episodes: number;
   rating: number;
   listeners: string;
-  progress: number;
   addedDate: string;
   isFavorite?: boolean;
 }
@@ -104,7 +98,6 @@ const PodRoom = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [activeTab, setActiveTab] = useState('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterRating, setFilterRating] = useState<string>('all');
@@ -192,7 +185,7 @@ const PodRoom = () => {
   };
 
   const handlePodcastClick = (podcastId: number) => {
-    navigate(`/dashboard/podroom/podcastvideo`);
+    navigate('/dashboard/podroom/podcastvideo');
   };
 
   return (
@@ -245,32 +238,8 @@ const PodRoom = () => {
           >
             Filters
           </Button>
-          <div className={`flex p-1 rounded-lg ${
-            theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'
-          }`}>
-            <Button
-              isIconOnly
-              className={`transition-colors ${
-                theme === 'dark' ? 'bg-gray-700' : 'bg-white'
-              } ${viewMode === 'grid' ? 'opacity-100' : 'opacity-50'}`}
-              onClick={() => setViewMode('grid')}
-            >
-              <Grid className="w-4 h-4" />
-            </Button>
-            <Button
-              isIconOnly
-              className={`transition-colors ${
-                viewMode === 'list' ? 
-                  theme === 'dark' ? 'bg-gray-700' : 'bg-white'
-                : 'bg-transparent'
-              } ${viewMode === 'list' ? 'opacity-100' : 'opacity-50'}`}
-              onClick={() => setViewMode('list')}
-            >
-              <ListIcon className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
       </div>
+    </div>
 
       <Tabs 
         selectedKey={activeTab}
@@ -288,151 +257,65 @@ const PodRoom = () => {
         <Tab key="favorites" title="Favorites" />
       </Tabs>
 
-      <div className={viewMode === 'grid' ? 
-        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : 
-        "w-full space-y-4"
-      }>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {getFilteredPodcasts().map((podcast) => (
-          <Card 
-            key={podcast.id} 
-            isPressable
-            isHoverable
-            className={`${
-              theme === 'dark' 
-                ? 'bg-gray-800/50 border-gray-700/50' 
-                : 'bg-white border-gray-200'
-            } border w-full`}
-            onClick={() => handlePodcastClick(podcast.id)}
+          <Card key={podcast.id} className={`${
+            theme === 'dark' 
+              ? 'bg-gray-800/50 border-gray-700/50' 
+              : 'bg-white border-gray-200' 
+          } border hover:scale-[1.02] transition-all duration-300`}
+          isPressable
+          onPress={() => handlePodcastClick(podcast.id)}
           >
             <CardBody className="p-4">
-              {viewMode === 'grid' ? (
-                <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
+              <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
                 <img
                   src={podcast.coverImage}
                   alt={podcast.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Avatar
-                      src={podcast.avatar}
-                      className="ring-2 ring-white/20"
-                    />
-                    <div>
-                      <h3 className="text-white font-semibold">{podcast.title}</h3>
-                      <p className="text-sm text-gray-300">{podcast.host}</p>
-                    </div>
-                  </div>
-                  <Progress 
-                    value={podcast.progress} 
-                    color="success"
-                    size="sm"
-                    className="max-w-full"
-                  />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Play className="w-8 h-8 text-white" />
+                </div>
+                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-sm rounded">
+                  45:30
                 </div>
               </div>
-              ) : (
-                <div className="flex items-center gap-6">
-                  <div className="relative w-48 aspect-video flex-shrink-0 rounded-lg overflow-hidden group">
-                    <img
-                      src={podcast.coverImage}
-                      alt={podcast.title}
-                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Play className="w-8 h-8 text-white" />
-                    </div>
-                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded">
-                      45:30
-                    </div>
-                  </div>
-                  <div className="flex-grow flex flex-col min-w-0 justify-between h-full">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <Avatar
-                            src={podcast.avatar}
-                            className="w-10 h-10 ring-2 ring-white/20"
-                          />
-                          <div>
-                            <h3 className={`text-lg font-semibold ${
-                              theme === 'dark' ? 'text-white' : 'text-gray-900'
-                            }`}>{podcast.title}</h3>
-                            <p className={`text-sm ${
-                              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                            }`}>{podcast.host}</p>
-                          </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          isIconOnly
-                          className={`${
-                            podcast.isFavorite
-                              ? 'bg-primary/20 text-primary'
-                              : theme === 'dark'
-                                ? 'bg-gray-700/50 text-gray-400 hover:text-white'
-                                : 'bg-gray-100 text-gray-600 hover:text-black'
-                          } transition-colors`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleFavorite(podcast.id);
-                          }}
-                        >
-                          <Star className={podcast.isFavorite ? 'fill-current' : ''} />
-                        </Button>
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <Badge color="primary" variant="flat">
-                          {podcast.category}
-                        </Badge>
-                        <div className="flex items-center gap-2">
-                          <span className="text-yellow-400">★</span>
-                          <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                            {podcast.rating}
-                          </span>
-                        </div>
-                        <div className={`flex items-center gap-2 ${
-                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
-                          <Users className="w-4 h-4" />
-                          <span>{podcast.listeners}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <Progress
-                        value={podcast.progress}
-                        color="success"
-                        size="sm"
-                        showValueLabel
-                        className="max-w-full"
-                        label="Progress"
-                        valueLabel={`${podcast.progress}%`}
-                        classNames={{
-                          label: theme === 'dark' ? 'text-gray-400' : 'text-gray-600',
-                          value: theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                        }}
-                      />
-
-                      <div className={`flex items-center gap-4 mt-2 ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                      }`}>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          <span>Added {podcast.addedDate}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <ListVideo className="w-4 h-4" />
-                          <span>{podcast.episodes} Episodes</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <h3 className={`text-xl font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>{podcast.title}</h3>
+              
+              <div className="flex items-center gap-3 mb-3">
+                <Avatar
+                  src={podcast.avatar}
+                  size="sm"
+                  className="ring-2 ring-white/20"
+                />
+                <div className="flex items-center gap-2">
+                  <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                    {podcast.host}
+                  </span>
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
                 </div>
-              )}
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Badge color="primary" variant="flat">
+                  {podcast.category}
+                </Badge>
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                    {podcast.rating}
+                  </span>
+                </div>
+                <div className={`flex items-center gap-2 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  <Users className="w-4 h-4" />
+                  <span>{podcast.listeners}</span>
+                </div>
+              </div>
             </CardBody>
           </Card>
         ))}

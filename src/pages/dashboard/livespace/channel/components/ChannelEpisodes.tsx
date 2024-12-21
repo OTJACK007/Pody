@@ -45,11 +45,12 @@ const ChannelEpisodes = () => {
           <Card 
             key={episode.id}
             isPressable
+            onPress={() => navigate('/dashboard/podroom/podcastvideo')}
             className={`${
               theme === 'dark'
                 ? 'bg-gray-800/50 border-gray-700/50'
                 : 'bg-white border-gray-200'
-            } border`}
+            } border hover:scale-[1.02] transition-all duration-300`}
           >
             <CardBody className="p-4">
               <div className="relative aspect-video rounded-lg overflow-hidden mb-4">

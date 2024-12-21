@@ -213,7 +213,9 @@ const ManageVideos = () => {
               theme === 'dark' 
                 ? 'bg-gray-800/50 border-gray-700/50' 
                 : 'bg-white border-gray-200'
-            } border`}
+            } border hover:scale-[1.02] transition-all duration-300`}
+            isPressable
+            onPress={() => navigate('/dashboard/podroom/podcastvideo')}
           >
             <CardBody className="p-4">
               {viewMode === 'grid' ? (
@@ -223,7 +225,6 @@ const ManageVideos = () => {
                       src={video.thumbnail}
                       alt={video.title}
                       className="w-full h-full object-cover"
-                      onClick={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)}
                     />
                     <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                       <Play className="w-8 h-8 text-white cursor-pointer" onClick={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)} />
