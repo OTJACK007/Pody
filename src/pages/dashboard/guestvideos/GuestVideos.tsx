@@ -5,6 +5,8 @@ import { Button, Avatar } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
 import GuestHeader from './components/GuestHeader';
 import GuestProfile from './components/GuestProfile';
+import FullContent from '../podcasts/components/FullContent';
+import TranscriptView from '../podcasts/components/TranscriptView';
 import GuestPodcasts from './components/GuestPodcasts';
 import GuestSocials from './components/GuestSocials';
 import SubscriptionModal from '../../../components/modals/SubscriptionModal';

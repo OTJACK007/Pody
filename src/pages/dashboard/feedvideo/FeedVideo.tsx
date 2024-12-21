@@ -5,9 +5,11 @@ import { Button, Card, CardBody, Tabs, Tab, Chip, Progress, Avatar, Popover, Pop
 import { useTheme } from '../../../contexts/ThemeContext';
 import VideoPlayer from './components/VideoPlayer';
 import KeyMoments from './components/KeyMoments';
+import FullContent from '../podcasts/components/FullContent';
 import ShortsCarousel from './components/ShortsCarousel';
 import InsightsList from './components/InsightsList';
 import TopicInsights from './components/TopicInsights';
+import TranscriptView from '../podcasts/components/TranscriptView';
 import CodyAIChat from '../../../components/features/CodyAIChat';
 import RelatedContent from '../podcasts/components/RelatedContent';
 import NotionConnect from './components/NotionConnect';
@@ -220,14 +222,46 @@ const FeedVideo = () => {
               <Tab key="key-moments" title="Key Moments" />
               <Tab key="insights" title="Insights" />
               <Tab key="topics" title="Topics" />
+              <Tab key="transcript" title="Transcript" />
               <Tab key="shorts" title="Shorts" />
             </Tabs>
 
             <div className="mt-6">
               {selectedView === 'full' && (
-                <div className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                  {podcastData.description}
-                </div>
+                <FullContent content={{
+                  title: podcastData.title,
+                  description: podcastData.description,
+                  sections: [
+                    {
+                      title: 'Overview',
+                      content: 'This episode explores the fascinating world of artificial intelligence and its profound impact across various industries. We delve into current trends, ethical considerations, and future predictions from industry experts.',
+                      key_points: [
+                        'Evolution of AI technology',
+                        'Current industry applications',
+                        'Future predictions and trends',
+                        'Impact on business and society'
+                      ],
+                      detailed_points: [
+                        {
+                          title: 'Evolution of AI Technology',
+                          content: 'The journey of AI technology has been remarkable, starting from simple rule-based systems to today\'s sophisticated neural networks. We\'ve seen major breakthroughs in machine learning, natural language processing, and computer vision.'
+                        },
+                        {
+                          title: 'Current Industry Applications',
+                          content: 'AI is currently transforming numerous industries. In healthcare, it\'s improving diagnostic accuracy and drug discovery. Financial institutions use AI for fraud detection and risk assessment.'
+                        },
+                        {
+                          title: 'Future Predictions and Trends',
+                          content: 'The future of AI holds exciting possibilities. Experts predict significant advancements in autonomous systems, more sophisticated language models, and breakthrough applications in quantum computing.'
+                        },
+                        {
+                          title: 'Impact on Business and Society',
+                          content: 'AI\'s influence extends beyond technological advancement, reshaping business models and societal structures. It\'s creating new job categories while automating routine tasks.'
+                        }
+                      ]
+                    }
+                  ]
+                }} />
               )}
               {selectedView === 'key-moments' && (
                 <KeyMoments moments={podcastData.keyMoments} />
@@ -237,6 +271,9 @@ const FeedVideo = () => {
               )}
               {selectedView === 'topics' && (
                 <TopicInsights topics={podcastData.topics} moments={podcastData.keyMoments} />
+              )}
+              {selectedView === 'transcript' && (
+                <TranscriptView podcastId={podcastData.id} />
               )}
               {selectedView === 'shorts' && (
                 <ShortsCarousel shorts={[

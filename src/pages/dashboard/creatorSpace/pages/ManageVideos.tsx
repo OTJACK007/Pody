@@ -13,6 +13,7 @@ const ManageVideos = () => {
   const [showFiltersModal, setShowFiltersModal] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedTab, setSelectedTab] = useState('all');
+  const [contentType, setContentType] = useState<'videos' | 'shorts'>('videos');
 
   const videos = [
     {
@@ -23,7 +24,8 @@ const ManageVideos = () => {
       duration: '15:30',
       publishDate: '2024-03-15',
       status: 'public',
-      progress: 100
+      progress: 100,
+      type: 'video'
     },
     {
       id: 2,
@@ -33,7 +35,8 @@ const ManageVideos = () => {
       duration: '12:45',
       publishDate: '2024-03-14',
       status: 'private',
-      progress: 100
+      progress: 100,
+      type: 'video'
     },
     {
       id: 3,
@@ -43,7 +46,30 @@ const ManageVideos = () => {
       duration: '18:20',
       publishDate: '2024-03-13',
       status: 'unlisted',
-      progress: 75
+      progress: 75,
+      type: 'video'
+    },
+    {
+      id: 4,
+      title: 'Quick AI Tips',
+      thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
+      views: '250K',
+      duration: '0:60',
+      publishDate: '2024-03-12',
+      status: 'public',
+      progress: 100,
+      type: 'short'
+    },
+    {
+      id: 5,
+      title: 'ML Best Practices',
+      thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800',
+      views: '180K',
+      duration: '0:45',
+      publishDate: '2024-03-11',
+      status: 'public',
+      progress: 100,
+      type: 'short'
     }
   ];
 
@@ -138,7 +164,7 @@ const ManageVideos = () => {
       <div className="flex items-center justify-between">
         <div className="flex-1 max-w-xl">
           <Input
-            placeholder="Search videos..."
+            placeholder={`Search ${contentType}...`}
             classNames={{
               input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
               inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
@@ -147,6 +173,19 @@ const ManageVideos = () => {
         </div>
       </div>
 
+      <Tabs
+        selectedKey={contentType}
+        onSelectionChange={(key) => setContentType(key as 'videos' | 'shorts')}
+        classNames={{
+          tabList: `${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} p-1 rounded-lg`,
+          cursor: `${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`,
+          tab: `${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} data-[selected=true]:${theme === 'dark' ? 'text-white' : 'text-gray-900'}`,
+          tabContent: "group-data-[selected=true]:text-inherit"
+        }}
+      >
+        <Tab key="videos" title="Videos" />
+        <Tab key="shorts" title="Shorts" />
+      </Tabs>
       <Tabs 
         selectedKey={selectedTab}
         onSelectionChange={(key) => setSelectedTab(key.toString())}
@@ -167,7 +206,7 @@ const ManageVideos = () => {
         "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : 
         "space-y-4"
       }>
-        {videos.map((video) => (
+        {videos.filter(video => video.type === contentType.slice(0, -1)).map((video) => (
           <Card 
             key={video.id}
             className={`${
@@ -184,9 +223,10 @@ const ManageVideos = () => {
                       src={video.thumbnail}
                       alt={video.title}
                       className="w-full h-full object-cover"
+                      onClick={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)}
                     />
                     <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Play className="w-8 h-8 text-white" />
+                      <Play className="w-8 h-8 text-white cursor-pointer" onClick={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)} />
                     </div>
                     <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded">
                       {video.duration}
@@ -274,10 +314,11 @@ const ManageVideos = () => {
                     <img
                       src={video.thumbnail}
                       alt={video.title}
+                      onClick={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Play className="w-8 h-8 text-white" />
+                      <Play className="w-8 h-8 text-white cursor-pointer" onClick={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)} />
                     </div>
                     <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded">
                       {video.duration}

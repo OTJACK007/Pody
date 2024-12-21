@@ -14,6 +14,8 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@nextui-org/react": "^2.2.10",
     "@supabase/supabase-js": "^2.39.7",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
     "chart.js": "^4.4.2",
     "embla-carousel-react": "^8.0.0",
     "framer-motion": "^11.0.8",

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { ArrowLeft, Brain, Plus, CheckCircle2, Eye, MessageSquare, Share2, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import { ArrowLeft, Brain, Plus, CheckCircle2, Eye, Share2, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { Button, Card, CardBody, Avatar, Badge } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
 import CodyAIChat from '../../../components/features/CodyAIChat';
@@ -21,7 +21,6 @@ const ShortVideo = () => {
     description: 'Essential tips for getting started with AI development',
     videoUrl: 'https://video.wixstatic.com/video/c67dd6_8c436b9b6e42468a9e2b68ea49868528/1080p/mp4/file.mp4',
     views: '1.2M',
-    likes: '45K',
     shares: '12K',
     channel: {
       name: 'TechBites',
@@ -165,12 +164,6 @@ const ShortVideo = () => {
                 <Eye className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} />
                 <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
                   {shortData.views} views
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MessageSquare className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} />
-                <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                  {shortData.likes} likes
                 </span>
               </div>
               <div className="flex items-center gap-2">
