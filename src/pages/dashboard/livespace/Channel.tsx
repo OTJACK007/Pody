@@ -145,7 +145,9 @@ const Channel = () => {
             : 'bg-white border-gray-200'
         } border`}>
           <CardBody className="p-6">
-            <h3 className="text-2xl font-bold text-white">{channel.stats.totalViews}</h3>
+            <h3 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              {channel.stats.totalViews}
+            </h3>
             <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
               Total Views
             </p>
@@ -157,7 +159,9 @@ const Channel = () => {
             : 'bg-white border-gray-200'
         } border`}>
           <CardBody className="p-6">
-            <h3 className="text-2xl font-bold text-white">{channel.stats.totalEpisodes}</h3>
+            <h3 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              {channel.stats.totalEpisodes}
+            </h3>
             <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
               Total Episodes
             </p>
@@ -169,7 +173,9 @@ const Channel = () => {
             : 'bg-white border-gray-200'
         } border`}>
           <CardBody className="p-6">
-            <h3 className="text-2xl font-bold text-white">{channel.stats.avgRating}</h3>
+            <h3 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              {channel.stats.avgRating}
+            </h3>
             <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
               Average Rating
             </p>

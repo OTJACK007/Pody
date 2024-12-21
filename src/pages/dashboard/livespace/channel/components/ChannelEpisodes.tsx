@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, Progress } from "@nextui-org/react";
 import { useTheme } from '../../../../../contexts/ThemeContext';
 
 const ChannelEpisodes = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
 
   const episodes = [
     {
