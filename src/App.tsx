@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute';
 import AuthCallback from './pages/AuthCallback';
 import ShortVideo from './pages/dashboard/shortvideo/ShortVideo';
+import VideoPage from './pages/dashboard/video/VideoPage';
 import { ThemeProvider } from './contexts/ThemeContext';
 import BrandDeals from './pages/dashboard/BrandDeals';
 import LandingPage from './pages/LandingPage';
@@ -64,6 +65,7 @@ function App() {
             <Route path="livespace/channel" element={<Channel />} />
             <Route path="feedvideo/:id" element={<FeedVideo />} />
             <Route path="shortvideo/:id" element={<ShortVideo />} />
+            <Route path="video/:id" element={<VideoPage />} />
             <Route path="guestvideos/:id" element={<GuestVideos />} />
             <Route path="podroom" element={<PodRoom />} />
             <Route path="podroom/podcastvideo" element={<PodcastVideo />} />

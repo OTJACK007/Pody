@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
+import { X } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface VideoFiltersModalProps {
@@ -36,126 +36,140 @@ const VideoFiltersModal = ({ isOpen, onClose, onFiltersChange }: VideoFiltersMod
     onClose();
   };
 
-  return (
-    <Modal 
-      isOpen={isOpen} 
-      onClose={onClose}
-      classNames={{
-        base: `${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'}`,
-        closeButton: `${theme === 'dark' ? 'text-white hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`
-      }}
-    >
-      <ModalContent>
-        <ModalHeader>Filter Videos</ModalHeader>
-        <ModalBody className="space-y-6">
-          {/* Date Filter */}
-          <div>
-            <h4 className={`text-sm font-medium mb-3 ${
-              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-            }`}>Date</h4>
-            <div className="space-y-2">
-              {dateOptions.map(option => (
-                <label 
-                  key={option.value}
-                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
-                    dateFilter === option.value
-                      ? theme === 'dark'
-                        ? 'bg-primary/20 text-primary'
-                        : 'bg-primary/10 text-primary'
-                      : theme === 'dark'
-                        ? 'hover:bg-gray-700/50'
-                        : 'hover:bg-gray-100'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="dateFilter"
-                    value={option.value}
-                    checked={dateFilter === option.value}
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    className="hidden"
-                  />
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                    dateFilter === option.value
-                      ? 'border-primary'
-                      : theme === 'dark'
-                        ? 'border-gray-600'
-                        : 'border-gray-300'
-                  }`}>
-                    {dateFilter === option.value && (
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                    )}
-                  </div>
-                  <span>{option.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+  if (!isOpen) return null;
 
-          {/* Duration Filter */}
-          <div>
-            <h4 className={`text-sm font-medium mb-3 ${
-              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-            }`}>Duration</h4>
-            <div className="space-y-2">
-              {durationOptions.map(option => (
-                <label 
-                  key={option.value}
-                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
-                    durationFilter === option.value
-                      ? theme === 'dark'
-                        ? 'bg-primary/20 text-primary'
-                        : 'bg-primary/10 text-primary'
-                      : theme === 'dark'
-                        ? 'hover:bg-gray-700/50'
-                        : 'hover:bg-gray-100'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="durationFilter"
-                    value={option.value}
-                    checked={durationFilter === option.value}
-                    onChange={(e) => setDurationFilter(e.target.value)}
-                    className="hidden"
-                  />
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                    durationFilter === option.value
-                      ? 'border-primary'
-                      : theme === 'dark'
-                        ? 'border-gray-600'
-                        : 'border-gray-300'
-                  }`}>
-                    {durationFilter === option.value && (
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                    )}
-                  </div>
-                  <span>{option.label}</span>
-                </label>
-              ))}
-            </div>
+  return (
+    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50`}>
+      <div className={`relative w-full max-w-md ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      } rounded-lg shadow-xl p-6`}>
+        <button
+          onClick={onClose}
+          className={`absolute top-4 right-4 p-1 rounded-lg transition-colors ${
+            theme === 'dark'
+              ? 'hover:bg-gray-700 text-gray-400'
+              : 'hover:bg-gray-100 text-gray-600'
+          }`}
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <h2 className={`text-xl font-semibold mb-6 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>Filter Videos</h2>
+
+        {/* Date Filter */}
+        <div className="mb-6">
+          <h4 className={`text-sm font-medium mb-3 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>Date</h4>
+          <div className="space-y-2">
+            {dateOptions.map(option => (
+              <label 
+                key={option.value}
+                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
+                  dateFilter === option.value
+                    ? theme === 'dark'
+                      ? 'bg-primary/20 text-primary'
+                      : 'bg-primary/10 text-primary'
+                    : theme === 'dark'
+                      ? 'hover:bg-gray-700/50'
+                      : 'hover:bg-gray-100'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="dateFilter"
+                  value={option.value}
+                  checked={dateFilter === option.value}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="hidden"
+                />
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  dateFilter === option.value
+                    ? 'border-primary'
+                    : theme === 'dark'
+                      ? 'border-gray-600'
+                      : 'border-gray-300'
+                }`}>
+                  {dateFilter === option.value && (
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                  )}
+                </div>
+                <span>{option.label}</span>
+              </label>
+            ))}
           </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            color="danger"
-            variant="flat"
-            onPress={() => {
+        </div>
+
+        {/* Duration Filter */}
+        <div className="mb-6">
+          <h4 className={`text-sm font-medium mb-3 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>Duration</h4>
+          <div className="space-y-2">
+            {durationOptions.map(option => (
+              <label 
+                key={option.value}
+                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
+                  durationFilter === option.value
+                    ? theme === 'dark'
+                      ? 'bg-primary/20 text-primary'
+                      : 'bg-primary/10 text-primary'
+                    : theme === 'dark'
+                      ? 'hover:bg-gray-700/50'
+                      : 'hover:bg-gray-100'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="durationFilter"
+                  value={option.value}
+                  checked={durationFilter === option.value}
+                  onChange={(e) => setDurationFilter(e.target.value)}
+                  className="hidden"
+                />
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  durationFilter === option.value
+                    ? 'border-primary'
+                    : theme === 'dark'
+                      ? 'border-gray-600'
+                      : 'border-gray-300'
+                }`}>
+                  {durationFilter === option.value && (
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                  )}
+                </div>
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => {
               setDateFilter('all');
               setDurationFilter('all');
             }}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              theme === 'dark'
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+            }`}
           >
             Reset
-          </Button>
-          <Button
-            color="primary"
-            onPress={handleApplyFilters}
+          </button>
+          <button
+            onClick={handleApplyFilters}
+            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
           >
             Apply Filters
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

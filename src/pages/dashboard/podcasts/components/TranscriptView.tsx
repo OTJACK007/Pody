@@ -1,33 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardBody, Input, Button, Progress } from "@nextui-org/react";
 import { Search, Download, Copy, Clock } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { getVideoTranscript } from '../../../../services/videoData';
 
 interface TranscriptViewProps {
-  podcastId: string;
+  videoId: string;
 }
 
-const TranscriptView = ({ podcastId }: TranscriptViewProps) => {
+const TranscriptView = ({ videoId }: TranscriptViewProps) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [transcript, setTranscript] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { theme } = useTheme();
 
-  const transcript = [
-    {
-      time: '00:00:00',
-      speaker: 'Host',
-      text: 'Welcome to another episode of Tech Insights. Today we\'re diving deep into the future of AI technology.'
-    },
-    {
-      time: '00:00:15',
-      speaker: 'Guest',
-      text: 'Thanks for having me. I\'m excited to share my insights on where AI is heading and its potential impact.'
-    },
-    {
-      time: '00:00:30',
-      speaker: 'Host',
-      text: 'Let\'s start with the ethical considerations. What are the key challenges we need to address?'
-    }
-  ];
+  useEffect(() => {
+    const loadTranscript = async () => {
+      const data = await getVideoTranscript(videoId);
+      setTranscript(data);
+      setIsLoading(false);
+    };
+
+    loadTranscript();
+  }, [videoId]);
+
+  if (isLoading) {
+    return <div>Loading transcript...</div>;
+  }
 
   return (
     <div className="space-y-6">

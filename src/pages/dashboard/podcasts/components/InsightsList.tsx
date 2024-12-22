@@ -12,7 +12,7 @@ const InsightsList = ({ insights }: InsightsListProps) => {
   const { theme } = useTheme();
 
   const filteredInsights = insights.filter(insight =>
-    insight.toLowerCase().includes(searchQuery.toLowerCase())
+    typeof insight === 'string' && insight.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -51,9 +51,9 @@ const InsightsList = ({ insights }: InsightsListProps) => {
             } border transition-colors group`}
           >
             <CardBody className="p-4">
-              <p className={`mb-4 ${
+              <p className={`mb-4 break-words ${
                 theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}>{insight}</p>
+              }`}>{typeof insight === 'object' ? insight.content : insight}</p>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">

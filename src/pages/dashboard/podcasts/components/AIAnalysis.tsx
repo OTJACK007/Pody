@@ -3,39 +3,37 @@ import { Card, CardBody, Progress, Button, Chip } from "@nextui-org/react";
 import { Brain, Sparkles, MessageSquare, Lightbulb, TrendingUp, Target } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
-interface AIAnalysisProps {
-  podcast: {
+export interface AIAnalysisProps {
+  video: {
     title: string;
-    topics: string[];
-    keyMoments: Array<{
-      title: string;
-      insights: string[];
-    }>;
+    description?: string;
+    topics?: string[];
+    aiAnalysis?: {
+      key_takeaways: string[];
+      content_quality: {
+        insightDepth: number;
+        actionability: number;
+        relevance: number;
+        clarity: number;
+      };
+      recommendations: string[];
+    };
   };
   onAskQuestion: () => void;
 }
 
-const AIAnalysis = ({ podcast, onAskQuestion }: AIAnalysisProps) => {
+const AIAnalysis = ({ video, onAskQuestion }: AIAnalysisProps) => {
   const { theme } = useTheme();
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
-
-  const aiInsights = {
-    keyTakeaways: [
-      'AI ethics must be prioritized in development',
-      'Machine learning is becoming more accessible',
-      'Healthcare will be transformed by AI applications'
-    ],
-    contentQuality: {
-      insightDepth: 95,
-      actionability: 88,
-      relevance: 92,
-      clarity: 90
+  // Ensure we always have default values
+  const aiInsights = video.aiAnalysis || {
+    key_takeaways: [],
+    content_quality: {
+      insightDepth: 0,
+      actionability: 0,
+      relevance: 0,
+      clarity: 0
     },
-    recommendations: [
-      'Explore practical AI implementation strategies',
-      'Consider ethical implications in AI development',
-      'Focus on healthcare AI applications'
-    ]
+    recommendations: []
   };
 
   return (
@@ -64,7 +62,7 @@ const AIAnalysis = ({ podcast, onAskQuestion }: AIAnalysisProps) => {
             <ul className={`list-none space-y-2 ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
             }`}>
-              {aiInsights.keyTakeaways.map((takeaway, index) => (
+              {aiInsights.key_takeaways.map((takeaway, index) => (
                 <li key={index} className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                   <span>{takeaway}</span>
@@ -82,7 +80,7 @@ const AIAnalysis = ({ podcast, onAskQuestion }: AIAnalysisProps) => {
               <Target className="w-4 h-4 text-primary" />
             </div>
             <div className="space-y-3">
-              {Object.entries(aiInsights.contentQuality).map(([key, value]) => (
+              {Object.entries(aiInsights.content_quality).map(([key, value]) => (
                 <div key={key}>
                   <div className="flex justify-between text-sm mb-1">
                     <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
@@ -111,7 +109,7 @@ const AIAnalysis = ({ podcast, onAskQuestion }: AIAnalysisProps) => {
               <TrendingUp className="w-4 h-4 text-primary" />
             </div>
             <div className="flex flex-wrap gap-2">
-              {podcast.topics.map((topic) => (
+              {(video.topics || []).map((topic) => (
                 <Chip key={topic} size="sm" variant="flat">
                   {topic}
                 </Chip>

@@ -3,19 +3,31 @@ import { Card, CardBody, Button, Progress } from "@nextui-org/react";
 import { Play, Clock, MessageSquare } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
-interface KeyMoment {
-  timestamp: string;
-  title: string;
-  summary: string;
-  insights: string[];
-}
+import { useEffect, useState } from 'react';
+import { getVideoKeyMoments } from '../../../../services/videoData';
 
 interface KeyMomentsProps {
-  moments: KeyMoment[];
+  videoId: string;
 }
 
-const KeyMoments = ({ moments }: KeyMomentsProps) => {
+const KeyMoments = ({ videoId }: KeyMomentsProps) => {
   const { theme } = useTheme();
+  const [moments, setMoments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadKeyMoments = async () => {
+      const data = await getVideoKeyMoments(videoId);
+      setMoments(data);
+      setIsLoading(false);
+    };
+
+    loadKeyMoments();
+  }, [videoId]);
+
+  if (isLoading) {
+    return <div>Loading key moments...</div>;
+  }
 
   return (
     <div className="space-y-4">

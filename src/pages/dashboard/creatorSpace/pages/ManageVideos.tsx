@@ -201,7 +201,7 @@ const ManageVideos = () => {
                 : 'bg-white border-gray-200'
             } border hover:scale-[1.02] transition-all duration-300`}
             isPressable
-            onPress={() => navigate(video.type === 'video' ? '/dashboard/podroom/podcastvideo' : `/dashboard/shortvideo/${video.id}`)}
+            onPress={() => navigate(`/dashboard/video/${video.id}`)}
           >
             <CardBody className="p-4">
               <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
