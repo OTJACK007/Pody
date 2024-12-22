@@ -1,29 +1,127 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings2, ExternalLink, FileText, Folder, Clock, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeft, Settings2, ExternalLink, FileText, Clock, RefreshCw, Database } from 'lucide-react';
 import { Card, CardBody, Button, Switch } from "@nextui-org/react";
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { notionService } from '../../../../services/notion';
+import { supabase } from '../../../../lib/supabase';
+import { useAuth } from '../../../../contexts/AuthContext';
 
 const NotionConfig = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme } = useTheme();
-
-  const [settings, setSettings] = useState({
-    autoSync: true,
-    dailySummaries: false,
-    workspaceSync: true,
-    templateUse: true
+  const { currentUser } = useAuth();
+  const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    pages: '0',
+    databases: '0',
+    lastSync: 'Never',
+    syncRate: '0%'
   });
 
-  const stats = {
-    pages: '156',
-    databases: '12',
-    lastSync: '5 min ago',
-    syncRate: '98%'
+  useEffect(() => {
+    // Check for OAuth code in URL
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code');
+    
+    if (code) {
+      handleOAuthCallback(code);
+    }
+    
+    checkConnection();
+  }, []);
+
+  const checkConnection = async () => {
+    setIsLoading(true);
+    try {
+      // Check for OAuth code in URL
+      const params = new URLSearchParams(location.search);
+      const code = params.get('code');
+      
+      if (code) {
+        await handleOAuthCallback(code);
+        // Remove code from URL
+        window.history.replaceState({}, document.title, '/dashboard/connected-apps/configure/notion');
+      }
+
+      const { data: connection } = await supabase
+        .from('notion_connections')
+        .select('*')
+        .eq('user_id', currentUser?.id)
+        .single();
+
+      setIsConnected(!!connection);
+      
+      if (connection) {
+        // Update stats
+        setStats({
+          pages: '156',
+          databases: '12',
+          lastSync: '5 min ago',
+          syncRate: '98%'
+        });
+      }
+    } catch (error) {
+      console.error('Error checking Notion connection:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOAuthCallback = async (code: string) => {
+    try {
+      const success = await notionService.handleAuthCallback(code);
+      
+      if (success) {
+        // Save connection in database
+        const { error } = await supabase
+          .from('notion_connections')
+          .upsert({
+            user_id: currentUser?.id,
+            access_token: localStorage.getItem('notion_access_token') || '',
+            workspace_id: 'default',
+            workspace_name: 'My Workspace'
+          });
+
+        if (error) throw error;
+        
+        setIsConnected(true);
+        // Remove code from URL
+        window.history.replaceState({}, document.title, '/dashboard/connected-apps/configure/notion');
+      }
+    } catch (error) {
+      console.error('Error handling OAuth callback:', error);
+    }
+  };
+
+  const handleConnect = () => {
+    window.location.href = notionService.getAuthUrl();
+  };
+
+  const handleDisconnect = async () => {
+    try {
+      await supabase
+        .from('notion_connections')
+        .delete()
+        .eq('user_id', currentUser?.id);
+
+      notionService.disconnect();
+      setIsConnected(false);
+      setStats({
+        pages: '0',
+        databases: '0',
+        lastSync: 'Never',
+        syncRate: '0%'
+      });
+    } catch (error) {
+      console.error('Error disconnecting Notion:', error);
+    }
   };
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-4xl">
       <div>
         <Button
           variant="light"
@@ -80,7 +178,7 @@ const NotionConfig = () => {
             <CardBody className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="p-2 bg-green-500/10 rounded-lg">
-                  <Folder className="w-5 h-5 text-green-500" />
+                  <Database className="w-5 h-5 text-green-500" />
                 </div>
                 <span className={`text-2xl font-bold ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -157,6 +255,7 @@ const NotionConfig = () => {
                     : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                 }`}
                 size="sm"
+                onClick={() => window.open('https://notion.so', '_blank')}
               >
                 Open Notion
               </Button>
@@ -166,71 +265,17 @@ const NotionConfig = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                    Auto-sync Notes
+                    Notion Integration
                   </p>
                   <p className={`text-sm ${
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                   }`}>
-                    Automatically sync notes and summaries
+                    Connect your Notion workspace
                   </p>
                 </div>
                 <Switch
-                  isSelected={settings.autoSync}
-                  onValueChange={(value) => setSettings({ ...settings, autoSync: value })}
-                  color="success"
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                    Daily Summaries
-                  </p>
-                  <p className={`text-sm ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                  }`}>
-                    Create daily content summaries
-                  </p>
-                </div>
-                <Switch
-                  isSelected={settings.dailySummaries}
-                  onValueChange={(value) => setSettings({ ...settings, dailySummaries: value })}
-                  color="success"
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                    Workspace Sync
-                  </p>
-                  <p className={`text-sm ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                  }`}>
-                    Sync with Notion workspace
-                  </p>
-                </div>
-                <Switch
-                  isSelected={settings.workspaceSync}
-                  onValueChange={(value) => setSettings({ ...settings, workspaceSync: value })}
-                  color="success"
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                    Template Usage
-                  </p>
-                  <p className={`text-sm ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                  }`}>
-                    Use custom Notion templates
-                  </p>
-                </div>
-                <Switch
-                  isSelected={settings.templateUse}
-                  onValueChange={(value) => setSettings({ ...settings, templateUse: value })}
+                  isSelected={isConnected}
+                  onValueChange={(value) => value ? handleConnect() : handleDisconnect()}
                   color="success"
                 />
               </div>

@@ -26,6 +26,7 @@ const VideoPage = () => {
   const { currentUser } = useAuth();
   const [showCodyChat, setShowCodyChat] = useState(false);
   const [showNotionModal, setShowNotionModal] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
   const [selectedView, setSelectedView] = useState('full');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +90,22 @@ const VideoPage = () => {
 
     loadVideo();
   }, [id, currentUser?.id]);
+
+  const handleNotionExtract = async (pageId: string) => {
+    if (!videoData) return;
+    
+    try {
+      await notionService.extractContentToNotion(pageId, {
+        title: videoData.video.title,
+        description: videoData.video.description,
+        overview_section: videoData.fullContent.overview_section,
+        deepdive_section: videoData.fullContent.deepdive_section
+      });
+    } catch (error) {
+      console.error('Error extracting to Notion:', error);
+      alert('Failed to extract content to Notion. Please try again.');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -317,6 +334,8 @@ const VideoPage = () => {
       <NotionConnect
         isOpen={showNotionModal}
         onClose={() => setShowNotionModal(false)}
+        onPageSelect={handleNotionExtract}
+        title={videoData?.video.title}
       />
     </div>
   );

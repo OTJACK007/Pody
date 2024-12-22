@@ -8,6 +8,35 @@ const ConnectedApps = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
 
+  const handleConnect = async (network: any) => {
+    try {
+      if (network.name === 'Notion') {
+        window.location.href = notionService.getAuthUrl();
+        return;
+      }
+
+      const account: SocialAccount = {
+        id: Date.now().toString(),
+        platform: network.name,
+      };
+    } catch (error) {
+      console.error('Error connecting account:', error);
+    }
+  };
+
+  const handleDisconnect = async (platform: string) => {
+    try {
+      if (platform === 'Notion') {
+        notionService.disconnect();
+        return;
+      }
+
+      await disconnectAccount(platform);
+    } catch (error) {
+      console.error('Error disconnecting account:', error);
+    }
+  };
+
   const apps = [
     {
       id: 'youtube',
