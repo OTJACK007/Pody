@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Button, Input } from "@nextui-org/react";
-import { Search, Tag, Plus, MessageSquare, Share2 } from 'lucide-react';
+import { Search, Tag, Plus, Share2 } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface InsightsListProps {
-  insights: string[];
+  insights?: Array<{
+    id: string;
+    content: string;
+    timestamp: string;
+  }>;
 }
 
 const InsightsList = ({ insights }: InsightsListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { theme } = useTheme();
 
-  const filteredInsights = insights.filter(insight =>
-    typeof insight === 'string' && insight.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredInsights = (insights || []).filter(insight =>
+    insight.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -41,9 +45,9 @@ const InsightsList = ({ insights }: InsightsListProps) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredInsights.map((insight, index) => (
+        {filteredInsights.map((insight) => (
           <Card
-            key={index}
+            key={insight.id}
             className={`${
               theme === 'dark'
                 ? 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-800'
@@ -53,7 +57,7 @@ const InsightsList = ({ insights }: InsightsListProps) => {
             <CardBody className="p-4">
               <p className={`mb-4 break-words ${
                 theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}>{typeof insight === 'object' ? insight.content : insight}</p>
+              }`}>{insight.content}</p>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -72,11 +76,6 @@ const InsightsList = ({ insights }: InsightsListProps) => {
                   >
                     <Share2 className="w-4 h-4" />
                   </Button>
-                </div>
-                <div className={`text-sm ${
-                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                }`}>
-                  5 min ago
                 </div>
               </div>
             </CardBody>

@@ -1,32 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardBody, Input, Button, Progress } from "@nextui-org/react";
 import { Search, Download, Copy, Clock } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
-import { getVideoTranscript } from '../../../../services/videoData';
 
 interface TranscriptViewProps {
-  videoId: string;
+  transcript: {
+    time: string;
+    speaker: string;
+    text: string;
+  }[];
 }
 
-const TranscriptView = ({ videoId }: TranscriptViewProps) => {
+const TranscriptView = ({ transcript }: TranscriptViewProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [transcript, setTranscript] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { theme } = useTheme();
 
-  useEffect(() => {
-    const loadTranscript = async () => {
-      const data = await getVideoTranscript(videoId);
-      setTranscript(data);
-      setIsLoading(false);
-    };
-
-    loadTranscript();
-  }, [videoId]);
-
-  if (isLoading) {
-    return <div>Loading transcript...</div>;
-  }
+  const filteredTranscript = transcript?.filter(entry =>
+    entry.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    entry.speaker?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
 
   return (
     <div className="space-y-6">
@@ -71,7 +63,7 @@ const TranscriptView = ({ videoId }: TranscriptViewProps) => {
       } border`}>
         <CardBody className="p-6">
           <div className="space-y-6">
-            {transcript.map((entry, index) => (
+            {filteredTranscript.map((entry, index) => (
               <div 
                 key={index}
                 className="flex gap-4 group"

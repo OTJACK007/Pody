@@ -5,8 +5,12 @@ import { useTheme } from '../../../../contexts/ThemeContext';
 import type { Transcript } from '../../../../types/video';
 
 interface EditTranscriptProps {
-  transcript: Transcript[];
-  onChange: (newTranscript: Transcript[]) => void;
+  transcript: {
+    time: string;
+    speaker: string;
+    text: string;
+  }[];
+  onChange: (newTranscript: {time: string; speaker: string; text: string}[]) => void;
 }
 
 const EditTranscript = ({ transcript, onChange }: EditTranscriptProps) => {
@@ -15,9 +19,7 @@ const EditTranscript = ({ transcript, onChange }: EditTranscriptProps) => {
   const handleAdd = () => {
     onChange([
       ...transcript,
-      {
-        id: crypto.randomUUID(),
-        video_id: transcript[0]?.video_id || '',
+      {  
         time: '00:00:00',
         speaker: '',
         text: ''

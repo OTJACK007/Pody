@@ -3,36 +3,22 @@ import { Card, CardBody, Button, Progress } from "@nextui-org/react";
 import { Play, Clock, MessageSquare } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
-import { useEffect, useState } from 'react';
-import { getVideoKeyMoments } from '../../../../services/videoData';
-
-interface KeyMomentsProps {
-  videoId: string;
+interface Props {
+  moments: {
+    timestamp: string;
+    title: string;
+    summary: string;
+    insights: string[];
+  }[];
 }
 
-const KeyMoments = ({ videoId }: KeyMomentsProps) => {
+const KeyMoments = ({ moments }: Props) => {
   const { theme } = useTheme();
-  const [moments, setMoments] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadKeyMoments = async () => {
-      const data = await getVideoKeyMoments(videoId);
-      setMoments(data);
-      setIsLoading(false);
-    };
-
-    loadKeyMoments();
-  }, [videoId]);
-
-  if (isLoading) {
-    return <div>Loading key moments...</div>;
-  }
 
   return (
     <div className="space-y-4">
       {moments.map((moment, index) => (
-        <Card
+        <Card 
           key={index}
           className={`${
             theme === 'dark'
@@ -67,9 +53,9 @@ const KeyMoments = ({ videoId }: KeyMomentsProps) => {
                     <span>{moment.timestamp}</span>
                   </div>
                 </div>
-
+                
                 <div className="space-y-2">
-                  {moment.insights.map((insight, i) => (
+                  {moment.insights?.map((insight, i) => (
                     <div
                       key={i}
                       className={`flex items-center gap-2 text-sm ${
