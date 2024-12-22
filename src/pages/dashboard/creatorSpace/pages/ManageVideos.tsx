@@ -234,14 +234,14 @@ const ManageVideos = () => {
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu>
-                    <DropdownItem>Edit</DropdownItem>
-                    <DropdownItem>Analytics</DropdownItem>
-                    <DropdownItem
-                      className="text-danger"
-                      color="danger"
-                      onPress={() => handleDeleteVideo(video.id)}
-                    >
-                      Delete
+                    <DropdownItem onPress={() => navigate(`/dashboard/video/edit/${video.id}`)}>Edit</DropdownItem>
+                    <DropdownItem>
+                      <div 
+                        className="text-danger cursor-pointer w-full"
+                        onClick={() => handleDeleteVideo(video.id)}
+                      >
+                        Delete
+                      </div>
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>

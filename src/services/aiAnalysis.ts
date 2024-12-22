@@ -11,6 +11,8 @@ export interface AIAnalysis {
     clarity: number;
   };
   recommendations: string[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const getVideoAIAnalysis = async (videoId: string): Promise<AIAnalysis | null> => {
@@ -18,15 +20,11 @@ export const getVideoAIAnalysis = async (videoId: string): Promise<AIAnalysis | 
     .from('ai_analysis')
     .select('*')
     .eq('video_id', videoId)
-    .maybeSingle();
+    .single();
 
   if (error) {
     console.error('Error fetching AI analysis:', error);
-    return null;
-  }
-  
-  // Return default values if no analysis exists
-  if (!data) {
+    // Return default structure if no analysis exists
     return {
       id: '',
       video_id: videoId,
@@ -39,6 +37,27 @@ export const getVideoAIAnalysis = async (videoId: string): Promise<AIAnalysis | 
       },
       recommendations: []
     };
+  }
+
+  return data;
+};
+
+export const updateVideoAIAnalysis = async (videoId: string, analysis: Partial<AIAnalysis>): Promise<AIAnalysis | null> => {
+  const { data, error } = await supabase
+    .from('ai_analysis')
+    .upsert([{
+      video_id: videoId,
+      ...analysis,
+      updated_at: new Date().toISOString()
+    }], {
+      onConflict: 'video_id'
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating AI analysis:', error);
+    return null;
   }
 
   return data;

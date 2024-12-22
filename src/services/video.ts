@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { getVideoAIAnalysis } from './aiAnalysis';
 import type { Video, Insight, KeyMoment, Transcript, Topic, FullContent, RelatedContent } from '../types/video';
 
 // Get video by ID with all metadata
@@ -18,21 +19,30 @@ export const getVideoWithMetadata = async (videoId: string): Promise<{
       { data: keyMoments },
       { data: transcript },
       { data: topics },
-      { data: fullContent },
-      { data: relatedContent }
+      { data: fullContentData },
+      { data: relatedContent },
+      aiAnalysis
     ] = await Promise.all([
       supabase.from('videos').select('*').eq('id', videoId).single(),
       supabase.from('insights').select('*').eq('video_id', videoId),
       supabase.from('key_moments').select('*').eq('video_id', videoId),
       supabase.from('transcripts').select('*').eq('video_id', videoId),
       supabase.from('topics').select('*').eq('video_id', videoId),
-      supabase.from('full_content').select('*').eq('video_id', videoId).single(),
+      supabase.from('full_content').select('*').eq('video_id', videoId),
       supabase.from('related_content')
         .select('*, related_video:videos!related_video_id(*)')
-        .eq('video_id', videoId)
+        .eq('video_id', videoId),
+      getVideoAIAnalysis(videoId)
     ]);
 
     if (!video) return null;
+    
+    // Get the most recent full content entry if multiple exist
+    const fullContent = fullContentData && fullContentData.length > 0 
+      ? fullContentData.sort((a, b) => 
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        )[0]
+      : null;
 
     return {
       video,
@@ -41,7 +51,8 @@ export const getVideoWithMetadata = async (videoId: string): Promise<{
       transcript: transcript || [],
       topics: topics || [],
       fullContent,
-      relatedVideos: relatedContent?.map(rc => rc.related_video) || []
+      relatedVideos: relatedContent?.map(rc => rc.related_video) || [],
+      aiAnalysis
     };
   } catch (error) {
     console.error('Error fetching video metadata:', error);
@@ -245,3 +256,27 @@ export const incrementViews = async (videoId: string): Promise<void> => {
     console.error('Error incrementing views:', error);
   }
 };
+
+export const updateVideo = async (videoId: string, updates: Partial<Video>): Promise<Video | null> => {
+  // Add updated_at timestamp
+  const updatedData = {
+    ...updates,
+    updated_at: new Date().toISOString()
+  };
+
+  const { data, error } = await supabase
+    .from('videos')
+    .update(updatedData)
+    .eq('id', videoId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating video:', error);
+    return null;
+  }
+
+  return data;
+};
+
+// Video metadata operations
