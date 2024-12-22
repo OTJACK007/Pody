@@ -10,12 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@dnd-kit/sortable": "^8.0.0", 
+    "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@nextui-org/react": "^2.2.10",
+    "@notionhq/client": "^2.2.15",
     "@supabase/supabase-js": "^2.39.7",
-    "html2canvas": "^1.4.1",
-    "jspdf": "^2.5.1",
     "chart.js": "^4.4.2",
     "embla-carousel-react": "^8.0.0",
     "framer-motion": "^11.0.8",
