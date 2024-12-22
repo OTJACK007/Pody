@@ -28,9 +28,9 @@ class NotionService {
   private client: Client | null = null;
   private accessToken: string | null = null;
 
-  private readonly clientId = '164d872b-594c-804a-8bae-003728fc272e';
-  private readonly clientSecret = 'secret_azeMrgewQx1PE7W8rpsj9xhvI4OlUcrhn7gzwMahoFX';
-  private readonly redirectUri = 'http://localhost:3000/dashboard/connected-apps/configure/notion';
+  private readonly clientId = import.meta.env.VITE_NOTION_CLIENT_ID;
+  private readonly clientSecret = import.meta.env.VITE_NOTION_CLIENT_SECRET;
+  private readonly redirectUri = import.meta.env.VITE_NOTION_REDIRECT_URI;
 
   constructor() {
     // Initialize with stored token if available
