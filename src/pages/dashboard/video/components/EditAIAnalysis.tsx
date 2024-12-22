@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardBody, Button, Input, Progress } from "@nextui-org/react";
+import { Card, CardBody, Button, Input, Slider } from "@nextui-org/react";
 import { Plus, Trash2, Brain } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
@@ -63,7 +63,7 @@ const EditAIAnalysis = ({ analysis = defaultAnalysis, onChange }: EditAIAnalysis
       ...safeAnalysis,
       content_quality: {
         ...safeAnalysis.content_quality,
-        [metric]: Math.min(100, Math.max(0, Number(value)))
+        [metric]: value
       }
     });
   };
@@ -146,30 +146,38 @@ const EditAIAnalysis = ({ analysis = defaultAnalysis, onChange }: EditAIAnalysis
             theme === 'dark' ? 'text-white' : 'text-gray-900'
           }`}>Content Quality</h3>
 
-          {Object.entries(analysis.content_quality).map(([metric, value]) => (
-            <div key={metric}>
-              <div className="flex justify-between text-sm mb-2">
-                <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                  {metric.charAt(0).toUpperCase() + metric.slice(1)}
-                </span>
-                <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                  {value}%
-                </span>
+          <div className="space-y-6">
+            {Object.entries(analysis.content_quality).map(([metric, value]) => (
+              <div key={metric}>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    {metric.charAt(0).toUpperCase() + metric.slice(1)}
+                  </span>
+                  <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                    {value}%
+                  </span>
+                </div>
+                <Slider
+                  size="sm"
+                  step={1}
+                  minValue={0}
+                  maxValue={100}
+                  value={value}
+                  onChange={(value) => handleQualityChange(
+                    metric as keyof typeof analysis.content_quality,
+                    value as number
+                  )}
+                  className="max-w-full"
+                  classNames={{
+                    track: theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200',
+                    filledTrack: 'bg-primary',
+                    thumb: 'bg-primary'
+                  }}
+                  aria-label={`${metric} quality`}
+                />
               </div>
-              <Input
-                type="number"
-                value={value}
-                onChange={(e) => handleQualityChange(
-                  metric as keyof typeof analysis.content_quality,
-                  parseInt(e.target.value)
-                )}
-                classNames={{
-                  input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
-                  inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
-                }}
-              />
-            </div>
-          ))}
+            ))}
+          </div>
         </CardBody>
       </Card>
 

@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardBody, Button, Input } from "@nextui-org/react";
 import { Plus, Trash2, Clock, User } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { supabase } from '../../../../lib/supabase';
 import type { Transcript } from '../../../../types/video';
+
+// Debounce helper
+const debounce = (func: Function, wait: number) => {
+  let timeout: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
 
 interface EditTranscriptProps {
   transcript: {
@@ -10,39 +20,70 @@ interface EditTranscriptProps {
     speaker: string;
     text: string;
   }[];
+  videoId: string;
   onChange: (newTranscript: {time: string; speaker: string; text: string}[]) => void;
 }
 
-const EditTranscript = ({ transcript, onChange }: EditTranscriptProps) => {
+const EditTranscript = ({ transcript, videoId, onChange }: EditTranscriptProps) => {
   const { theme } = useTheme();
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleAdd = () => {
-    onChange([
+  // Debounced save function
+  const debouncedSave = useCallback(
+    debounce(async (newTranscript: typeof transcript) => {
+      try {
+        setIsSaving(true);
+        const { error } = await supabase
+          .from('transcripts_json')
+          .upsert({
+            video_id: videoId,
+            content: newTranscript,
+            updated_at: new Date()
+          }, {
+            onConflict: 'video_id'
+          });
+
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error saving transcript:', error);
+      } finally {
+        setIsSaving(false);
+      }
+    }, 1000),
+    [videoId]
+  );
+
+  const handleAdd = async () => {
+    const newTranscript = [
       ...transcript,
       {  
         time: '00:00:00',
         speaker: '',
         text: ''
       }
-    ]);
+    ];
+    onChange(newTranscript);
+    debouncedSave(newTranscript);
   };
 
-  const handleRemove = (index: number) => {
-    onChange(transcript.filter((_, i) => i !== index));
+  const handleRemove = async (index: number) => {
+    const newTranscript = transcript.filter((_, i) => i !== index);
+    onChange(newTranscript);
+    debouncedSave(newTranscript);
   };
 
   const handleChange = (index: number, field: keyof Transcript, value: string) => {
-    onChange(
-      transcript.map((entry, i) => 
-        i === index ? { ...entry, [field]: value } : entry
-      )
+    const newTranscript = transcript.map((entry, i) => 
+      i === index ? { ...entry, [field]: value } : entry
     );
+    onChange(newTranscript);
+    debouncedSave(newTranscript);
   };
 
   return (
     <div className="space-y-6">
       {transcript.map((entry, index) => (
-        <Card key={entry.id} className={`${
+        <Card key={`transcript-${index}`} className={`${
           theme === 'dark' 
             ? 'bg-gray-800/50 border-gray-700/50' 
             : 'bg-white border-gray-200'
@@ -75,6 +116,7 @@ const EditTranscript = ({ transcript, onChange }: EditTranscriptProps) => {
                 isIconOnly
                 color="danger"
                 variant="light"
+                isDisabled={isSaving}
                 onClick={() => handleRemove(index)}
               >
                 <Trash2 className="w-4 h-4" />
@@ -97,6 +139,7 @@ const EditTranscript = ({ transcript, onChange }: EditTranscriptProps) => {
       <Button
         startContent={<Plus className="w-4 h-4" />}
         className="w-full bg-primary text-white"
+        isDisabled={isSaving}
         onClick={handleAdd}
       >
         Add Transcript Entry

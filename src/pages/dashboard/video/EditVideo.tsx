@@ -377,6 +377,7 @@ const EditVideo = () => {
         {selectedTab === 'transcript' && (
           <EditTranscript
             transcript={videoData.transcript}
+            videoId={id!}
             onChange={(newTranscript) => setVideoData(prev => prev ? {
               ...prev,
               transcript: newTranscript
