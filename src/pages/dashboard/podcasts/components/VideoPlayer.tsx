@@ -5,9 +5,10 @@ import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface VideoPlayerProps {
   videoUrl: string;
+  onRef?: (ref: HTMLVideoElement | null) => void;
 }
 
-const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
+const VideoPlayer = ({ videoUrl, onRef }: VideoPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -15,6 +16,12 @@ const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
   const [volume, setVolume] = useState(100);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { theme } = useTheme();
+
+  useEffect(() => {
+    if (onRef) {
+      onRef(videoRef.current);
+    }
+  }, [onRef]);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -154,7 +161,7 @@ const VideoPlayer = ({ videoUrl }: VideoPlayerProps) => {
               <button
                 className="px-3 py-1 text-sm text-white bg-white/20 rounded-full hover:bg-white/30 transition-colors"
               >
-                HD
+                4K
               </button>
             </div>
           </div>

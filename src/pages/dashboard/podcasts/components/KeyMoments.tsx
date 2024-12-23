@@ -3,17 +3,24 @@ import { Card, CardBody, Button, Progress } from "@nextui-org/react";
 import { Play, Clock, MessageSquare } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
-interface Props {
+interface KeyMomentsProps {
   moments: {
     timestamp: string;
     title: string;
     summary: string;
     insights: string[];
   }[];
+  onSeek?: (timestamp: string) => void;
 }
 
-const KeyMoments = ({ moments }: Props) => {
+const KeyMoments = ({ moments, onSeek }: KeyMomentsProps) => {
   const { theme } = useTheme();
+
+  const handleSeek = (timestamp: string) => {
+    if (onSeek) {
+      onSeek(timestamp);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -31,7 +38,7 @@ const KeyMoments = ({ moments }: Props) => {
               <Button
                 isIconOnly
                 className="bg-primary text-white"
-                onClick={() => console.log('Play moment')}
+                onClick={() => handleSeek(moment.timestamp)}
               >
                 <Play className="w-4 h-4" />
               </Button>

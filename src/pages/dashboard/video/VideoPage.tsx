@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Brain, Plus, Link as LinkIcon, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, Brain, Plus, Link as LinkIcon, Sparkles, X, Download, Clock, Eye } from 'lucide-react';
 import { Button, Card, CardBody, Tabs, Tab, Chip, Progress, Avatar, Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -17,6 +17,7 @@ import TranscriptView from '../podcasts/components/TranscriptView';
 import CodyAIChat from '../../../components/features/CodyAIChat';
 import NotionConnect from '../podcasts/components/NotionConnect';
 import AIAnalysis from '../podcasts/components/AIAnalysis';
+import ExportModal from './components/ExportModal';
 import RelatedContent from '../podcasts/components/RelatedContent';
 import type { Video } from '../../../types/video';
 
@@ -27,8 +28,10 @@ const VideoPage = () => {
   const { currentUser } = useAuth();
   const [showCodyChat, setShowCodyChat] = useState(false);
   const [showNotionModal, setShowNotionModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [isInPodroom, setIsInPodroom] = useState(false);
+  const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
   const [isAddingToPodroom, setIsAddingToPodroom] = useState(false);
   const [selectedView, setSelectedView] = useState('full');
   const [isLoading, setIsLoading] = useState(true);
@@ -161,6 +164,18 @@ const VideoPage = () => {
     }
   };
 
+  const handleSeek = (timestamp: string) => {
+    if (!videoRef) return;
+    
+    // Convert timestamp (HH:MM:SS) to seconds
+    const [hours, minutes, seconds] = timestamp.split(':').map(Number);
+    const timeInSeconds = (hours * 3600) + (minutes * 60) + seconds;
+    
+    // Seek video to timestamp
+    videoRef.currentTime = timeInSeconds;
+    videoRef.play();
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -254,6 +269,17 @@ const VideoPage = () => {
               Link to Notion
             </Button>
             <Button
+              startContent={<Download className="w-4 h-4" />}
+              className={`${
+                theme === 'dark'
+                  ? 'bg-gray-700 text-white hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+              }`}
+              onClick={() => setShowExportModal(true)}
+            >
+              Export
+            </Button>
+            <Button
               startContent={<Brain className="w-4 h-4" />}
               className="bg-primary text-white hover:bg-primary/90"
               onClick={() => setShowCodyChat(true)}
@@ -274,7 +300,10 @@ const VideoPage = () => {
                 : 'bg-white border-gray-200'
             } border`}>
               <CardBody className="p-0">
-                <VideoPlayer videoUrl={video.video_url || ''} />
+                <VideoPlayer 
+                  videoUrl={video.video_url || ''} 
+                  onRef={(ref) => setVideoRef(ref)}
+                />
               </CardBody>
             </Card>
 
@@ -282,12 +311,14 @@ const VideoPage = () => {
               <div className="flex items-center gap-4">
                 <div className={`flex items-center gap-2 text-sm ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                }`}>
+                }`}> 
+                  <Clock className="w-4 h-4" />
                   <span>{video.duration}</span>
                 </div>
                 <div className={`flex items-center gap-2 text-sm ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                 }`}>
+                  <Eye className="w-4 h-4" />
                   <span>{video.views} views</span>
                 </div>
               </div>
@@ -353,7 +384,10 @@ const VideoPage = () => {
                 <FullContent content={fullContent} />
               )}
               {selectedView === 'key-moments' && (
-                <KeyMoments moments={keyMoments} />
+                <KeyMoments 
+                  moments={keyMoments}
+                  onSeek={handleSeek}
+                />
               )}
               {selectedView === 'insights' && (
                 <InsightsList insights={insights} />
@@ -393,6 +427,15 @@ const VideoPage = () => {
         onClose={() => setShowNotionModal(false)}
         onPageSelect={handleNotionExtract}
         title={videoData?.video.title}
+      />
+      
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={(type, sections) => {
+          console.log('Export:', type, sections);
+          // Handle export logic here
+        }}
       />
     </div>
   );
