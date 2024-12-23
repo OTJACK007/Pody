@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ExternalLink, CheckCircle2, Users, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ExternalLink, CheckCircle2, Users, Clock, ArrowRight } from 'lucide-react';
 import { Button, Badge, Avatar } from "@nextui-org/react";
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../../contexts/ThemeContext';
@@ -10,6 +10,7 @@ interface LiveCreator {
   channel_name: string;
   profile_image: string;
   streaming_platform: string;
+  stream_title: string;
   stream_viewers: number;
   stream_started_at: string;
 }
@@ -43,25 +44,6 @@ const LiveBanner = () => {
     loadFeaturedCreator();
   }, []);
 
-  const getPlatformIcon = (platform: string) => {
-    switch (platform) {
-      case 'YouTube':
-        return 'https://static.wixstatic.com/media/c67dd6_aea51bc85e594033b8a29040d67b1d15~mv2.png';
-      case 'Twitch':
-        return 'https://static.wixstatic.com/media/c67dd6_089d6bbd564f44d283886219447b54da~mv2.png';
-      case 'Kick':
-        return 'https://static.wixstatic.com/media/c67dd6_39dedfcfc65b4375a61bf0e763ac8447~mv2.png';
-      case 'X':
-        return 'https://static.wixstatic.com/media/c67dd6_a7b28b585b034f56ad6ab32232e745fc~mv2.webp';
-      case 'TikTok':
-        return 'https://static.wixstatic.com/media/c67dd6_669a072e9da540e3aef4ab2262eb8693~mv2.png';
-      case 'Instagram':
-        return 'https://static.wixstatic.com/media/c67dd6_b9fe6adb4004453a9db57fe97cd4d6aa~mv2.png';
-      default:
-        return '';
-    }
-  };
-
   const formatViewers = (viewers: number) => {
     if (viewers >= 1000000) {
       return `${(viewers / 1000000).toFixed(1)}M`;
@@ -88,23 +70,25 @@ const LiveBanner = () => {
   return (
     <div className={`${
       theme === 'dark'
-        ? 'bg-gradient-to-r from-gray-800/50 via-gray-800/30 to-gray-800/50 border-gray-700'
-        : 'bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 border-gray-200'
+        ? 'bg-gradient-to-r from-gray-800/50 via-gray-800/30 to-gray-800/50 border-gray-700/50'
+        : 'bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 border-gray-200/50'
     } border rounded-lg relative overflow-hidden group`}>
-      <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-transparent to-red-500/10 animate-pulse" />
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10 animate-pulse pointer-events-none" />
       
-      <div className="relative p-6 flex items-center gap-6">
+      <div className="relative p-6 flex items-center gap-8 z-10">
         <div className="relative">
           <Avatar
             src={featuredCreator.profile_image}
-            className="w-20 h-20 ring-4 ring-primary"
+            className="w-24 h-24 ring-4 ring-primary/20"
           />
-          <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-background p-1.5">
-            <img 
-              src={getPlatformIcon(featuredCreator.streaming_platform)}
-              alt={featuredCreator.streaming_platform}
-              className="w-full h-full object-contain"
-            />
+          <div className="absolute -top-2 -right-2">
+            <div className="p-2 rounded-full bg-background">
+              <img 
+                src="https://static.wixstatic.com/media/c67dd6_089d6bbd564f44d283886219447b54da~mv2.png"
+                alt="Twitch"
+                className="w-6 h-6"
+              />
+            </div>
           </div>
         </div>
 
@@ -113,16 +97,15 @@ const LiveBanner = () => {
             <h2 className={`text-2xl font-bold ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'
             }`}>{featuredCreator.channel_name}</h2>
-            <div className="flex items-center gap-2">
-              <Badge
-                content=""
-                color="danger"
-                placement="bottom-right"
-                className="animate-pulse"
-              >
-                <span className="text-sm font-semibold text-primary">LIVE</span>
-              </Badge>
-            </div>
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+            <Badge
+              content=""
+              color="danger"
+              placement="bottom-right"
+              className="animate-pulse"
+            >
+              <span className="text-sm font-semibold text-primary">LIVE</span>
+            </Badge>
           </div>
           
           <p className={`text-lg mb-3 ${
@@ -148,29 +131,36 @@ const LiveBanner = () => {
         <div className="flex items-center gap-3">
           <Button
             className="bg-primary text-white"
+            radius="full"
+            size="lg"
             endContent={<ExternalLink className="w-4 h-4" />}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              window.open(`https://${featuredCreator.streaming_platform.toLowerCase()}.com/${featuredCreator.channel_name}`, '_blank');
+              window.open(`https://twitch.tv/${featuredCreator.channel_name}`, '_blank');
             }}
+            style={{ position: 'relative', zIndex: 20 }}
           >
             Watch Stream
           </Button>
           <Button
             className="bg-primary text-white"
+            radius="full"
+            size="lg"
+            endContent={<ArrowRight className="w-4 h-4" />}
             onClick={(e) => {
-              e.preventDefault();
+              e.preventDefault(); 
               e.stopPropagation();
               navigate('/dashboard/livespace/live-creators');
             }}
+            style={{ position: 'relative', zIndex: 20 }}
           >
             View All Live
           </Button>
         </div>
       </div>
       
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
     </div>
   );
 };

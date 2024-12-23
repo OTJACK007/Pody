@@ -82,6 +82,79 @@ export const getUserVideos = async (userId: string, type?: 'video' | 'short'): P
   return data;
 };
 
+// Get public videos with optional category filter
+export const getPublicVideos = async (category?: string): Promise<Video[]> => {
+  try {
+    let query = supabase
+      .from('videos')
+      .select(`
+        *,
+        channel:userchannels!inner(
+          channel_name,
+          profile_image
+        )
+      `)
+      .eq('status', 'public')
+      .order('publish_date', { ascending: false });
+
+    if (category && category !== 'Trending') {
+      query = query.eq('category', category);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    return data.map(video => ({
+      ...video,
+      channel: {
+        name: video.channel?.channel_name || 'Unknown Channel',
+        avatar: video.channel?.profile_image || "https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png"
+      }
+    }));
+  } catch (error) {
+    console.error('Error fetching public videos:', error);
+    return [];
+  }
+};
+
+// Get public shorts with optional category filter
+export const getPublicShorts = async (category?: string): Promise<Video[]> => {
+  try {
+    let query = supabase
+      .from('videos')
+      .select(`
+        *,
+        channel:userchannels!inner(
+          channel_name,
+          profile_image
+        )
+      `)
+      .eq('status', 'public')
+      .eq('type', 'short')
+      .order('publish_date', { ascending: false });
+      
+    if (category) {
+      query = query.eq('category', category);
+    }
+    
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    return data.map(video => ({
+      ...video,
+      channel: {
+        name: video.channel?.channel_name || 'Unknown Channel',
+        avatar: video.channel?.profile_image || "https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png"
+      }
+    }));
+  } catch (error) {
+    console.error('Error fetching public shorts:', error);
+    return [];
+  }
+};
+
 // Get filtered videos
 export const getFilteredVideos = async (
   userId: string,
@@ -280,3 +353,78 @@ export const updateVideo = async (videoId: string, updates: Partial<Video>): Pro
 };
 
 // Video metadata operations
+export const getVideo = async (videoId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('videos')
+      .select(`
+        *,
+        channel:userchannels!inner(
+          channel_name,
+          profile_image
+        )
+      `)
+      .eq('id', videoId)
+      .single();
+
+    if (error) throw error;
+
+    return {
+      ...data,
+      channel: {
+        name: data.channel?.channel_name || 'Unknown Channel',
+        avatar: data.channel?.profile_image || "https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png"
+      },
+      relatedVideos: await getRelatedVideos(videoId)
+    };
+  } catch (error) {
+    console.error('Error fetching video:', error);
+    return null;
+  }
+};
+
+const getRelatedVideos = async (videoId: string) => {
+  try {
+    const { data, error } = await supabase
+      .rpc('get_video_relationships')
+      .eq('video_id', videoId)
+      .single();
+
+    if (error) throw error;
+
+    return data?.related_videos || [];
+  } catch (error) {
+    console.error('Error fetching related videos:', error);
+    return [];
+  }
+};
+
+// Search videos
+export const searchVideos = async (
+  query: string,
+  category?: string,
+  type?: 'video' | 'short'
+): Promise<Video[]> => {
+  try {
+    const { data, error } = await supabase.rpc('search_videos', {
+      search_query: query,
+      category_filter: category,
+      type_filter: type
+    });
+
+    if (error) throw error;
+
+    return data.map(video => ({
+      ...video,
+      channel: {
+        name: video.channel_name,
+        avatar: video.channel_avatar
+      }
+    }));
+  } catch (error) {
+    console.error('Error searching videos:', error);
+    return [];
+  }
+};
+
+// Get filtered videos

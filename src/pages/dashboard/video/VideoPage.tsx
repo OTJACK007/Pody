@@ -6,6 +6,7 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { supabase } from '../../../lib/supabase';
 import { getVideoWithMetadata } from '../../../services/video';
+import { addVideoToPodroom } from '../../../services/podroom';
 import { getVideoAIAnalysis } from '../../../services/aiAnalysis';
 import VideoPlayer from '../podcasts/components/VideoPlayer';
 import KeyMoments from '../podcasts/components/KeyMoments';
@@ -27,6 +28,8 @@ const VideoPage = () => {
   const [showCodyChat, setShowCodyChat] = useState(false);
   const [showNotionModal, setShowNotionModal] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isInPodroom, setIsInPodroom] = useState(false);
+  const [isAddingToPodroom, setIsAddingToPodroom] = useState(false);
   const [selectedView, setSelectedView] = useState('full');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +43,19 @@ const VideoPage = () => {
     topics: any[];
     fullContent: any;
     relatedVideos: Video[];
+    aiAnalysis: any;
+    insights: any[];
+    keyMoments: any[];
+    transcript: any[];
+    topics: any[];
+    fullContent: any;
+    relatedVideos: Video[];
   } | null>(null);
+
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, [id]); // Scroll when video ID changes
 
   useEffect(() => {
     const loadVideo = async () => {
@@ -91,6 +106,25 @@ const VideoPage = () => {
     loadVideo();
   }, [id, currentUser?.id]);
 
+  // Check if video is in podroom
+  useEffect(() => {
+    const checkPodroom = async () => {
+      if (!id) return;
+      const { data } = await supabase
+        .from('podroom_videos')
+        .select('id')
+        .eq('video_id', id)
+        .eq('user_id', currentUser?.id)
+        .maybeSingle();
+      
+      setIsInPodroom(!!data);
+    };
+
+    if (currentUser?.id) {
+      checkPodroom();
+    }
+  }, [id, currentUser?.id]);
+
   const handleNotionExtract = async (pageId: string) => {
     if (!videoData) return;
     
@@ -104,6 +138,26 @@ const VideoPage = () => {
     } catch (error) {
       console.error('Error extracting to Notion:', error);
       alert('Failed to extract content to Notion. Please try again.');
+    }
+  };
+
+  const handleAddToPodroom = async () => {
+    if (!currentUser || !videoData) return;
+    
+    try {
+      setIsAddingToPodroom(true);
+      const result = await addVideoToPodroom(videoData.video.id);
+      
+      if (result) {
+        alert('Video added to PodRoom successfully!');
+      } else {
+        throw new Error('Failed to add video to PodRoom');
+      }
+    } catch (error) {
+      console.error('Error adding to PodRoom:', error);
+      alert('Failed to add video to PodRoom. Please try again.');
+    } finally {
+      setIsAddingToPodroom(false);
     }
   };
 
@@ -177,9 +231,12 @@ const VideoPage = () => {
           <div className="flex items-center gap-3">
             <Button
               startContent={<Plus className="w-4 h-4" />}
+              isDisabled={isInPodroom}
+              isLoading={isAddingToPodroom}
               className="bg-secondary text-black font-medium hover:bg-secondary/90"
+              onClick={handleAddToPodroom}
             >
-              Add to PodRoom
+              {isInPodroom ? 'Already in PodRoom' : 'Add to PodRoom'}
             </Button>
             <Button
               startContent={<img 

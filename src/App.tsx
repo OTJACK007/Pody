@@ -11,6 +11,7 @@ import BrandDeals from './pages/dashboard/BrandDeals';
 import LandingPage from './pages/LandingPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import LiveSpace from './pages/dashboard/LiveSpace';
+import LiveCreators from './pages/dashboard/livespace/LiveCreators';
 import CreatorSpace from './pages/dashboard/CreatorSpace';
 import ManageChannel from './pages/dashboard/creatorSpace/pages/ManageChannel';
 import ManageVideos from './pages/dashboard/creatorSpace/pages/ManageVideos';
@@ -61,6 +62,8 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/livespace" replace />} />
           <Route path="livespace" element={<LiveSpace />} />
+          <Route path="livespace/live-creators" element={<LiveCreators />} />
+          <Route path="livespace/live-creators" element={<LiveCreators />} />
             <Route path="creator-space" element={<CreatorSpace />} />
             <Route path="creator-space/manage-channel" element={<ManageChannel />} />
             <Route path="creator-space/manage-videos" element={<ManageVideos />} />

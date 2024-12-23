@@ -1,50 +1,34 @@
 import React from 'react';
 import { Card, CardBody, Button, Avatar, Progress } from "@nextui-org/react";
-import { Play, Clock, ArrowRight } from 'lucide-react';
+import { Play, Clock, ArrowRight, Eye } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
-interface RelatedContentProps {
-  topics: string[];
+interface Channel {
+  name: string;
+  avatar: string;
 }
 
-const RelatedContent = ({ topics }: RelatedContentProps) => {
-  const { theme } = useTheme();
+interface Video {
+  id: string;
+  title: string;
+  thumbnail: string;
+  duration: string;
+  views: string;
+  channel?: Channel;
+}
 
-  const relatedPodcasts = [
-    {
-      id: 1,
-      title: 'AI Ethics and Society',
-      channel: {
-        name: 'Tech Ethics',
-        avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400'
-      },
-      duration: '45:30',
-      progress: 0,
-      thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400'
-    },
-    {
-      id: 2,
-      title: 'Machine Learning Trends',
-      channel: {
-        name: 'AI Insights',
-        avatar: 'https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=400'
-      },
-      duration: '38:15',
-      progress: 25,
-      thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400'
-    },
-    {
-      id: 3,
-      title: 'Healthcare AI Revolution',
-      channel: {
-        name: 'Future Health',
-        avatar: 'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=400'
-      },
-      duration: '42:20',
-      progress: 0,
-      thumbnail: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400'
-    }
-  ];
+interface RelatedContentProps {
+  videos: Video[];
+}
+
+const RelatedContent = ({ videos }: RelatedContentProps) => {
+  const { theme } = useTheme();
+  const navigate = useNavigate();
+  
+  if (!videos?.length) {
+    return null;
+  }
 
   return (
     <Card className={`${
@@ -67,20 +51,25 @@ const RelatedContent = ({ topics }: RelatedContentProps) => {
         </div>
 
         <div className="space-y-4">
-          {relatedPodcasts.map((podcast) => (
+          {videos.map((video) => (
             <div
-              key={podcast.id}
+              key={video.id}
               className={`flex gap-4 p-2 rounded-lg transition-colors cursor-pointer ${
                 theme === 'dark'
                   ? 'hover:bg-gray-700/30'
                   : 'hover:bg-gray-100'
-              }`}
+              }`} 
+              onClick={() => navigate(`/dashboard/video/${video.id}`)}
             >
               <div className="relative flex-shrink-0">
-                <img
-                  src={podcast.thumbnail}
-                  alt={podcast.title}
+                <video
                   className="w-24 h-16 object-cover rounded-lg"
+                  src={video.video_url}
+                  poster={video.thumbnail}
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
                 />
                 <Button
                   isIconOnly
@@ -94,16 +83,16 @@ const RelatedContent = ({ topics }: RelatedContentProps) => {
               <div className="flex-grow min-w-0">
                 <h3 className={`font-medium truncate ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
-                }`}>{podcast.title}</h3>
+                }`}>{video.title}</h3>
                 
                 <div className="flex items-center gap-2 mt-1">
                   <Avatar
-                    src={podcast.channel.avatar}
+                    src={video.channel?.avatar || "https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png"}
                     className="w-4 h-4"
                   />
                   <span className={`text-sm truncate ${
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                  }`}>{podcast.channel.name}</span>
+                  }`}>{video.channel?.name || 'Unknown Channel'}</span>
                 </div>
 
                 <div className="flex items-center gap-4 mt-2">
@@ -111,16 +100,14 @@ const RelatedContent = ({ topics }: RelatedContentProps) => {
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                   }`}>
                     <Clock className="w-3 h-3" />
-                    <span>{podcast.duration}</span>
+                    <span>{video.duration}</span>
                   </div>
-                  {podcast.progress > 0 && (
-                    <Progress
-                      value={podcast.progress}
-                      color="primary"
-                      size="sm"
-                      className="max-w-24"
-                    />
-                  )}
+                  <div className={`flex items-center gap-1 text-xs ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
+                    <Eye className="w-3 h-3" />
+                    <span>{video.views}</span>
+                  </div>
                 </div>
               </div>
             </div>

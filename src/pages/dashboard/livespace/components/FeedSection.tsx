@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Play, CheckCircle2, Search, Eye, Filter, Sparkles } from 'lucide-react';
-import { Genre } from '../../../../types';
+import React, { useState, useEffect } from 'react';
+import { Play, CheckCircle2, Search, Eye, Filter, Sparkles, Star } from 'lucide-react';
+import { Genre, Video } from '../../../../types';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import { getTrendingEmoji } from '../../../../utils/emoji';
+import { searchVideos } from '../../../../services/video';
 import ShortsStorm from './ShortsStorm';
-import { Input, Button, Avatar } from "@nextui-org/react";
+import { Input, Button, Avatar, Card, CardBody, Image } from "@nextui-org/react";
 import useEmblaCarousel from 'embla-carousel-react';
 import CodyAIChat from '../../../../components/features/CodyAIChat';
 import { useNavigate } from 'react-router-dom';
@@ -12,9 +13,20 @@ import { useNavigate } from 'react-router-dom';
 interface FeedSectionProps {
   selectedGenre: Genre;
   onGenreChange: (genre: Genre) => void;
+  videos: Video[];
+  shorts: Video[];
+  isLoading: boolean;
+  onVideoClick: (videoId: string) => void;
 }
 
-const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
+const FeedSection = ({ 
+  selectedGenre, 
+  onGenreChange,
+  videos,
+  shorts,
+  isLoading,
+  onVideoClick
+}: FeedSectionProps) => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const [shortsMode, setShortsMode] = useState(false);
@@ -29,7 +41,55 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
     containScroll: 'trimSnaps',
     dragFree: true,
   });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Video[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
+  // Filter content based on search and type
+  const displayedContent = React.useMemo(() => {
+    const content = searchQuery ? searchResults : (shortsMode ? shorts : videos);
+    return content.filter(v => v.type === (shortsMode ? 'short' : 'video'));
+  }, [searchQuery, searchResults, shortsMode, shorts, videos]);
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Debounce search
+  useEffect(() => {
+    const performSearch = async () => {
+      if (!debouncedQuery) {
+        setSearchResults([]);
+        return;
+      }
+      
+      setIsSearching(true);
+      try {
+        const results = await searchVideos(
+          debouncedQuery,
+          selectedGenre === 'Trending' ? undefined : selectedGenre,
+          shortsMode ? 'short' : 'video'
+        );
+        setSearchResults(results);
+      } catch (error) {
+        console.error('Error searching videos:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    performSearch();
+  }, [debouncedQuery, selectedGenre, shortsMode]);
+
+  // Filter videos by type
+  const filteredVideos = videos.filter(video => video.type === 'video');
+  const filteredShorts = shorts.filter(video => video.type === 'short');
+  
   const genres: Genre[] = [
     'Trending',
     'Mindset',
@@ -44,162 +104,6 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
     'Motivation',
     'Entertainment'
   ];
-
-  const shortsContent = [
-    {
-      id: 'short-1',
-      title: 'Quick AI Tips for Beginners',
-      coverImage: 'https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800',
-      views: '1.2M',
-      channel: {
-        name: 'TechBites',
-        avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400',
-        verified: true
-      }
-    },
-    {
-      id: 'short-2',
-      title: '60-Second Productivity Hack',
-      coverImage: 'https://images.unsplash.com/photo-1483058712412-4245e9b90334?w=800',
-      views: '856K',
-      channel: {
-        name: 'LifeHacks',
-        avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400',
-        verified: true
-      }
-    },
-    {
-      id: 'short-3',
-      title: 'Mind-Blowing Tech Facts',
-      coverImage: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800',
-      views: '2.1M',
-      channel: {
-        name: 'TechFacts',
-        avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400',
-        verified: true
-      }
-    },
-    {
-      id: 'short-4',
-      title: 'Future of Web3 Explained',
-      coverImage: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800',
-      views: '923K',
-      channel: {
-        name: 'CryptoDaily',
-        avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=400',
-        verified: true
-      }
-    },
-    {
-      id: 'short-5',
-      title: 'Morning Routine Secrets',
-      coverImage: 'https://images.unsplash.com/photo-1484627147104-f5197bcd6651?w=800',
-      views: '1.5M',
-      channel: {
-        name: 'LifestylePro',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
-        verified: true
-      }
-    },
-    {
-      id: 'short-6',
-      title: 'Investment Tips 2024',
-      coverImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800',
-      views: '1.8M',
-      channel: {
-        name: 'WealthTips',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-        verified: true
-      }
-    }
-  ];
-
-  const feedContent = [
-    {
-      id: '1',
-      title: 'The Future of AI in 2024',
-      coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
-      genre: 'Technology',
-      duration: '45 min',
-      rating: 4.8,
-      views: '125K',
-      channel: {
-        name: 'TechInsights',
-        avatar: 'https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=400',
-        verified: true
-      }
-    },
-    {
-      id: '2',
-      title: 'Building Mental Resilience',
-      coverImage: 'https://images.unsplash.com/photo-1589149098258-3e9102cd63d3?w=800',
-      genre: 'Personal Growth',
-      duration: '32 min',
-      rating: 4.9,
-      views: '98K',
-      channel: {
-        name: 'MindsetGuru',
-        avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400',
-        verified: true
-      }
-    },
-    {
-      id: '3',
-      title: 'Startup Success Stories',
-      coverImage: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800',
-      genre: 'Business',
-      duration: '38 min',
-      rating: 4.7,
-      views: '156K',
-      channel: {
-        name: 'BusinessPro',
-        avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
-        verified: true
-      }
-    },
-    {
-      id: '4',
-      title: 'Web3 Revolution: The Future of Internet',
-      coverImage: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800',
-      genre: 'Web3',
-      duration: '42 min',
-      rating: 4.6,
-      views: '112K',
-      channel: {
-        name: 'CryptoVision',
-        avatar: 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=400',
-        verified: true
-      }
-    },
-    {
-      id: '5',
-      title: 'Mastering E-commerce Growth',
-      coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
-      genre: 'Ecommerce',
-      duration: '35 min',
-      rating: 4.8,
-      views: '89K',
-      channel: {
-        name: 'BusinessGrowth',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
-        verified: true
-      }
-    },
-    {
-      id: '6',
-      title: 'Wealth Building Strategies 2024',
-      coverImage: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800',
-      genre: 'Wealth',
-      duration: '50 min',
-      rating: 4.9,
-      views: '203K',
-      channel: {
-        name: 'WealthMastery',
-        avatar: 'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=400',
-        verified: true
-      }
-    }
-  ].filter(item => selectedGenre === 'Trending' || item.genre === selectedGenre);
 
   return (
     <div>
@@ -217,6 +121,8 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
           <Input
             className="w-[400px]"
             placeholder={`Search ${shortsMode ? 'shorts' : 'videos'}...`}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             startContent={<Search className="w-4 h-4 text-gray-400" />}
             classNames={{
               input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -262,117 +168,179 @@ const FeedSection = ({ selectedGenre, onGenreChange }: FeedSectionProps) => {
       </div>
 
       {/* Feed Content */}
-      {shortsMode ? (
-        <div className="overflow-hidden -mx-6" ref={shortsEmblaRef}>
-          <div className="flex gap-4 px-6">
-            {shortsContent.map((item) => (
-              <div 
-                key={item.id}
-                className="flex-none w-[200px] relative group cursor-pointer"
-                onClick={() => navigate(`/dashboard/shortvideo/${item.id}`)}
-              >
-                <div className="relative aspect-[9/16] rounded-lg overflow-hidden">
-                  <img
-                    src={item.coverImage}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <button className="p-3 bg-primary rounded-full hover:bg-primary/80 transition-colors">
-                        <Play className="w-6 h-6 text-white" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Avatar
-                      src={item.channel.avatar}
-                      className="w-6 h-6 ring-2 ring-white/20"
+      <div className="mt-6">
+        {shortsMode ? (
+          <div className="overflow-hidden -mx-6" ref={shortsEmblaRef}>
+            <div className="flex gap-4 px-6 py-4">
+              {displayedContent.map((item) => (
+                <div 
+                  key={item.id}
+                  className="flex-none w-[200px] relative group cursor-pointer"
+                  onClick={() => navigate(`/dashboard/video/${item.id}`)}
+                >
+                  <div className="relative aspect-[9/16] rounded-lg overflow-hidden">
+                    <video
+                      src={item.video_url}
+                      poster={item.thumbnail}
+                      className="w-full h-full object-cover"
+                      muted
+                      loop
+                      playsInline
+                      autoPlay
+                      style={{ objectFit: 'cover' }}
                     />
-                    <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                      {item.channel.name}
-                    </span>
-                    {item.channel.verified && (
-                      <CheckCircle2 className="w-4 h-4 text-primary" />
-                    )}
+                    <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center gap-4">
+                      <div className="transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+                        <Sparkles className="w-10 h-10 text-primary animate-pulse" />
+                      </div>
+                      <div className="transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-200">
+                        <h3 className="text-xl font-bold text-white bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] animate-gradient bg-clip-text text-transparent">
+                          Get Insights
+                        </h3>
+                      </div>
+                      <div className="transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-300">
+                        <p className="text-gray-300 text-xs max-w-[80%] mx-auto text-center">
+                          AI-powered analysis
+                        </p>
+                      </div>
+                    </div>
+                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded-md">
+                      {item.duration}
+                    </div>
                   </div>
-                  <h3 className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                    {item.title}
-                  </h3>
-                  <div className={`flex items-center space-x-2 text-sm ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                  }`}>
-                    <div className="flex items-center gap-1">
-                      <Eye className="w-4 h-4" />
-                      <span>{item.views}</span>
+                  <div className="mt-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Avatar
+                        src={item.channel?.avatar}
+                        className="w-6 h-6 ring-2 ring-white/20"
+                      />
+                      <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                        {item.channel?.name}
+                      </span>
+                      {item.channel?.verified && (
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                      )}
+                    </div>
+                    <h3 className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                      {item.title}
+                    </h3>
+                    <div className={`flex items-center space-x-2 text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        <span>{item.views} views</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {feedContent.map((item) => (
-          <div 
-            key={item.id}
-            className="relative group cursor-pointer"
-            onClick={() => navigate(`/dashboard/feedvideo/${item.id}`)}
-          >
-            <div className={`relative ${shortsMode ? 'aspect-[9/16] max-w-[280px] mx-auto' : 'aspect-video'} rounded-lg overflow-hidden`}>
-              <img
-                src={item.coverImage}
-                alt={item.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <button className="p-3 bg-primary rounded-full hover:bg-primary/80 transition-colors">
-                    <Play className="w-6 h-6 text-white" />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="mt-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Avatar
-                  src={item.channel.avatar}
-                  className="w-6 h-6 ring-2 ring-white/20"
-                />
-                <span className={`${
-                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  {item.channel.name}
-                </span>
-                {item.channel.verified && (
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
-                )}
-              </div>
-              <h3 className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                {item.title}
-              </h3>
-              <div className={`flex items-center space-x-2 text-sm ${
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-              }`}>
-                <span>{item.genre}</span>
-                <span>•</span>
-                <span>{item.duration}</span>
-                <span>•</span>
-                <span className="text-secondary">★ {item.rating}</span>
-                <span>•</span>
-                <div className="flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
-                  <span>{item.views}</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
-        ))}
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {isLoading ? (
+              <div className="col-span-full flex justify-center py-12">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : filteredVideos.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  No videos found in this category
+                </p>
+              </div>
+            ) : (
+              filteredVideos.map((item) => (
+                <Card 
+                  key={item.id}
+                  isPressable
+                  isHoverable
+                  onPress={() => onVideoClick(item.id)}
+                  className={`${
+                    theme === 'dark' 
+                      ? 'bg-gray-800/50 border-gray-700/50' 
+                      : 'bg-white border-gray-200'
+                  } border group`}
+                >
+                  <CardBody className="p-0">
+                    <div className="relative">
+                      <video
+                        className="w-full aspect-video object-cover rounded-t-lg"
+                        src={item.video_url}
+                        poster={item.thumbnail}
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                        style={{ objectFit: 'cover' }}
+                      />
+                      <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center gap-4">
+                        <div className="transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+                          <Sparkles className="w-12 h-12 text-primary animate-pulse" />
+                        </div>
+                        <div className="transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-200">
+                          <h3 className="text-2xl font-bold text-white bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] animate-gradient bg-clip-text text-transparent">
+                            Get Insights
+                          </h3>
+                        </div>
+                        <div className="transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-300">
+                          <p className="text-gray-300 text-sm max-w-[80%] mx-auto text-center">
+                            Unlock AI-powered analysis and key takeaways
+                          </p>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded-md">
+                        {item.duration}
+                      </div>
+                    </div>
+                  </CardBody>
+                  <CardBody className="p-4">
+                    <h3 className={`text-lg font-semibold mb-2 line-clamp-2 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>{item.title}</h3>
+                    
+                    <div className="flex items-center gap-3 mb-2">
+                      <Avatar
+                        src={item.channel?.avatar}
+                        size="sm"
+                        className="ring-2 ring-white/20"
+                      />
+                      <div className="flex items-center gap-2">
+                        <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                          {item.channel?.name}
+                        </span>
+                        {item.channel?.verified && (
+                          <CheckCircle2 className="w-3 h-3 text-primary" />
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <Eye className="w-3 h-3" />
+                        <span>{item.views} views</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className={`text-sm px-2 py-1 rounded-full ${
+                          theme === 'dark' 
+                            ? 'bg-gray-700/50 text-gray-300' 
+                            : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {item.category}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 text-green-500 fill-green-500" />
+                          <span className="text-sm text-green-500">{item.rating}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              ))
+            )}
+          </div>
+        )}
       </div>
-      )}
 
       <CodyAIChat isOpen={showCodyChat} onClose={() => setShowCodyChat(false)} />
     </div>
