@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardBody, Button, Input, Slider } from "@nextui-org/react";
+import { Card, CardBody, Button, Input, Slider, Progress } from "@nextui-org/react";
 import { Plus, Trash2, Brain } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
@@ -157,23 +157,20 @@ const EditAIAnalysis = ({ analysis = defaultAnalysis, onChange }: EditAIAnalysis
                     {value}%
                   </span>
                 </div>
-                <Slider
+                <Progress
                   size="sm"
-                  step={1}
-                  minValue={0}
-                  maxValue={100}
                   value={value}
-                  onChange={(value) => handleQualityChange(
-                    metric as keyof typeof analysis.content_quality,
-                    value as number
-                  )}
-                  className="max-w-full"
-                  classNames={{
-                    track: theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200',
-                    filledTrack: 'bg-primary',
-                    thumb: 'bg-primary'
+                  color="primary"
+                  className="max-w-full cursor-pointer"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const percentage = Math.round((x / rect.width) * 100);
+                    handleQualityChange(
+                      metric as keyof typeof analysis.content_quality,
+                      Math.min(100, Math.max(0, percentage))
+                    );
                   }}
-                  aria-label={`${metric} quality`}
                 />
               </div>
             ))}

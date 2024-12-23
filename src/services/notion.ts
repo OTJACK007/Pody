@@ -2,7 +2,7 @@ import { Client } from "@notionhq/client";
 
 const NOTION_CLIENT_ID = '164d872b-594c-804a-8bae-003728fc272e';
 const NOTION_CLIENT_SECRET = 'secret_azeMrgewQx1PE7W8rpsj9xhvI4OlUcrhn7gzwMahoFX';
-const REDIRECT_URI = 'http://localhost:3000/auth/notion/callback';
+const REDIRECT_URI = 'https://shogun360.netlify.app/auth/notion/callback';
 
 export interface NotionPage {
   id: string;

@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute';
 import AuthCallback from './pages/AuthCallback';
+import NotionCallback from './pages/NotionCallback';
 import ShortVideo from './pages/dashboard/shortvideo/ShortVideo';
 import EditVideo from './pages/dashboard/video/EditVideo';
 import VideoPage from './pages/dashboard/video/VideoPage';
@@ -56,6 +57,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/notion/callback" element={<NotionCallback />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/livespace" replace />} />
           <Route path="livespace" element={<LiveSpace />} />
