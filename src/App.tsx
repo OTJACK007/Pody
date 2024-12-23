@@ -14,6 +14,7 @@ import LiveSpace from './pages/dashboard/LiveSpace';
 import LiveCreators from './pages/dashboard/livespace/LiveCreators';
 import CreatorSpace from './pages/dashboard/CreatorSpace';
 import ManageChannel from './pages/dashboard/creatorSpace/pages/ManageChannel';
+import CategoryPage from './pages/dashboard/knowledge/CategoryPage';
 import ManageVideos from './pages/dashboard/creatorSpace/pages/ManageVideos';
 import Channel from './pages/dashboard/livespace/Channel';
 import FeedVideo from './pages/dashboard/feedvideo/FeedVideo';
@@ -77,6 +78,7 @@ function App() {
             <Route path="podroom" element={<PodRoom />} />
             <Route path="podroom/podcastvideo" element={<PodcastVideo />} />
             <Route path="knowledge" element={<KnowledgeLibrary />} />
+            <Route path="knowledge/category/:id" element={<CategoryPage />} />
             <Route path="cody-ai" element={<CodyAI />} />
             <Route path="goals" element={<MyGoals />} />
             <Route path="tasks" element={<TasksCalendar />} />

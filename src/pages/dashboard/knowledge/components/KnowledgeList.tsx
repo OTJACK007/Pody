@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Button, Input } from "@nextui-org/react"; 
-import { Search, Tag, Plus, MessageSquare, Share2, Trash2 } from 'lucide-react';
+import { Search, Tag, Plus, Share2, Trash2 } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import DeleteNoteModal from '../../../../components/dashboard/modals/DeleteNoteModal';
 
-interface InsightsListProps {
-  insights: string[];
+interface KnowledgeListProps {
+  insights?: string[];
 }
 
-const KnowledgeList = ({ insights }: InsightsListProps) => {
+const KnowledgeList = ({ insights = [] }: KnowledgeListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedNote, setSelectedNote] = useState<string | null>(null);
@@ -46,11 +46,11 @@ const KnowledgeList = ({ insights }: InsightsListProps) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             startContent={<Search className="w-4 h-4" />}
-            className={`flex-grow ${
-              theme === 'dark' 
-                ? 'bg-gray-800/50 border-gray-700/50' 
-                : 'bg-white border-gray-200'
-            }`}
+            className="flex-grow"
+            classNames={{
+              input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
+              inputWrapper: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`
+            }}
           />
           <Button
             isIconOnly
@@ -77,14 +77,6 @@ const KnowledgeList = ({ insights }: InsightsListProps) => {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                    className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                  </Button>
                   <Button
                     isIconOnly
                     size="sm"

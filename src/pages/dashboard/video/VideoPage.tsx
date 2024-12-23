@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Brain, Plus, Link as LinkIcon, Sparkles, X, Download, Clock, Eye } from 'lucide-react';
+import { ArrowLeft, Brain, Plus, Link as LinkIcon, Sparkles, X, Download, Clock as ClockIcon, Eye } from 'lucide-react';
 import { Button, Card, CardBody, Tabs, Tab, Chip, Progress, Avatar, Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -312,7 +312,7 @@ const VideoPage = () => {
                 <div className={`flex items-center gap-2 text-sm ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                 }`}> 
-                  <Clock className="w-4 h-4" />
+                  <ClockIcon className="w-4 h-4" />
                   <span>{video.duration}</span>
                 </div>
                 <div className={`flex items-center gap-2 text-sm ${
