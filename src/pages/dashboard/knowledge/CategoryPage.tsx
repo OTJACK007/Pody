@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, Filter, Brain, Plus, Sparkles, Share2, Download, Rocket, Command, Bot, Wand2, MessageSquare, Book, FileText, Star, Clock } from 'lucide-react';
 import { Button, Input, Tabs, Tab, Card, CardBody, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { useTheme } from '../../../contexts/ThemeContext';
+import { supabase } from '../../../lib/supabase';
 import KnowledgeGrid from './components/KnowledgeGrid';
 import KnowledgeList from './components/KnowledgeList';
 import FilterPanel from './components/FilterPanel';
@@ -12,16 +13,52 @@ import AISummaries from './components/AISummaries';
 import Highlights from './components/Highlights';
 import TopicInsights from './components/TopicInsights';
 import NotesEditor from './components/NotesEditor';
+import { useCategoryContent } from '../../../hooks/useCategoryContent';
 
 const CategoryPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [showFilters, setShowFilters] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedTab, setSelectedTab] = useState('all');
   const [showCodyChat, setShowCodyChat] = useState(false);
   const [showNotionModal, setShowNotionModal] = useState(false);
   const { theme } = useTheme();
+  const [categoryName, setCategoryName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const {
+    summaries,
+    highlights,
+    topics,
+    notes,
+    isLoading,
+    error,
+    loadContent
+  } = useCategoryContent(id || '');
+
+  useEffect(() => {
+    const loadCategory = async () => {
+      if (!id) return;
+      
+      try {
+        const { data: category, error } = await supabase
+          .from('knowledge_categories')
+          .select('name')
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+        setCategoryName(category.name);
+        
+        // Load content
+        await loadContent();
+      } catch (error) {
+        console.error('Error loading category:', error);
+      }
+    };
+
+    loadCategory();
+  }, [id, loadContent]);
 
   const aiTools = [
     {
@@ -50,51 +87,6 @@ const CategoryPage = () => {
     }
   ];
 
-  const mockData = {
-    summaries: [
-      {
-        id: 1,
-        title: 'AI Ethics and Society',
-        content: 'AI-generated summary of key ethical considerations in AI development...',
-        source: {
-          type: 'podcast',
-          title: 'Tech Ethics Today',
-          image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400'
-        },
-        tags: ['AI', 'Ethics', 'Technology'],
-        date: '2024-03-14',
-        type: 'summary'
-      }
-    ],
-    highlights: [
-      {
-        id: 1,
-        quote: "Innovation distinguishes between a leader and a follower.",
-        context: "Analysis of leadership qualities in tech industry...",
-        source: {
-          type: 'podcast',
-          title: 'Tech Leadership',
-          image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400'
-        },
-        tags: ['Leadership', 'Innovation', 'Technology'],
-        date: '2024-03-13',
-        type: 'highlight'
-      }
-    ],
-    topics: [
-      {
-        id: 1,
-        topic_name: 'AI Ethics',
-        relevance: 95,
-        insights: [
-          'AI systems must be designed with clear ethical guidelines',
-          'Transparency is crucial for building trust in AI',
-          'Ethics should be considered from the start of development'
-        ]
-      }
-    ]
-  };
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -114,9 +106,9 @@ const CategoryPage = () => {
           <div>
             <h1 className={`text-3xl font-bold ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'
-            }`}>Technology</h1>
+            }`}>{categoryName}</h1>
             <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-              Your technology knowledge hub
+              Your {categoryName.toLowerCase()} knowledge hub
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -223,6 +215,8 @@ const CategoryPage = () => {
             <div className="flex-1 max-w-xl">
               <Input
                 placeholder="Search in this category..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 startContent={<Search className="w-4 h-4 text-gray-400" />}
                 classNames={{
                   input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -309,20 +303,40 @@ const CategoryPage = () => {
           </Tabs>
 
           <div className="mt-6">
-            {selectedTab === 'all' && (
-              viewMode === 'grid' ? <KnowledgeGrid /> : <KnowledgeList />
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  {error}
+                </p>
+              </div>
+            ) : selectedTab === 'all' && notes.length === 0 ? (
+              <div className="text-center py-12">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  No notes found in this category.
+                </p>
+              </div>
+            ) : selectedTab === 'all' && (
+              <KnowledgeList notes={notes} />
             )}
             {selectedTab === 'ai-summaries' && (
-              <AISummaries summaries={mockData.summaries} />
+              <AISummaries summaries={summaries} />
             )}
             {selectedTab === 'highlights' && (
-              <Highlights highlights={mockData.highlights} />
+              <Highlights highlights={highlights} />
             )}
             {selectedTab === 'topics' && (
-              <TopicInsights topics={mockData.topics} />
+              <TopicInsights topics={topics} />
             )}
             {selectedTab === 'recent' && (
-              <NotesEditor />
+              <div className="text-center py-12">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  No recent notes found.
+                </p>
+              </div>
             )}
           </div>
         </div>

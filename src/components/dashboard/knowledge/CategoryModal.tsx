@@ -43,14 +43,12 @@ const CategoryModal = ({ isOpen, onClose, category, onSave }: CategoryModalProps
   const handleImageUpload = async (file: File) => {
     if (!currentUser?.id) return;
     setIsUploading(true);
-    setUploadProgress(0);
 
     try {
       // Validate file type
       if (!file.type.startsWith('image/')) {
         alert('Please upload an image file');
         setIsUploading(false);
-        setUploadProgress(0);
         return;
       }
 
@@ -58,7 +56,6 @@ const CategoryModal = ({ isOpen, onClose, category, onSave }: CategoryModalProps
       if (file.size > 5 * 1024 * 1024) {
         alert('File size must be less than 5MB');
         setIsUploading(false);
-        setUploadProgress(0);
         return;
       }
 
@@ -66,8 +63,7 @@ const CategoryModal = ({ isOpen, onClose, category, onSave }: CategoryModalProps
       const fileExt = file.name.split('.').pop();
       const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
 
-      // Start upload
-      setUploadProgress(10);
+      setUploadProgress(30);
 
       const { error: uploadError, data } = await supabase.storage
         .from('category-images')
@@ -77,20 +73,15 @@ const CategoryModal = ({ isOpen, onClose, category, onSave }: CategoryModalProps
 
       if (uploadError) throw uploadError;
 
-      setUploadProgress(75);
+      setUploadProgress(60);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('category-images')
         .getPublicUrl(fileName);
 
-      if (!publicUrl) {
-        throw new Error('Failed to get public URL for uploaded image');
-      }
-
       setImage(publicUrl);
       setUploadProgress(100);
-
       setTimeout(() => {
         setIsUploading(false);
         setUploadProgress(0);
@@ -100,10 +91,6 @@ const CategoryModal = ({ isOpen, onClose, category, onSave }: CategoryModalProps
       alert('Failed to upload image. Please try again.');
       setIsUploading(false);
       setUploadProgress(0);
-      // Clear file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   };
 
@@ -117,44 +104,18 @@ const CategoryModal = ({ isOpen, onClose, category, onSave }: CategoryModalProps
     try {
       if (isUploading) {
         alert('Please wait for image upload to complete');
-        setIsSubmitting(false);
         return;
       }
 
-      // Prepare data for Supabase
-      const categoryData = category 
-        ? {
-            // Update existing category
-            id: category.id,
-            name: name.trim(),
-            description: description.trim() || null,
-            image: image || null,
-            updated_at: new Date().toISOString()
-          }
-        : {
-            // Create new category
-            name: name.trim(),
-            description: description.trim() || null,
-            image: image || null,
-            notes_count: 0,
-            last_updated: new Date().toISOString()
-          };
-
-      await onSave(categoryData);
-
-      // Reset form
-      setName('');
-      setDescription('');
-      setImage('');
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      
+      await onSave({
+        name,
+        description,
+        image
+      });
       onClose();
     } catch (error) {
       console.error('Error saving category:', error);
-      const message = error instanceof Error ? error.message : 'Failed to save category';
-      alert(message);
+      alert('Failed to save category. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

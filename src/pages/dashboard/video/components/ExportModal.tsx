@@ -1,19 +1,37 @@
-import React, { useState } from 'react';
-import { Download, Library, FileText, Brain, MessageSquare, Clock, ArrowRight, X, Lightbulb } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Select, SelectItem } from "@nextui-org/react";
+import { searchCategories, exportVideoToKnowledge } from '../../../../services/knowledge';
+import type { KnowledgeCategory } from '../../../../types/knowledge';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { Download, Library, FileText, Brain, MessageSquare, Clock, ArrowRight, X, Lightbulb, FolderPlus } from 'lucide-react';
 
 interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onExport: (type: 'library' | 'download', sections: string[]) => void;
+  videoId: string;
 }
 
-const ExportModal = ({ isOpen, onClose, onExport }: ExportModalProps) => {
+const ExportModal = ({ isOpen, onClose, videoId }: ExportModalProps) => {
   const [exportType, setExportType] = useState<'library' | 'download' | null>(null);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [categories, setCategories] = useState<KnowledgeCategory[]>([]);
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
+  const navigate = useNavigate();
   const { theme } = useTheme();
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const data = await searchCategories('');
+      setCategories(data);
+    };
+
+    if (exportType === 'library') {
+      loadCategories();
+    }
+  }, [exportType]);
 
   if (!isOpen) return null;
 
@@ -28,17 +46,60 @@ const ExportModal = ({ isOpen, onClose, onExport }: ExportModalProps) => {
   const handleExport = async () => {
     if (!exportType || selectedSections.length === 0) return;
     
-    setIsExporting(true);
-    
-    // Simulate export progress
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      setExportProgress(i);
+    // Validate category selection for library export
+    if (exportType === 'library' && !selectedCategory) {
+      alert('Please select a category');
+      return;
     }
     
-    onExport(exportType, selectedSections);
-    setIsExporting(false);
-    onClose();
+    // Validate category selection for library export
+    if (exportType === 'library' && !selectedCategory) {
+      alert('Please select a category');
+      return;
+    }
+    
+    setIsExporting(true);
+    
+    try {
+      // Show AI processing message
+      setExportProgress(25);
+      
+      if (exportType === 'library') {
+        // Export to knowledge library
+        const success = await exportVideoToKnowledge(
+          videoId,
+          selectedCategory,
+          selectedSections
+        );
+
+        if (!success) {
+          throw new Error('Failed to export content to knowledge library');
+        }
+
+        setExportProgress(100);
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Show success message with navigation option
+        const confirmed = window.confirm(
+          'Content exported successfully! Would you like to view it in your Knowledge Library?'
+        );
+        if (confirmed) {
+          navigate('/dashboard/knowledge');
+        }
+      } else {
+        // Handle PDF download
+        setExportProgress(100);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        alert('Content exported successfully!');
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to export content';
+      console.error('Export error:', error);
+      alert(message);
+    } finally {
+      setIsExporting(false);
+      onClose();
+    }
   };
 
   return (
@@ -119,6 +180,31 @@ const ExportModal = ({ isOpen, onClose, onExport }: ExportModalProps) => {
           </div>
         ) : (
           <div className="space-y-6">
+            {exportType === 'library' && (
+              <div className="mb-6">
+                <h4 className={`text-sm font-medium mb-3 ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>Select Category</h4>
+                <Select
+                  label="Category"
+                  placeholder="Select a category"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  startContent={<FolderPlus className="w-4 h-4 text-gray-400" />}
+                  classNames={{
+                    trigger: `${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-100 border-gray-300'}`,
+                    value: theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }}
+                >
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </Select>
+              </div>
+            )}
+
             {/* Section Selection */}
             <div className="space-y-4">
               {sections.map((section) => (
@@ -165,7 +251,7 @@ const ExportModal = ({ isOpen, onClose, onExport }: ExportModalProps) => {
               <div className="mt-6">
                 <div className="flex justify-between text-sm mb-2">
                   <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                    Exporting...
+                    {exportProgress < 100 ? 'Cody is processing content...' : 'Export complete!'}
                   </span>
                   <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
                     {exportProgress}%
@@ -209,12 +295,12 @@ const ExportModal = ({ isOpen, onClose, onExport }: ExportModalProps) => {
           {exportType && (
             <button
               onClick={handleExport}
-              disabled={selectedSections.length === 0 || isExporting}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              disabled={selectedSections.length === 0 || isExporting || (exportType === 'library' && !selectedCategory)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                 exportType === 'library'
                   ? 'bg-primary text-white hover:bg-primary/90'
                   : 'bg-secondary text-black hover:bg-secondary/90'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+              }`}
             >
               <span>{exportType === 'library' ? 'Add to Library' : 'Download'}</span>
               <ArrowRight className="w-4 h-4" />

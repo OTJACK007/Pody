@@ -4,7 +4,23 @@ import { Share2, Star, Bookmark, ExternalLink, Calendar, Quote, Trash2 } from 'l
 import { useTheme } from '../../../../contexts/ThemeContext';
 import DeleteNoteModal from '../../../../components/dashboard/modals/DeleteNoteModal';
 
-const Highlights = () => {
+interface Highlight {
+  id: string;
+  quote: string;
+  context: string;
+  source_type: string;
+  source_title: string;
+  source_url?: string;
+  timestamp: string;
+  tags: string[];
+  created_at: string;
+}
+
+interface HighlightsProps {
+  highlights: Highlight[];
+}
+
+const Highlights = ({ highlights }: HighlightsProps) => {
   const { theme } = useTheme();
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedHighlight, setSelectedHighlight] = useState(null);
@@ -30,40 +46,9 @@ const Highlights = () => {
     }
   };
 
-  const highlights = [
-    {
-      id: 1,
-      quote: "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-      context: "Discussion on resilience and perseverance in business...",
-      source: {
-        type: 'podcast',
-        title: 'Success Mindset',
-        image: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400',
-        timestamp: '23:45'
-      },
-      tags: ['Motivation', 'Success', 'Mindset'],
-      date: '2024-03-15',
-      isFavorite: true
-    },
-    {
-      id: 2,
-      quote: "Innovation distinguishes between a leader and a follower.",
-      context: "Analysis of leadership qualities in tech industry...",
-      source: {
-        type: 'podcast',
-        title: 'Tech Leadership',
-        image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
-        timestamp: '15:20'
-      },
-      tags: ['Leadership', 'Innovation', 'Technology'],
-      date: '2024-03-14',
-      isFavorite: false
-    }
-  ];
-
   const handleShare = (highlight) => {
     setSelectedHighlight(highlight);
-    const defaultTweet = `💡 "${highlight.quote}"\n\nFrom ${highlight.source.title}\n\n#Insights #Learning`;
+    const defaultTweet = `💡 "${highlight.quote}"\n\nFrom ${highlight.source_title}\n\n#Insights #Learning`;
     setTweetText(defaultTweet);
     setShowShareModal(true);
   };
@@ -77,7 +62,13 @@ const Highlights = () => {
   return (
     <>
     <div className="space-y-4">
-      {highlights.map((highlight) => (
+      {highlights.length === 0 ? (
+        <div className="text-center py-12">
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            No highlights found in this category.
+          </p>
+        </div>
+      ) : highlights.map((highlight) => (
         <Card key={highlight.id} className={`${
           theme === 'dark' 
             ? 'bg-gray-800/50 border-gray-700/50' 
@@ -86,7 +77,7 @@ const Highlights = () => {
           <CardBody className="p-4">
             <div className="flex items-start gap-4">
               <Avatar
-                src={highlight.source.image}
+                src={highlight.source_url}
                 className="flex-shrink-0 w-16 h-16 rounded-lg ring-2 ring-white/20"
               />
               <div className="flex-grow">
@@ -113,13 +104,13 @@ const Highlights = () => {
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                   }`}>
                     <Calendar className="w-4 h-4" />
-                    <span>{highlight.date}</span>
+                    <span>{new Date(highlight.created_at).toLocaleDateString()}</span>
                   </div>
                   <div className={`flex items-center gap-2 text-sm ${
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                   }`}>
                     <Quote className="w-4 h-4" />
-                    <span>at {highlight.source.timestamp}</span>
+                    <span>at {highlight.timestamp}</span>
                   </div>
                   <div className="flex gap-2">
                     {highlight.tags.map((tag) => (
@@ -161,9 +152,9 @@ const Highlights = () => {
                     <Button
                       isIconOnly
                       variant="light"
-                      className={highlight.isFavorite ? 'text-yellow-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
+                      className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}
                     >
-                      <Star className="w-4 h-4" fill={highlight.isFavorite ? 'currentColor' : 'none'} />
+                      <Star className="w-4 h-4" fill="none" />
                     </Button>
                   </div>
                 </div>

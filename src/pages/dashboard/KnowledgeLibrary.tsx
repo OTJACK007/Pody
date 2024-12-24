@@ -1,69 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Library, Plus, Edit3, Trash2, Search } from 'lucide-react';
 import { Card, CardBody, CardHeader, Button, Input } from "@nextui-org/react";
+import DeleteCategoryModal from '../../components/dashboard/modals/DeleteCategoryModal';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useKnowledge } from '../../hooks/useKnowledge';
 import CategoryModal from './knowledge/components/CategoryModal';
 import KnowledgeStats from './knowledge/components/KnowledgeStats';
+import type { KnowledgeCategory } from '../../types/knowledge';
 
 const KnowledgeLibrary = () => {
   const { theme } = useTheme();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingCategory, setEditingCategory] = useState<KnowledgeCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const {
+    categories,
+    isLoading,
+    error,
+    loadCategories,
+    handleCreateCategory,
+    handleUpdateCategory,
+    handleDeleteCategory,
+    handleSearch
+  } = useKnowledge();
 
-  const categories = [
-    {
-      id: 1,
-      name: 'Technology',
-      description: 'Tech insights and innovations',
-      image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
-      notesCount: 45,
-      lastUpdated: '2 hours ago'
-    },
-    {
-      id: 2,
-      name: 'Business',
-      description: 'Business strategies and entrepreneurship',
-      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
-      notesCount: 32,
-      lastUpdated: '1 day ago'
-    },
-    {
-      id: 3,
-      name: 'Personal Growth',
-      description: 'Self-improvement and development',
-      image: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800',
-      notesCount: 28,
-      lastUpdated: '3 days ago'
-    },
-    {
-      id: 4,
-      name: 'Finance',
-      description: 'Investment and money management',
-      image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800',
-      notesCount: 19,
-      lastUpdated: '5 days ago'
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  useEffect(() => {
+    const debounceSearch = setTimeout(() => {
+      handleSearch(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(debounceSearch);
+  }, [searchQuery, handleSearch]);
+
+  const handleModalSave = async (data: {
+    name: string;
+    description?: string;
+    image?: string;
+  }) => {
+    setIsSaving(true);
+    try {
+      if (!currentUser?.id) {
+        throw new Error('You must be logged in to perform this action');
+      }
+
+      if (editingCategory) {
+        const updatedCategory = await handleUpdateCategory(editingCategory.id, {
+          name: data.name,
+          description: data.description || '',
+          image: data.image || '',
+          last_updated: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+        
+        if (!updatedCategory) {
+          throw new Error('Failed to update category');
+        }
+
+        // Refresh categories after update
+        await loadCategories();
+      } else {
+        const newCategory = await handleCreateCategory(
+          data.name,
+          data.description,
+          data.image
+        );
+        
+        if (!newCategory) {
+          throw new Error('Failed to create category');
+        }
+
+        // Refresh categories after create
+        await loadCategories();
+      }
+
+      handleModalClose();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save category';
+      console.error('Error saving category:', message);
+      alert(message);
+    } finally {
+      setIsSaving(false);
     }
-  ];
-
-  const stats = {
-    totalNotes: 124,
-    categories: categories.length,
-    tags: 45,
-    recentlyAdded: 8
   };
 
-  const handleEditCategory = (category: any) => {
+  const stats = {
+    totalNotes: categories.reduce((acc, cat) => acc + cat.notes_count, 0),
+    categories: categories.length || 0,
+    tags: categories.reduce((acc, cat) => acc + (cat.tags?.length || 0), 0),
+    recentlyAdded: categories.filter(cat => 
+      new Date(cat.last_updated).getTime() > Date.now() - 24 * 60 * 60 * 1000
+    ).length
+  };
+
+  const handleEditCategory = (category: KnowledgeCategory) => {
     setEditingCategory(category);
     setShowCategoryModal(true);
   };
 
-  const filteredCategories = categories.filter(category =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    category.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleDeleteConfirm = async (id: string) => {
+    setCategoryToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (categoryToDelete) {
+      await handleDeleteCategory(categoryToDelete);
+      setShowDeleteModal(false);
+      setCategoryToDelete(null);
+    }
+  };
+
+  const handleModalClose = () => {
+    setShowCategoryModal(false);
+    setEditingCategory(null);
+  };
+
+  const handleModalSubmit = async (data: {
+    name: string;
+    description?: string;
+    image?: string;
+  }) => {
+    if (editingCategory) {
+      await handleUpdateCategory(editingCategory.id, data);
+    } else {
+      await handleCreateCategory(data.name, data.description, data.image);
+    }
+    handleModalClose();
+  };
 
   return (
     <div className="space-y-8">
@@ -86,7 +160,9 @@ const KnowledgeLibrary = () => {
           <Input
             placeholder="Search categories..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+            }}
             startContent={<Search className="w-4 h-4 text-gray-400" />}
             classNames={{
               input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -106,10 +182,27 @@ const KnowledgeLibrary = () => {
         </Button>
       </div>
 
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : categories.length === 0 ? (
+        <div className="text-center py-12">
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            {searchQuery ? 'No categories found matching your search.' : 'No categories yet. Create your first one!'}
+          </p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCategories.map((category) => (
+        {categories.map((category) => (
           <Card
-            key={category.id}
+            key={category.id} 
             isPressable
             className={`${
               theme === 'dark'
@@ -123,7 +216,7 @@ const KnowledgeLibrary = () => {
                 <div>
                   <p className={`text-tiny uppercase font-bold ${
                     theme === 'dark' ? 'text-white/60' : 'text-black/60'
-                  }`}>{category.notesCount} Notes</p>
+                  }`}>{category.notes_count} Notes</p>
                   <h4 className={`text-xl font-medium ${
                     theme === 'dark' ? 'text-white' : 'text-black'
                   }`}>{category.name}</h4>
@@ -148,7 +241,7 @@ const KnowledgeLibrary = () => {
                     className="bg-red-500/20 text-red-500"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Handle delete
+                      handleDeleteConfirm(category.id);
                     }}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -168,19 +261,28 @@ const KnowledgeLibrary = () => {
               }`}>{category.description}</p>
               <p className={`text-tiny mt-2 ${
                 theme === 'dark' ? 'text-gray-400' : 'text-gray-300'
-              }`}>Last updated {category.lastUpdated}</p>
+              }`}>Last updated {new Date(category.last_updated).toLocaleDateString()}</p>
             </CardBody>
           </Card>
         ))}
       </div>
+      )}
 
       <CategoryModal
         isOpen={showCategoryModal}
-        onClose={() => {
-          setShowCategoryModal(false);
-          setEditingCategory(null);
-        }}
+        onClose={handleModalClose}
         category={editingCategory}
+        onSave={handleModalSave}
+      />
+      
+      <DeleteCategoryModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCategoryToDelete(null);
+        }}
+        onConfirm={handleDelete}
+        isLoading={isLoading}
       />
     </div>
   );

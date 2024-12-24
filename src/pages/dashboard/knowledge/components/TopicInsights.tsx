@@ -4,10 +4,11 @@ import { Tag, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTheme } from '../../../../contexts/ThemeContext';
 
 interface Topic {
-  id: number;
+  id: string;
   topic_name: string;
   relevance: number;
   insights: string[];
+  created_at: string;
 }
 
 interface TopicInsightsProps {
@@ -20,7 +21,13 @@ const TopicInsights = ({ topics }: TopicInsightsProps) => {
 
   return (
     <div className="space-y-4">
-      {topics.map((topic) => (
+      {topics.length === 0 ? (
+        <div className="text-center py-12">
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+            No topics found in this category.
+          </p>
+        </div>
+      ) : topics.map((topic) => (
         <Card
           key={topic.id}
           className={`${
