@@ -93,3 +93,38 @@ export const uploadChannelImage = async (
     return null;
   }
 };
+
+// Get featured channels
+export const getFeaturedChannels = async (): Promise<UserChannel[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('userchannels')
+      .select('*')
+      .eq('is_shogun_featured', true)
+      .order('channel_name');
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching featured channels:', error);
+    return [];
+  }
+};
+
+// Get featured guests
+export const getFeaturedGuests = async (): Promise<UserChannel[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('userchannels')
+      .select('*')
+      .eq('is_creator', true)
+      .eq('is_shogun_featured', true)
+      .order('channel_name');
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching featured guests:', error);
+    return [];
+  }
+};

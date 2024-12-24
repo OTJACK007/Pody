@@ -1,27 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Users, Star } from 'lucide-react';
 import { Card, CardBody, CardFooter, Button, Avatar, Chip } from "@nextui-org/react";
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import useEmblaCarousel from 'embla-carousel-react';
+import { getFeaturedChannels } from '../../../../services/channel';
+import type { UserChannel } from '../../../../services/channel';
 
 const FeaturedChannels = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const [channels, setChannels] = useState<UserChannel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [emblaRef] = useEmblaCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
     dragFree: true,
   });
 
-  const featuredChannels = [
-    {
-      id: '1',
-      name: 'TechInsights',
-      avatar: 'https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=400',
-      subscribers: '1.2M',
-      rating: 4.8,
-      category: 'Technology',
       verified: true,
       isLive: true,
     },
@@ -61,16 +57,44 @@ const FeaturedChannels = () => {
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
       subscribers: '450K',
       rating: 4.6,
-      category: 'Creativity',
-      verified: true,
-      isLive: false,
-    }
-  ];
+  useEffect(() => {
+    const loadFeaturedChannels = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getFeaturedChannels();
+        setChannels(data);
+      } catch (error) {
+        console.error('Error loading featured channels:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadFeaturedChannels();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (channels.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+          No featured channels available
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-hidden -mx-6" ref={emblaRef}>
       <div className="flex gap-4 px-6 py-4">
-        {featuredChannels.map((channel) => (
+        {channels.map((channel) => (
           <div key={channel.id} className="flex-none w-[300px]">
             <Card className={`${
               theme === 'dark'
@@ -84,9 +108,9 @@ const FeaturedChannels = () => {
                       isBordered
                       radius="lg"
                       size="lg"
-                      src={channel.avatar}
+                      src={channel.profile_image}
                     />
-                    {channel.isLive && (
+                    {channel.is_streaming && (
                       <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-gray-800 rounded-full animate-pulse"></span>
                     )}
                   </div>
@@ -94,8 +118,8 @@ const FeaturedChannels = () => {
                     <div className="flex items-center gap-2">
                       <h3 className={`text-small font-semibold ${
                         theme === 'dark' ? 'text-white' : 'text-gray-900'
-                      }`}>{channel.name}</h3>
-                      {channel.verified && (
+                      }`}>{channel.channel_name}</h3>
+                      {channel.is_verified && (
                         <CheckCircle2 className="w-4 h-4 text-primary" />
                       )}
                     </div>
@@ -103,13 +127,13 @@ const FeaturedChannels = () => {
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                     }`}>
                       <Users className="w-3 h-3" />
-                      <span>{channel.subscribers} subscribers</span>
+                      <span>{channel.subscribers || '0'} subscribers</span>
                     </div>
                     <div className={`flex items-center gap-2 text-tiny ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                     }`}>
                       <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
-                      <span>{channel.rating} rating</span>
+                      <span>{channel.rating || '4.8'} rating</span>
                     </div>
                   </div>
                 </div>
@@ -123,7 +147,7 @@ const FeaturedChannels = () => {
                   }}
                   size="sm"
                 >
-                  {channel.category}
+                  {channel.category || 'Technology'}
                 </Chip>
                 <Button
                   color="success"

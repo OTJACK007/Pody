@@ -407,22 +407,24 @@ export const searchVideos = async (
 ): Promise<Video[]> => {
   try {
     const { data, error } = await supabase.rpc('search_videos', {
-      search_query: query,
-      category_filter: category,
-      type_filter: type
+      search_query: query || '',
+      category_filter: category || null,
+      type_filter: type || null
     });
 
     if (error) throw error;
+    if (!data) return [];
 
-    return data.map(video => ({
+    return data.map((video: any) => ({
       ...video,
       channel: {
-        name: video.channel_name,
-        avatar: video.channel_avatar
+        name: video.channel_name || 'Unknown Channel',
+        avatar: video.channel_avatar || 'https://static.wixstatic.com/media/c67dd6_14b426420ff54c82ad19ed7af43ef12b~mv2.png',
+        verified: video.channel_is_verified || false
       }
     }));
   } catch (error) {
-    console.error('Error searching videos:', error);
+    console.error('Error searching videos:', error instanceof Error ? error.message : error);
     return [];
   }
 };

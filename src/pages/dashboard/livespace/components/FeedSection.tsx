@@ -19,6 +19,31 @@ interface FeedSectionProps {
   onVideoClick: (videoId: string) => void;
 }
 
+const getPlatformIcon = (platform: string): string => {
+  switch (platform) {
+    case 'Shogun Live':
+      return 'https://static.wixstatic.com/media/c67dd6_13666aed622048b3b2f3a929081c486f~mv2.png';
+    case 'YouTube':
+      return 'https://static.wixstatic.com/media/c67dd6_f8c1be01d8b64398b3e2b57ac4d8cbfb~mv2.png';
+    case 'X':
+      return 'https://static.wixstatic.com/media/c67dd6_a7b28b585b034f56ad6ab32232e745fc~mv2.webp';
+    case 'TikTok':
+      return 'https://static.wixstatic.com/media/c67dd6_669a072e9da540e3aef4ab2262eb8693~mv2.png';
+    case 'Instagram':
+      return 'https://static.wixstatic.com/media/c67dd6_b9fe6adb4004453a9db57fe97cd4d6aa~mv2.png';
+    case 'LinkedIn':
+      return 'https://static.wixstatic.com/media/c67dd6_bb44a9fdef4e4fabbbbbad4f88a24540~mv2.webp';
+    case 'Facebook':
+      return 'https://static.wixstatic.com/media/c67dd6_e11a6a0bb99345839dbdc7cf12357c0b~mv2.png';
+    case 'Twitch':
+      return 'https://static.wixstatic.com/media/c67dd6_089d6bbd564f44d283886219447b54da~mv2.png';
+    case 'Kick':
+      return 'https://static.wixstatic.com/media/c67dd6_39dedfcfc65b4375a61bf0e763ac8447~mv2.png';
+    default:
+      return 'https://static.wixstatic.com/media/c67dd6_13666aed622048b3b2f3a929081c486f~mv2.png';
+  }
+};
+
 const FeedSection = ({ 
   selectedGenre, 
   onGenreChange,
@@ -104,6 +129,46 @@ const FeedSection = ({
     'Motivation',
     'Entertainment'
   ];
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Perform search when debounced query changes
+  useEffect(() => {
+    const performSearch = async () => {
+      if (!debouncedQuery) {
+        setSearchResults([]);
+        return;
+      }
+      
+      setIsSearching(true);
+      try {
+        const { data, error } = await supabase.rpc(
+          'search_videos',
+          {
+            search_query: debouncedQuery,
+            category_filter: selectedGenre === 'Trending' ? null : selectedGenre,
+            type_filter: shortsMode ? 'short' : 'video'
+          }
+        );
+
+        if (error) throw error;
+        setSearchResults(data || []);
+      } catch (error) {
+        console.error('Error searching videos:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    performSearch();
+  }, [debouncedQuery, selectedGenre, shortsMode]);
 
   return (
     <div>
@@ -122,7 +187,12 @@ const FeedSection = ({
             className="w-[400px]"
             placeholder={`Search ${shortsMode ? 'shorts' : 'videos'}...`}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (!e.target.value) {
+                setSearchResults([]);
+              }
+            }}
             startContent={<Search className="w-4 h-4 text-gray-400" />}
             classNames={{
               input: `${theme === 'dark' ? 'bg-gray-700/50 text-white' : 'bg-gray-100 text-gray-900'}`,
@@ -224,13 +294,16 @@ const FeedSection = ({
                     <h3 className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
                       {item.title}
                     </h3>
-                    <div className={`flex items-center space-x-2 text-sm ${
+                    <div className={`flex items-center gap-2 text-sm ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                     }`}>
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        <span>{item.views} views</span>
-                      </div>
+                      <img 
+                        src={getPlatformIcon(item.linkedplatform || 'Shogun Live')} 
+                        alt={item.linkedplatform || 'Shogun Live'}
+                        className="w-4 h-4"
+                      />
+                      <Eye className="w-4 h-4" />
+                      <span>{item.views} views</span>
                     </div>
                   </div>
                 </div>
@@ -316,9 +389,18 @@ const FeedSection = ({
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
-                        <Eye className="w-3 h-3" />
-                        <span>{item.views} views</span>
+                      <div className={`flex items-center gap-2 text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        <img 
+                          src={getPlatformIcon(item.linkedplatform || 'Shogun Live')} 
+                          alt={item.linkedplatform || 'Shogun Live'}
+                          className="w-4 h-4"
+                        />
+                        <div className="flex items-center gap-1">
+                          <Eye className="w-4 h-4" />
+                          <span>{item.views} views</span>
+                        </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <span className={`text-sm px-2 py-1 rounded-full ${
