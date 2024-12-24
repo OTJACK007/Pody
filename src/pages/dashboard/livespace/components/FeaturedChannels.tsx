@@ -18,45 +18,6 @@ const FeaturedChannels = () => {
     dragFree: true,
   });
 
-      verified: true,
-      isLive: true,
-    },
-    {
-      id: '2',
-      name: 'MindsetGuru',
-      avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400',
-      subscribers: '850K',
-      rating: 4.9,
-      category: 'Personal Growth',
-      verified: true,
-      isLive: false,
-    },
-    {
-      id: '3',
-      name: 'BusinessPro',
-      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
-      subscribers: '620K',
-      rating: 4.7,
-      category: 'Business',
-      verified: true,
-      isLive: false,
-    },
-    {
-      id: '4',
-      name: 'FitLife',
-      avatar: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400',
-      subscribers: '920K',
-      rating: 4.8,
-      category: 'Fitness',
-      verified: true,
-      isLive: true,
-    },
-    {
-      id: '5',
-      name: 'CreativeMinds',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-      subscribers: '450K',
-      rating: 4.6,
   useEffect(() => {
     const loadFeaturedChannels = async () => {
       setIsLoading(true);
@@ -76,14 +37,14 @@ const FeaturedChannels = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 rounded-full border-primary border-t-transparent animate-spin"></div>
       </div>
     );
   }
 
   if (channels.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="py-12 text-center">
         <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
           No featured channels available
         </p>
@@ -92,7 +53,7 @@ const FeaturedChannels = () => {
   }
 
   return (
-    <div className="overflow-hidden -mx-6" ref={emblaRef}>
+    <div className="-mx-6 overflow-hidden" ref={emblaRef}>
       <div className="flex gap-4 px-6 py-4">
         {channels.map((channel) => (
           <div key={channel.id} className="flex-none w-[300px]">
@@ -101,7 +62,7 @@ const FeaturedChannels = () => {
                 ? 'bg-gray-800/50 border-gray-700'
                 : 'bg-white border-gray-200'
             } border`}>
-              <CardBody className="overflow-visible p-4">
+              <CardBody className="p-4 overflow-visible">
                 <div className="flex gap-4">
                   <div className="relative">
                     <Avatar
@@ -111,7 +72,7 @@ const FeaturedChannels = () => {
                       src={channel.profile_image}
                     />
                     {channel.is_streaming && (
-                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-gray-800 rounded-full animate-pulse"></span>
+                      <span className="absolute w-4 h-4 bg-red-500 border-2 border-gray-800 rounded-full -top-1 -right-1 animate-pulse"></span>
                     )}
                   </div>
                   <div className="flex flex-col gap-1">
@@ -132,7 +93,7 @@ const FeaturedChannels = () => {
                     <div className={`flex items-center gap-2 text-tiny ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                     }`}>
-                      <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
                       <span>{channel.rating || '4.8'} rating</span>
                     </div>
                   </div>
