@@ -62,43 +62,41 @@ const FeaturedChannels = () => {
                 ? 'bg-gray-800/50 border-gray-700'
                 : 'bg-white border-gray-200'
             } border`}>
-              <CardBody className="p-4 overflow-visible">
-                <div className="flex gap-4">
-                  <div className="relative">
-                    <Avatar
-                      isBordered
-                      radius="lg"
-                      size="lg"
-                      src={channel.profile_image}
-                    />
-                    {channel.is_streaming && (
-                      <span className="absolute w-4 h-4 bg-red-500 border-2 border-gray-800 rounded-full -top-1 -right-1 animate-pulse"></span>
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className={`text-small font-semibold ${
-                        theme === 'dark' ? 'text-white' : 'text-gray-900'
-                      }`}>{channel.channel_name}</h3>
-                      {channel.is_verified && (
-                        <CheckCircle2 className="w-4 h-4 text-primary" />
-                      )}
-                    </div>
-                    <div className={`flex items-center gap-2 text-tiny ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                    }`}>
-                      <Users className="w-3 h-3" />
-                      <span>{channel.subscribers || '0'} subscribers</span>
-                    </div>
-                    <div className={`flex items-center gap-2 text-tiny ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                    }`}>
-                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                      <span>{channel.rating || '4.8'} rating</span>
-                    </div>
-                  </div>
-                </div>
-              </CardBody>
+              <CardBody className="p-0">
+  <div className="relative w-full h-[168px]">
+    <img
+      src={channel.banner_image || channel.profile_image}
+      alt={channel.channel_name}
+      className="w-full h-full object-cover"
+    />
+    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+    <div className="absolute bottom-4 left-4 right-4">
+      <div className="flex items-center gap-3">
+        <div className="relative">
+          <Avatar
+            src={channel.profile_image}
+            className="ring-2 ring-white/20"
+            size="lg"
+          />
+          {channel.is_streaming && (
+            <span className="absolute w-3 h-3 bg-red-500 border-2 border-gray-800 rounded-full top-0.5 right-1 animate-pulse"></span>
+          )}
+        </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="text-white font-semibold">{channel.channel_name}</h3>
+            {channel.is_verified && (
+              <CheckCircle2 className="w-4 h-4 text-primary" />
+            )}
+          </div>
+          <p className="text-sm text-gray-300">
+            {channel.description || `${channel.subscribers || '0'} subscribers`}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</CardBody>
               <CardFooter className="justify-between">
                 <Chip
                   variant="flat"

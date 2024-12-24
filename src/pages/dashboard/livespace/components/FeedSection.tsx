@@ -287,9 +287,7 @@ const FeedSection = ({
                       <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
                         {item.channel?.name}
                       </span>
-                      {item.channel?.verified && (
                         <CheckCircle2 className="w-4 h-4 text-primary" />
-                      )}
                     </div>
                     <h3 className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>
                       {item.title}
@@ -381,10 +379,8 @@ const FeedSection = ({
                       <div className="flex items-center gap-2">
                         <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
                           {item.channel?.name}
-                        </span>
-                        {item.channel?.verified && (
+                        </span> 
                           <CheckCircle2 className="w-3 h-3 text-primary" />
-                        )}
                       </div>
                     </div>
                     
